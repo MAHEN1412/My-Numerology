@@ -1,0 +1,2626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Numerology Calculator — Driver Number, Conductor Number and Lo Shu Grid</title>
+<meta name="description" content="Free Vedic numerology calculator. Discover your Driver Number (Mulank), Conductor Number (Bhagyank), and Lo Shu Grid from your date of birth, with detailed interpretations and videos.">
+<meta property="og:title" content="Numerology Calculator — Discover What Your Birth Date Reveals">
+<meta property="og:description" content="Calculate your Driver Number (Mulank), Conductor Number (Bhagyank), and Lo Shu Grid from your date of birth.">
+<meta property="og:type" content="website">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0A0C18">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Numerology">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Vedic Numerology Calculator",
+  "applicationCategory": "LifestyleApplication",
+  "description": "Calculates Driver Number (Mulank), Conductor Number (Bhagyank), and Lo Shu Grid from a date of birth.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+<style>
+  :root{
+    --navy:#0A0C18; --navy-2:#12142B; --surface:#181B38; --surface-2:#1F2347;
+    --border:rgba(255,255,255,0.08); --border-strong:rgba(255,255,255,0.16);
+    --indigo:#7C6FF0; --violet:#9D7BFF; --gold:#D4AF6A;
+    --text:#F3F1FA; --text-dim:#B7B2D6; --text-muted:#7B7699;
+    --danger:#F0836B; --danger-bg:rgba(240,131,107,0.12);
+    --glow: radial-gradient(circle, rgba(157,123,255,0.28), transparent 70%);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;} }
+  body{margin:0;background:var(--navy);color:var(--text);font-family:'Inter',sans-serif;line-height:1.6;}
+  h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:600;margin:0;color:var(--text);}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+  a{color:var(--violet);}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 24px;}
+  button{font-family:'Inter',sans-serif;cursor:pointer;}
+  button:focus-visible, input:focus-visible, a:focus-visible{outline:2px solid var(--violet);outline-offset:2px;}
+
+  .hero{position:relative;padding:96px 24px 80px;text-align:center;overflow:hidden;}
+  .hero:before{content:'';position:absolute;top:-20%;left:50%;transform:translateX(-50%);width:900px;height:900px;background:var(--glow);pointer-events:none;}
+  .hero-inner{position:relative;max-width:640px;margin:0 auto;}
+  .kicker{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;}
+  .hero h1{font-size:clamp(32px,5vw,50px);line-height:1.15;letter-spacing:-0.01em;}
+  .hero p.lead{color:var(--text-dim);font-size:16px;margin-top:16px;}
+
+  .sacred-lines{position:absolute;inset:0;opacity:0.15;pointer-events:none;}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;}
+
+  #dobSection{padding:0 24px 64px;}
+  .dob-card{max-width:480px;margin:-40px auto 0;position:relative;box-shadow:0 30px 60px -30px rgba(0,0,0,0.6);}
+  .dob-card h2{font-size:24px;text-align:center;margin-bottom:8px;}
+  .dob-card p{text-align:center;color:var(--text-dim);font-size:14px;margin:0 0 24px;}
+  .field label{display:block;font-size:13px;font-weight:500;margin-bottom:8px;color:var(--text);}
+  .field input[type="date"], .field input[type="text"]{
+    width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;
+    padding:13px 14px;color:var(--text);font-size:16px;font-family:'Inter',sans-serif;color-scheme:dark;
+  }
+  .field input[type="text"]::placeholder{color:var(--text-muted);}
+  .field input:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(157,123,255,0.2);}
+  .field-error{color:var(--danger);font-size:13px;margin-top:8px;display:none;}
+  .field-error.show{display:block;}
+
+  .calc-btn{
+    width:100%;margin-top:20px;background:linear-gradient(135deg,var(--indigo),var(--violet));
+    color:#fff;border:none;border-radius:10px;padding:15px;font-size:15px;font-weight:600;
+    transition:transform .15s ease, opacity .15s ease;
+  }
+  .calc-btn:hover{opacity:0.92;}
+  .calc-btn:active{transform:scale(0.98);}
+  .calc-btn:disabled{opacity:0.6;cursor:default;}
+
+  .system-toggle{display:inline-flex;border:1px solid var(--border-strong);border-radius:8px;overflow:hidden;}
+  .system-toggle button{border:none;border-radius:0;padding:8px 14px;font-size:13px;background:var(--navy-2);color:var(--text);}
+  .system-toggle button.active{background:var(--indigo);color:#fff;}
+
+  #resultsRoot{display:none;}
+  section.block, details.block{padding:56px 0;border-top:1px solid var(--border);}
+  .section-accordion-summary{list-style:none;cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-dim,var(--gold));display:flex;align-items:center;justify-content:space-between;padding-right:4px;}
+  .section-accordion-summary::-webkit-details-marker{display:none;}
+  .section-accordion-summary::after{content:'+';font-size:20px;font-weight:400;color:var(--text-muted);transition:transform .2s;flex-shrink:0;margin-left:12px;}
+  details.section-accordion[open] > .section-accordion-summary::after{content:'\2212';}
+  .section-accordion-summary:hover{color:var(--gold);}
+  .section-accordion-body{margin-top:20px;}
+  .news-panel{display:grid;gap:10px;}
+  .news-item{display:block;padding:12px 16px;background:var(--surface);border:1px solid var(--border-strong);border-radius:8px;color:var(--text);text-decoration:none;font-size:14px;transition:border-color .15s;}
+  .news-item:hover{border-color:var(--gold);}
+  .news-item .news-meta{display:block;font-size:11px;color:var(--text-muted);margin-top:4px;}
+  .saved-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .saved-table th{text-align:left;padding:10px 12px;color:var(--text-dim);font-weight:600;border-bottom:1px solid var(--border-strong);}
+  .saved-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+  .saved-table textarea{width:100%;min-height:50px;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:6px;color:var(--text);font-size:12px;padding:6px;font-family:inherit;}
+  .saved-table .row-actions{display:flex;gap:8px;white-space:nowrap;}
+  .saved-table .row-actions button{background:none;border:1px solid var(--border-strong);border-radius:6px;padding:4px 10px;color:var(--text-dim);font-size:12px;cursor:pointer;}
+  .saved-table .row-actions button:hover{color:var(--gold);border-color:var(--gold);}
+  .common-numbers-grid{display:flex;gap:24px;flex-wrap:wrap;}
+  .common-numbers-col h4{font-size:13px;color:var(--text-dim);margin-bottom:8px;}
+  .common-numbers-col .cn-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px;}
+  .common-numbers-col .cn-num{width:22px;height:22px;border-radius:50%;background:var(--gold);color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;}
+  .dashboard-layout{display:grid;grid-template-columns:220px 1fr;gap:32px;align-items:start;}
+  @media (max-width:800px){.dashboard-layout{grid-template-columns:1fr;}}
+  .dashboard-sidebar{display:flex;flex-direction:column;gap:8px;position:sticky;top:24px;}
+  .sidebar-link{display:block;padding:12px 16px;background:var(--surface);border:1px solid var(--border-strong);border-radius:8px;color:var(--text);text-decoration:none;font-size:14px;font-weight:600;text-align:left;cursor:pointer;font-family:inherit;}
+  .sidebar-link:hover{border-color:var(--gold);color:var(--gold);}
+  .sidebar-stat{padding:16px;text-align:center;background:var(--navy-2);border-radius:8px;margin:8px 0;}
+  .sidebar-stat-num{display:block;font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--gold);}
+  .sidebar-stat-label{display:block;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;}
+  .sidebar-logout{color:var(--text-muted);}
+  section.block:first-of-type{border-top:none;}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin:0 0 16px;}
+
+  .reveal{opacity:0;transform:translateY(12px);animation:revealIn 0.5s ease forwards;}
+  @keyframes revealIn{to{opacity:1;transform:translateY(0);}}
+
+  .primary-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .primary-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:26px 20px;
+    text-align:center;cursor:pointer;transition:border-color .15s ease, transform .15s ease;
+  }
+  .primary-card:hover{border-color:var(--border-strong);transform:translateY(-2px);}
+  .primary-card .pc-label{font-size:12px;color:var(--text-muted);margin-bottom:10px;}
+  .primary-card .pc-value{font-size:48px;font-weight:700;color:var(--gold);font-family:'Cormorant Garamond',serif;line-height:1;}
+  .primary-card .pc-alt{font-size:12px;color:var(--text-dim);margin-top:10px;}
+  .primary-card .pc-hint{font-size:11px;color:var(--text-muted);margin-top:12px;}
+
+  .calc-panel{
+    max-height:0;overflow:hidden;transition:max-height .35s ease;background:var(--navy-2);
+    border:1px solid var(--border);border-radius:12px;margin-top:16px;
+  }
+  .calc-panel.open{max-height:400px;}
+  .calc-panel-inner{padding:18px 20px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text-dim);white-space:pre-wrap;line-height:1.9;text-align:left;}
+
+  .loshu-wrap{display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start;}
+  .loshu-grid{display:grid;grid-template-columns:repeat(3,88px);grid-template-rows:repeat(3,88px);gap:2px;background:var(--border);border:1px solid var(--border-strong);border-radius:12px;overflow:hidden;}
+  .loshu-cell{background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;color:inherit;padding:0;transition:background .15s ease;}
+  .loshu-cell:hover{background:var(--surface-2);}
+  .loshu-cell .digits{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;max-width:76px;}
+  .loshu-cell .d{font-size:26px;font-weight:700;color:var(--gold);font-family:'Cormorant Garamond',serif;}
+  .loshu-cell.repeated .d{animation:pulse 2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.55;}}
+  .loshu-cell.missing{color:var(--text-muted);font-size:20px;font-family:'JetBrains Mono',monospace;}
+  .tab7-layout{display:grid;grid-template-columns:380px 1fr;gap:24px;align-items:start;}
+  @media (max-width:860px){.tab7-layout{grid-template-columns:1fr;}}
+  .subtabs-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+  .subtab-btn{background:var(--surface);border:1px solid var(--border-strong);border-radius:8px;padding:8px 14px;color:var(--text-dim);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;}
+  .subtab-btn.active{background:var(--gold);color:var(--navy);border-color:var(--gold);}
+  .subtab-btn .close-x{opacity:.6;font-size:12px;padding:0 2px;}
+  .subtab-btn .close-x:hover{opacity:1;}
+  .loshu-legend{display:flex;gap:16px;margin-top:14px;font-size:12px;color:var(--text-dim);flex-wrap:wrap;}
+  .loshu-legend span{display:inline-flex;align-items:center;gap:6px;}
+  .swatch{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .loshu-summary{flex:1;min-width:220px;}
+  .taglist{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+  .tag{font-family:'JetBrains Mono',monospace;font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);color:var(--text-dim);}
+  .tag.present{border-color:var(--gold);color:var(--gold);}
+  .tag.repeat{border-color:var(--danger);color:var(--danger);}
+  .sumline{margin-top:18px;}
+  .sumline .k{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;}
+  #loshuInfo{margin-top:16px;padding:14px 16px;background:var(--navy-2);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--text-dim);display:none;}
+  #loshuInfo.show{display:block;}
+
+  .interp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+  .interp-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;}
+  .interp-card .num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--gold);}
+  .interp-card .nm{font-size:14px;font-weight:600;margin:4px 0 8px;}
+  .interp-card p{font-size:13px;color:var(--text-dim);margin:0 0 8px;}
+  .interp-card .lbl{font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:4px;}
+
+  .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .profile-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;}
+  .profile-card .ph-num{font-size:56px;font-weight:700;color:var(--gold);font-family:'Cormorant Garamond',serif;line-height:1;}
+  .profile-card .ph-name{font-size:20px;font-weight:600;margin:6px 0 4px;}
+  .profile-card .ph-meaning{font-size:13px;color:var(--text-dim);margin-bottom:18px;}
+  .profile-card h4{font-size:12px;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin:16px 0 8px;font-family:'Inter',sans-serif;font-weight:600;}
+  .profile-card ul{margin:0;padding-left:18px;font-size:14px;color:var(--text-dim);}
+  .profile-card li{margin-bottom:4px;}
+  .profile-card p{font-size:14px;color:var(--text-dim);margin:0;}
+  .lucky-row{display:flex;gap:20px;margin-top:16px;}
+  .lucky-item{font-size:13px;color:var(--text-dim);}
+  .lucky-item b{color:var(--text);}
+
+  .combo-card{background:linear-gradient(135deg, rgba(124,111,240,0.12), rgba(157,123,255,0.06));border:1px solid var(--border-strong);border-radius:16px;padding:28px;}
+  .combo-card h3{font-size:20px;margin-bottom:12px;}
+  .combo-card p{font-size:14px;color:var(--text-dim);margin:0 0 10px;}
+
+  .video-section{margin-bottom:36px;}
+  .video-section h3{font-size:18px;margin-bottom:14px;}
+  .video-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
+  .video-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;text-align:left;padding:0;color:inherit;border-width:1px;cursor:pointer;}
+  .video-card .thumb{position:relative;aspect-ratio:16/9;background:var(--navy-2);}
+  .video-card .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .video-card .play-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,12,24,0.25);}
+  .video-card .play-icon svg{width:36px;height:36px;}
+  .video-card .vmeta{padding:12px 14px;}
+  .video-card .vtitle{font-size:13px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .video-card .vchannel{font-size:12px;color:var(--text-muted);}
+  .video-card .vdate{font-size:11px;color:var(--text-muted);margin-top:2px;}
+  .video-empty, .video-warning{font-size:13px;color:var(--text-muted);padding:14px 0;}
+  .video-warning{color:var(--gold);}
+
+  .ref-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
+  .ref-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+  .ref-card .ref-label{font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--gold);margin-bottom:6px;}
+  .ref-card h4{font-size:16px;margin-bottom:8px;}
+  .ref-card p{font-size:13px;color:var(--text-dim);margin:0 0 12px;}
+  .ref-card .ref-source{font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;}
+  .ref-card a{font-size:12px;}
+  .ref-empty{font-size:13px;color:var(--text-muted);}
+
+  .field input[type="file"]{
+    width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;
+    padding:10px 12px;color:var(--text-dim);font-size:14px;font-family:'Inter',sans-serif;
+  }
+  .book-item{display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+  .book-item .bi-title{font-size:14px;font-weight:600;color:var(--text);}
+  .book-item .bi-meta{font-size:12px;color:var(--text-muted);margin-top:2px;}
+  .book-item button{padding:6px 12px;font-size:12px;color:var(--danger);border-color:var(--danger);background:transparent;}
+  .book-empty{font-size:13px;color:var(--text-muted);}
+
+  .insight-topic{margin-bottom:28px;}
+  .insight-topic h3{font-size:16px;margin-bottom:4px;}
+  .insight-topic .source-count{font-size:12px;color:var(--gold);margin-bottom:12px;}
+  .insight-book{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;}
+  .insight-book .ib-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;}
+  .insight-book .ib-author{font-size:12px;color:var(--text-muted);margin-bottom:10px;}
+  .insight-excerpt{font-size:13px;color:var(--text-dim);border-left:2px solid var(--border-strong);padding-left:12px;margin-bottom:8px;}
+  .insight-excerpt .ie-page{font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;}
+  .insight-none{font-size:13px;color:var(--text-muted);}
+
+  .candidate-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:16px;}
+  .candidate-card.top-pick{border-color:var(--gold);background:linear-gradient(135deg, rgba(212,175,106,0.08), transparent);}
+  .candidate-card .cc-number{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600;letter-spacing:0.03em;}
+  .candidate-card .cc-badge{font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--gold);margin-bottom:4px;}
+  .candidate-card .cc-score{font-size:24px;font-weight:700;color:var(--gold);font-family:'Cormorant Garamond',serif;}
+  .candidate-card .cc-score-label{font-size:10px;color:var(--text-muted);text-align:center;margin-top:2px;}
+  .candidate-detail{margin-top:10px;font-size:12px;color:var(--text-dim);}
+
+  .tab-nav{display:flex;gap:8px;padding:20px 0 0;border-bottom:1px solid var(--border);}
+  .tab-btn{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:14px;font-weight:600;padding:12px 4px;margin-right:24px;cursor:pointer;}
+  .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+  .tab-btn:hover:not(.active){color:var(--text-dim);}
+  .candidate-detail div{margin-bottom:3px;}
+  .mobile-analysis-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+
+  .swatch-item{display:inline-flex;flex-direction:column;align-items:center;gap:6px;margin-right:14px;margin-bottom:10px;}
+  .swatch-circle{width:36px;height:36px;border-radius:50%;border:1px solid var(--border-strong);}
+  .swatch-label{font-size:11px;color:var(--text-dim);text-align:center;max-width:70px;}
+  .swatch-source{font-size:10px;color:var(--text-muted);text-align:center;max-width:90px;}
+  .number-color-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:12px;}
+  .number-color-card .ncc-label{font-size:12px;color:var(--gold);margin-bottom:10px;}
+  .fav-num-item{display:inline-flex;flex-direction:column;align-items:center;background:var(--surface);border:1px solid var(--gold);border-radius:10px;padding:10px 14px;margin:0 8px 8px 0;min-width:60px;}
+  .fav-num-item .fn-num{font-size:20px;font-weight:700;color:var(--gold);font-family:'Cormorant Garamond',serif;}
+  .fav-num-item .fn-reason{font-size:10px;color:var(--text-muted);text-align:center;margin-top:4px;max-width:110px;}
+  .chal-num-item{border-color:var(--danger);}
+  .chal-num-item .fn-num{color:var(--danger);}
+  .compare-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:16px;}
+  .compare-table th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border-strong);color:var(--text-secondary);font-weight:500;font-size:12px;}
+  .compare-table td{padding:8px 10px;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;}
+  .compare-label{padding:2px 8px;border-radius:6px;font-size:11px;font-family:'Inter',sans-serif;}
+  .compare-label.Favorable{background:var(--accent-light, rgba(212,175,106,0.15));color:var(--gold);}
+  .compare-label.Neutral{background:rgba(255,255,255,0.06);color:var(--text-dim);}
+  .compare-label.Challenging{background:rgba(240,131,107,0.12);color:var(--danger);}
+
+  .crystal-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;}
+  .crystal-card.Compatible{border-color:var(--gold);}
+  .crystal-card.Avoid{border-color:var(--danger);opacity:0.85;}
+  .crystal-card .cr-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .crystal-card .cr-name{font-size:16px;font-weight:600;}
+  .crystal-card .cr-stars{font-size:14px;letter-spacing:1px;}
+  .crystal-card .cr-label{font-size:11px;padding:2px 8px;border-radius:6px;margin-left:8px;}
+  .crystal-card .cr-label.Compatible{background:rgba(212,175,106,0.15);color:var(--gold);}
+  .crystal-card .cr-label.Neutral{background:rgba(255,255,255,0.06);color:var(--text-dim);}
+  .crystal-card .cr-label.Avoid{background:rgba(240,131,107,0.12);color:var(--danger);}
+  .crystal-card .cr-reasons{font-size:12px;color:var(--text-dim);}
+  .crystal-card .cr-reasons div{margin-bottom:3px;}
+
+  .name-compare-card{background:var(--navy-2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+  .name-compare-card .nc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+  .name-compare-card .nc-name{font-size:14px;font-weight:600;}
+  .name-compare-card .nc-numbers{font-size:11px;color:var(--text-muted);margin-bottom:6px;}
+  .name-compare-card .nc-reasons{font-size:12px;color:var(--text-dim);}
+  .name-compare-card .nc-reasons div{margin-bottom:2px;}
+
+  .skeleton-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
+  .skeleton-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+  .skeleton-thumb{aspect-ratio:16/9;background:linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%);background-size:200% 100%;animation:shimmer 1.4s ease infinite;}
+  @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+  .skeleton-line{height:10px;background:var(--surface-2);border-radius:4px;margin:12px 14px;}
+  .loading-note{font-size:13px;color:var(--text-dim);margin-bottom:14px;}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(6,7,15,0.8);display:none;align-items:center;justify-content:center;z-index:100;padding:24px;}
+  .modal-overlay.open{display:flex;}
+  .modal-box{background:var(--navy-2);border-radius:14px;max-width:720px;width:100%;overflow:hidden;border:1px solid var(--border-strong);}
+  .modal-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border);}
+  .modal-header .mtitle{font-size:14px;font-weight:600;}
+  .modal-close{background:none;border:none;color:var(--text-dim);font-size:20px;line-height:1;padding:4px 8px;}
+  .modal-player{aspect-ratio:16/9;background:#000;}
+  .modal-player iframe{width:100%;height:100%;border:0;}
+  .modal-footer{padding:14px 18px;font-size:13px;}
+
+  .disclaimer{font-size:12px;color:var(--text-muted);text-align:center;padding:40px 24px;max-width:600px;margin:0 auto;}
+  footer{border-top:1px solid var(--border);padding:32px 24px;text-align:center;color:var(--text-muted);font-size:12px;}
+
+  @media (max-width:720px){
+    .primary-cards{grid-template-columns:1fr;}
+    .profile-grid{grid-template-columns:1fr;}
+    .loshu-grid{grid-template-columns:repeat(3,72px);grid-template-rows:repeat(3,72px);}
+    .video-row{grid-auto-flow:column;grid-auto-columns:80%;overflow-x:auto;grid-template-columns:none;padding-bottom:8px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="sacred-lines" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <p class="kicker">Vedic numerology calculator</p>
+    <h1>Discover what your birth date reveals</h1>
+    <p class="lead">Calculate your Driver Number (Mulank), Conductor Number (Bhagyank), and full Lo Shu Grid analysis &mdash; with videos matched to your exact numbers.</p>
+  </div>
+</header>
+
+<div class="wrap" style="padding-top:0;">
+  <div class="tab-nav" id="tabNav">
+    <button type="button" class="tab-btn active" data-tab="tab0">Dashboard</button>
+    <button type="button" class="tab-btn" data-tab="tab1">Lo Shu Numerology</button>
+    <button type="button" class="tab-btn" data-tab="tab2">Mobile Compatibility</button>
+    <button type="button" class="tab-btn" data-tab="tab3">Crystal Compatibility</button>
+    <button type="button" class="tab-btn" data-tab="tab4">Business Name</button>
+    <button type="button" class="tab-btn" data-tab="tab5">Number Compatibility</button>
+    <button type="button" class="tab-btn" data-tab="tab6">Relationship Match</button>
+    <button type="button" class="tab-btn" data-tab="tab7">Name correction Lo shu</button>
+    <button type="button" class="tab-btn" data-tab="tab9">Numerology News</button>
+  </div>
+</div>
+
+<div id="tab0Content">
+  <header class="hero" style="padding-top:56px;padding-bottom:56px;">
+    <div class="sacred-lines" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <p class="kicker">Dashboard</p>
+      <h1>Your saved profiles</h1>
+      <p class="lead">Password-protected. Click "Save to Dashboard" on any tab after calculating to keep a record here.</p>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-bottom:56px;">
+    <div id="dashboardLoginGate" class="card" style="max-width:380px;margin:0 auto;">
+      <h2 style="font-size:18px;margin-bottom:16px;">Dashboard login</h2>
+      <div class="field">
+        <label for="dashboardPasswordInput">Password</label>
+        <input type="password" id="dashboardPasswordInput">
+      </div>
+      <div class="field-error" id="dashboardLoginError" role="alert"></div>
+      <button class="calc-btn" id="dashboardLoginBtn">Log in</button>
+    </div>
+
+    <div id="dashboardContent" style="display:none;">
+      <div class="dashboard-layout">
+        <aside class="dashboard-sidebar">
+          <a href="/admin.html" target="_blank" rel="noopener" class="sidebar-link">Manage Books</a>
+          <a href="#" id="dashboardNewsLink" class="sidebar-link">Numerology News</a>
+          <div class="sidebar-stat">
+            <span class="sidebar-stat-num" id="sidebarTotalCount">0</span>
+            <span class="sidebar-stat-label">saved profiles</span>
+          </div>
+          <button type="button" class="sidebar-link sidebar-logout" id="dashboardLogoutBtn">Log out</button>
+        </aside>
+
+        <div class="dashboard-main">
+          <p class="eyebrow" style="margin-bottom:12px;">Common numbers across your saved profiles</p>
+          <div id="commonNumbersPanel">
+            <p style="font-size:13px;color:var(--text-dim);">Save a few profiles to see patterns here.</p>
+          </div>
+
+          <p class="eyebrow" style="margin:32px 0 12px;">Saved profiles</p>
+          <div id="savedProfilesTable">
+            <p style="font-size:13px;color:var(--text-dim);">No profiles saved yet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tab9Content" style="display:none;">
+  <header class="hero" style="padding-top:56px;padding-bottom:56px;">
+    <div class="sacred-lines" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <p class="kicker">News</p>
+      <h1>Numerology &amp; crystal news</h1>
+      <p class="lead">Headlines only, linking to the original source &mdash; nothing reproduced here.</p>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-bottom:56px;">
+    <div id="newsPanel" class="news-panel">
+      <p class="loading-note">Loading news&hellip;</p>
+    </div>
+  </div>
+</div>
+
+<div id="tab1Content" style="display:none;">
+<div id="dobSection">
+  <div class="card dob-card">
+    <h2>Discover your numerology</h2>
+    <p>Enter your date of birth to calculate your Driver Number, Conductor Number and Lo Shu Grid. Add your name for name numerology too.</p>
+    <div class="field">
+      <label for="dobInput">Date of birth</label>
+      <input type="date" id="dobInput" aria-describedby="dobError">
+      <div class="field-error" id="dobError" role="alert"></div>
+    </div>
+    <div class="field">
+      <label for="nameInput">Full name <span style="color:var(--text-muted);font-weight:400;">(optional &mdash; for name numerology)</span></label>
+      <input type="text" id="nameInput" placeholder="As it appears on your birth certificate" aria-describedby="nameError">
+      <div class="field-error" id="nameError" role="alert"></div>
+    </div>
+    <div class="field">
+      <label>Name numerology system</label>
+      <div class="system-toggle" id="systemToggle">
+        <button type="button" data-system="chaldean" class="active">Chaldean</button>
+        <button type="button" data-system="pythagorean">Pythagorean</button>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtn">Calculate my numbers</button>
+  </div>
+</div>
+
+<main id="resultsRoot">
+  <div class="wrap">
+
+    <section class="block" id="resultsAnchor">
+      <p class="eyebrow">Your numerology profile</p>
+      <div class="primary-cards">
+        <button class="primary-card" id="driverCard" aria-expanded="false" aria-controls="driverPanel">
+          <div class="pc-label">Driver Number</div>
+          <div class="pc-value" id="driverValue">&nbsp;</div>
+          <div class="pc-alt">Mulank &bull; Psychic Number &bull; Birth Number</div>
+          <div class="pc-hint">Tap to see the calculation</div>
+        </button>
+        <button class="primary-card" id="conductorCard" aria-expanded="false" aria-controls="conductorPanel">
+          <div class="pc-label">Conductor Number</div>
+          <div class="pc-value" id="conductorValue">&nbsp;</div>
+          <div class="pc-alt">Bhagyank &bull; Life Path Number &bull; Destiny Number</div>
+          <div class="pc-hint">Tap to see the calculation</div>
+        </button>
+        <button class="primary-card" id="loshuCard">
+          <div class="pc-label">Lo Shu Grid</div>
+          <div class="pc-value" style="font-size:20px;" id="loshuMini"></div>
+          <div class="pc-alt">Your birth-date number map</div>
+          <div class="pc-hint">Tap to view the grid</div>
+        </button>
+      </div>
+      <div class="calc-panel" id="driverPanel"><div class="calc-panel-inner" id="driverSteps"></div></div>
+      <div class="calc-panel" id="conductorPanel"><div class="calc-panel-inner" id="conductorSteps"></div></div>
+    </section>
+
+    <div style="text-align:center;padding:16px 0;">
+      <button type="button" class="btn-ghost" id="saveToDashboardBtn">Save to Dashboard</button>
+    </div>
+
+    <section class="block" id="driverProfileSection">
+      <p class="eyebrow">Your Driver Number</p>
+      <div class="profile-card">
+        <div class="ph-num" id="dpNum"></div>
+        <div class="ph-name" id="dpName"></div>
+        <p class="ph-meaning" id="dpMeaning"></p>
+        <h4>Personality</h4><p id="dpPersonality"></p>
+        <h4>Strengths</h4><ul id="dpStrengths"></ul>
+        <h4>Challenges</h4><ul id="dpChallenges"></ul>
+        <h4>Career tendencies</h4><ul id="dpCareer"></ul>
+        <h4>Relationships</h4><p id="dpRelationships"></p>
+        <div class="lucky-row" id="dpPlanetRow" style="display:none;">
+          <div class="lucky-item">Chaldean planetary ruler: <b id="dpPlanet"></b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="conductorProfileSection">
+      <p class="eyebrow">Your Conductor Number</p>
+      <div class="profile-card">
+        <div class="ph-num" id="cpNum"></div>
+        <div class="ph-name" id="cpName"></div>
+        <p class="ph-meaning" id="cpMeaning"></p>
+        <h4>Personality</h4><p id="cpPersonality"></p>
+        <h4>Strengths</h4><ul id="cpStrengths"></ul>
+        <h4>Challenges</h4><ul id="cpChallenges"></ul>
+        <h4>Career tendencies</h4><ul id="cpCareer"></ul>
+        <h4>Relationships</h4><p id="cpRelationships"></p>
+        <div class="lucky-row" id="cpPlanetRow" style="display:none;">
+          <div class="lucky-item">Chaldean planetary ruler: <b id="cpPlanet"></b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="loshuSection">
+      <p class="eyebrow">Lo Shu grid analysis</p>
+      <div class="loshu-wrap">
+        <div>
+          <div class="loshu-grid" id="loshuGrid" role="group" aria-label="Lo Shu grid, click a number to learn more"></div>
+          <div class="loshu-legend">
+            <span><i class="swatch" style="background:var(--gold)"></i>Present</span>
+            <span><i class="swatch" style="background:var(--danger)"></i>Repeated</span>
+            <span><i class="swatch" style="background:var(--text-muted)"></i>Missing</span>
+          </div>
+          <div id="loshuInfo" role="status"></div>
+        </div>
+        <div class="loshu-summary">
+          <div class="sumline"><div class="k">Numbers present</div><div class="taglist" id="presentTags"></div></div>
+          <div class="sumline"><div class="k">Numbers missing</div><div class="taglist" id="missingTags"></div></div>
+          <div class="sumline"><div class="k">Repeated numbers</div><div class="taglist" id="repeatTags"></div></div>
+        </div>
+      </div>
+      <div style="margin-top:28px;">
+        <div class="sumline"><div class="k">What your missing and repeated numbers suggest</div></div>
+        <div id="interpList" style="margin-top:10px;font-size:14px;color:var(--text-dim);"></div>
+      </div>
+    </section>
+
+    <details class="block section-accordion" id="nameNumerologySection" style="display:none;"><summary class="section-accordion-summary">Name numerology</summary><div class="section-accordion-body">
+      <div class="profile-grid">
+        <div class="profile-card">
+          <div class="ph-num" id="nnChaldeanVal"></div>
+          <div class="ph-name">Chaldean name number</div>
+          <p class="ph-meaning" id="nnChaldeanMeaning"></p>
+        </div>
+        <div class="profile-card">
+          <div class="ph-num" id="nnPythagoreanVal"></div>
+          <div class="ph-name">Pythagorean name number</div>
+          <p class="ph-meaning" id="nnPythagoreanMeaning"></p>
+        </div>
+      </div>
+      <div class="numgrid five" style="margin-top:16px;">
+        <div class="numcard"><div class="label">Soul Urge</div><div class="value" id="nnSoulUrge"></div></div>
+        <div class="numcard"><div class="label">Personality</div><div class="value" id="nnPersonality"></div></div>
+        <div class="numcard"><div class="label">Expression</div><div class="value" id="nnExpression"></div></div>
+      </div>
+      <details class="calc" style="margin-top:16px;">
+        <summary>Show name calculation steps</summary>
+        <div class="steps" id="nnSteps"></div>
+        <div class="letterrow" id="nnLetterBreakdown"></div>
+      </details>
+      <div style="margin-top:16px;">
+        <div class="sumline"><div class="k">Karmic lesson numbers</div></div>
+        <p id="nnKarmicText" style="font-size:14px;color:var(--text-dim);margin-top:8px;"></p>
+      </div>
+
+      <div class="combo-card" style="margin-top:24px;">
+        <h3>Name correction &mdash; try other spellings</h3>
+        <p style="font-size:13px;color:var(--text-dim);margin:6px 0 16px;">Your Driver and Conductor numbers, and your Lo Shu grid, stay fixed &mdash; they come from your birth date only. What changes with the name below are your Name Number, Soul Urge, Personality, Favorable Numbers, Colors, and Crystal Compatibility. Try a spelling, then click "Use this name" on the one you like to see your whole profile update.</p>
+        <div class="field">
+          <label for="nameCorrectionInput">Name spellings to compare <span style="color:var(--text-muted);font-weight:400;">(comma-separated, up to 10)</span></label>
+          <input type="text" id="nameCorrectionInput" placeholder="e.g. Mahender Potluri, Mahendar Potluri">
+        </div>
+        <div class="field-error" id="nameCorrectionError" role="alert"></div>
+        <button class="calc-btn" id="nameCorrectionBtn">Compare names</button>
+        <div id="nameCorrectionResults" style="margin-top:16px;"></div>
+
+        <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);">
+          <p style="font-size:13px;color:var(--text-dim);margin:0 0 12px;">Or let us try small variations of your name automatically &mdash; each suggestion adds or doubles just one letter, so it stays close to your real name. You be the judge of which ones still sound right.</p>
+          <button class="btn-ghost" id="nameSuggestBtn" style="width:100%;">Suggest variations of my name</button>
+          <div id="nameSuggestResults" style="margin-top:16px;"></div>
+        </div>
+      </div>
+    </div></details>
+
+    <details class="block section-accordion" id="missingNumbersSection"><summary class="section-accordion-summary">Missing numbers</summary><div class="section-accordion-body">
+      <div id="missingNumbersContainer" class="interp-grid"></div>
+    </div></details>
+
+    <details class="block section-accordion" id="repeatedNumbersSection"><summary class="section-accordion-summary">Repeated numbers</summary><div class="section-accordion-body">
+      <div id="repeatedNumbersContainer" class="interp-grid"></div>
+    </div></details>
+
+    <details class="block section-accordion" id="planesSection"><summary class="section-accordion-summary">Planes</summary><div class="section-accordion-body">
+      <div id="planesContainer" class="ref-grid"></div>
+    </div></details>
+
+    <details class="block section-accordion" id="arrowsSection"><summary class="section-accordion-summary">Arrows</summary><div class="section-accordion-body">
+      <div id="arrowsContainer" class="ref-grid"></div>
+    </div></details>
+
+    <details class="block section-accordion" id="combinedInterpretationSection"><summary class="section-accordion-summary">Combined interpretation</summary><div class="section-accordion-body">
+      <div class="combo-card">
+        <h3>Overall profile</h3>
+        <p id="ciOverallProfile"></p>
+        <h3 style="margin-top:16px;">Strengths</h3>
+        <div class="taglist" id="ciStrengths"></div>
+        <h3 style="margin-top:16px;">Traditional guidance</h3>
+        <p id="ciGuidance"></p>
+      </div>
+    </div></details>
+
+    <details class="block section-accordion" id="numbersColorsSection"><summary class="section-accordion-summary">Numbers &amp; colors</summary><div class="section-accordion-body">
+
+      <h3 style="font-size:16px;margin-bottom:8px;">Favorable numbers</h3>
+      <div id="favorableNumbersContainer" style="margin-bottom:20px;"></div>
+
+      <h3 style="font-size:16px;margin-bottom:8px;">Challenging numbers</h3>
+      <div id="challengingNumbersContainer" style="margin-bottom:20px;"></div>
+
+      <h3 style="font-size:16px;margin-bottom:8px;">Supportive combinations</h3>
+      <div class="taglist" id="supportiveCombosContainer" style="margin-bottom:24px;"></div>
+
+      <h3 style="font-size:16px;margin-bottom:12px;">Colors by number</h3>
+      <div id="colorsByNumberContainer" style="margin-bottom:24px;"></div>
+
+      <div class="combo-card">
+        <h3>My colors</h3>
+        <p style="font-size:12px;color:var(--text-dim);margin:4px 0 16px;">Numerology is a traditional belief system; color associations here are for personal interest, not medical, financial, or guaranteed-outcome claims.</p>
+        <div class="sumline"><div class="k">Best colors</div></div>
+        <div id="myColorsBest" style="margin:10px 0 16px;"></div>
+        <div class="sumline"><div class="k">Use moderately</div></div>
+        <div id="myColorsModerate" style="margin:10px 0 16px;"></div>
+        <div class="sumline"><div class="k">Personal palette</div></div>
+        <div id="myColorsPalette" style="margin-top:10px;"></div>
+      </div>
+    </div></details>
+
+    <details class="block section-accordion" id="numberLibrarySection"><summary class="section-accordion-summary">Meaning of every number, 1&ndash;9</summary><div class="section-accordion-body">
+      <div class="interp-grid" id="interpGrid"></div>
+    </div></details>
+
+    <details class="block section-accordion" id="videoSection"><summary class="section-accordion-summary">Explore more about your numbers</summary><div class="section-accordion-body">
+      <div id="videoContainer"></div>
+    </div></details>
+
+    <details class="block section-accordion" id="referenceSection"><summary class="section-accordion-summary">Reference library</summary><div class="section-accordion-body">
+      <p style="font-size:13px;color:var(--text-dim);margin:0 0 16px;">Open, freely-licensed background reading on your numbers, sourced from Wikipedia (CC BY-SA 4.0).</p>
+      <div id="referenceContainer"></div>
+    </div></details>
+
+    <details class="block section-accordion" id="bookInsightsSection"><summary class="section-accordion-summary">Book insights &mdash; 360&deg; case analysis</summary><div class="section-accordion-body">
+      <p style="font-size:13px;color:var(--text-dim);margin:0 0 16px;">What your uploaded books actually say about your numbers, with page citations. Each book's perspective is shown separately &mdash; nothing here is invented or merged into a single &ldquo;answer.&rdquo;</p>
+      <div id="bookInsightsContainer"></div>
+    </div></details>
+
+    <details class="block section-accordion" id="sourcesSection"><summary class="section-accordion-summary">Sources &amp; references</summary><div class="section-accordion-body">
+      <p style="font-size:13px;color:var(--text-dim);margin:0 0 16px;">Where the interpretation content on this page comes from.</p>
+      <div id="sourcesContainer" class="ref-grid"></div>
+    </div></details>
+
+    <p class="disclaimer">Numerology is a traditional belief system and is provided for educational, cultural and entertainment purposes. Interpretations should not be treated as scientific, medical, legal or financial advice.</p>
+  </div>
+</main>
+</div>
+
+<div id="tab2Content" style="display:none;">
+  <header class="hero" style="padding-top:56px;padding-bottom:56px;">
+    <div class="sacred-lines" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <p class="kicker">Mobile compatibility</p>
+      <h1>Check your mobile number</h1>
+      <p class="lead">Enter your details to find out if your phone number brings good luck.</p>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-bottom:56px;">
+    <div class="card" style="max-width:520px;">
+      <div class="field">
+        <label for="analyzeNameInput">Name <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+        <input type="text" id="analyzeNameInput" placeholder="As it appears on your birth certificate">
+      </div>
+      <div class="field">
+        <label for="analyzeDobInput">Date of birth</label>
+        <input type="date" id="analyzeDobInput">
+      </div>
+      <div class="field">
+        <label for="analyzeMobileInput">Phone number</label>
+        <input type="text" id="analyzeMobileInput" placeholder="e.g. 9395659999" inputmode="numeric">
+      </div>
+      <div class="field-error" id="analyzeMobileError" role="alert"></div>
+      <button class="calc-btn" id="analyzeMobileBtn">Get Lucky Number</button>
+    </div>
+
+    <div id="mobileAnalysisSection" style="display:none;margin-top:24px;max-width:520px;">
+      <p id="maWelcome" style="font-size:18px;margin-bottom:16px;"></p>
+      <p style="font-size:13px;color:var(--text-dim);margin:0 0 4px;">Number Breakdown:</p>
+      <p id="maBreakdownEquation" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold);margin:0 0 16px;word-break:break-all;"></p>
+      <p id="maVerdict" style="font-size:16px;font-weight:600;"></p>
+      <div id="maCorroboration" style="margin-top:12px;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="tab3Content" style="display:none;">
+  <header class="hero" style="padding-top:56px;padding-bottom:56px;">
+    <div class="sacred-lines" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <p class="kicker">Crystal compatibility</p>
+      <h1>Find crystals aligned with your numbers</h1>
+      <p class="lead">Traditional crystal associations, scored against your Driver, Conductor, Name, and Lo Shu missing numbers &mdash; with reasons, not just a rating.</p>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-bottom:24px;">
+    <div class="card" style="max-width:520px;">
+      <h2 style="font-size:18px;margin-bottom:16px;">Your details</h2>
+      <div class="field">
+        <label for="crystalDobInput">Date of birth</label>
+        <input type="date" id="crystalDobInput">
+      </div>
+      <div class="field">
+        <label for="crystalNameInput">Full name <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+        <input type="text" id="crystalNameInput" placeholder="As it appears on your birth certificate">
+      </div>
+      <div class="field">
+        <label>Name numerology system</label>
+        <div class="system-toggle" id="systemToggle3">
+          <button type="button" data-system="chaldean" class="active">Chaldean</button>
+          <button type="button" data-system="pythagorean">Pythagorean</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="crystalPurposeInput">Purpose <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+        <select id="crystalPurposeInput" style="width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:15px;font-family:'Inter',sans-serif;">
+          <option value="">No specific purpose</option>
+          <option value="personal">Personal</option>
+          <option value="business">Business</option>
+          <option value="career">Career</option>
+          <option value="finance">Finance</option>
+          <option value="communication">Communication</option>
+          <option value="relationships">Relationships</option>
+        </select>
+      </div>
+      <div class="field-error" id="crystalError" role="alert"></div>
+      <button class="calc-btn" id="crystalAnalyzeBtn">Find compatible crystals</button>
+    </div>
+  </div>
+
+  <div class="wrap" style="padding-bottom:56px;">
+    <div id="crystalResultsContainer"></div>
+    <div id="crystalSaveBtnWrap" style="display:none;text-align:center;padding:16px 0;">
+      <button type="button" class="btn-ghost" id="crystalSaveToDashboardBtn">Save to Dashboard</button>
+    </div>
+    <div id="crystalVideosContainer" style="margin-top:20px;"></div>
+    <div id="crystalBookInsightsContainer" style="margin-top:20px;"></div>
+  </div>
+</div>
+
+<div id="tab4Content" style="display:none;">
+  <header class="hero" style="padding-top:56px;padding-bottom:56px;">
+    <div class="sacred-lines" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <p class="kicker">Business name numerology</p>
+      <h1>Check your business name's numbers</h1>
+      <p class="lead">Same letter-value math as personal name numerology, applied to your company name &mdash; with career and money themes, and optional owner compatibility.</p>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-bottom:56px;">
+    <div class="card" style="max-width:520px;">
+      <div class="field">
+        <label for="businessNamesInput">Business name(s) <span style="color:var(--text-muted);font-weight:400;">(comma-separated, up to 10)</span></label>
+        <input type="text" id="businessNamesInput" placeholder="e.g. Sunrise Ventures, Golden Path Traders">
+      </div>
+      <div class="field">
+        <label>Name numerology system</label>
+        <div class="system-toggle" id="systemToggle4">
+          <button type="button" data-system="chaldean" class="active">Chaldean</button>
+          <button type="button" data-system="pythagorean">Pythagorean</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="businessOwnerDobInput">Owner's date of birth <span style="color:var(--text-muted);font-weight:400;">(optional &mdash; scores compatibility with the owner)</span></label>
+        <input type="date" id="businessOwnerDobInput">
+      </div>
+      <div class="field-error" id="businessNameError" role="alert"></div>
+      <button class="calc-btn" id="businessNameBtn">Analyze business name(s)</button>
+    </div>
+    <div id="businessNameResults" style="margin-top:20px;max-width:600px;"></div>
+  </div>
+</div>
+
+<div id="tab5Content" style="display:none;">
+  <header class="hero" style="padding-top:56px;padding-bottom:56px;">
+    <div class="sacred-lines" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <p class="kicker">Number compatibility</p>
+      <h1>Check any number against your profile</h1>
+      <p class="lead">Bank account, house/flat, or vehicle number &mdash; same digit math as mobile number analysis, scored against your Driver and Conductor.</p>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-bottom:56px;">
+    <div class="card" style="max-width:520px;">
+      <div class="field">
+        <label for="genericDobInput">Date of birth</label>
+        <input type="date" id="genericDobInput">
+      </div>
+      <div class="field">
+        <label for="genericTypeInput">Number type</label>
+        <select id="genericTypeInput" style="width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:15px;font-family:'Inter',sans-serif;">
+          <option value="bank_account">Bank Account Number</option>
+          <option value="house">House/Flat Number</option>
+          <option value="vehicle">Vehicle Number</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="genericValueInput">Number</label>
+        <input type="text" id="genericValueInput" placeholder="e.g. 50100234567890">
+      </div>
+      <div class="field-error" id="genericNumberError" role="alert"></div>
+      <button class="calc-btn" id="genericNumberBtn">Analyze this number</button>
+    </div>
+    <div id="genericNumberResults" style="margin-top:20px;max-width:600px;"></div>
+  </div>
+</div>
+
+<div id="tab6Content" style="display:none;">
+  <header class="hero" style="padding-top:56px;padding-bottom:56px;">
+    <div class="sacred-lines" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <p class="kicker">Relationship compatibility</p>
+      <h1>Compare two people's numbers</h1>
+      <p class="lead">Checks each person's Driver, Conductor, and (if given) Name Number against the other's &mdash; every point explained, nothing merged into a single opaque score.</p>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-bottom:56px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:720px;margin:0 auto;">
+      <div class="card">
+        <h2 style="font-size:16px;margin-bottom:16px;">Person A</h2>
+        <div class="field">
+          <label for="relALabel">Name/label</label>
+          <input type="text" id="relALabel" placeholder="e.g. Alex" value="Person A">
+        </div>
+        <div class="field">
+          <label for="relADob">Date of birth</label>
+          <input type="date" id="relADob">
+        </div>
+        <div class="field">
+          <label for="relAName">Full name <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+          <input type="text" id="relAName" placeholder="For Name Number comparison">
+        </div>
+      </div>
+      <div class="card">
+        <h2 style="font-size:16px;margin-bottom:16px;">Person B</h2>
+        <div class="field">
+          <label for="relBLabel">Name/label</label>
+          <input type="text" id="relBLabel" placeholder="e.g. Sam" value="Person B">
+        </div>
+        <div class="field">
+          <label for="relBDob">Date of birth</label>
+          <input type="date" id="relBDob">
+        </div>
+        <div class="field">
+          <label for="relBName">Full name <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+          <input type="text" id="relBName" placeholder="For Name Number comparison">
+        </div>
+      </div>
+    </div>
+    <div style="max-width:720px;margin:20px auto 0;">
+      <div class="field-error" id="relationshipError" role="alert"></div>
+      <button class="calc-btn" id="relationshipBtn" style="width:100%;">Check compatibility</button>
+    </div>
+    <div id="relationshipResults" style="margin-top:20px;max-width:720px;margin-left:auto;margin-right:auto;"></div>
+  </div>
+</div>
+
+<div id="tab7Content" style="display:none;">
+  <header class="hero" style="padding-top:56px;padding-bottom:56px;">
+    <div class="sacred-lines" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <p class="kicker">Compare name variants</p>
+      <h1>Name correction Lo shu</h1>
+      <p class="lead">Calculate a name, then try another &mdash; each one opens as its own tab right here, so you can switch back and forth without losing either.</p>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-bottom:56px;">
+    <div class="tab7-layout">
+      <div class="card">
+        <h2 style="font-size:18px;margin-bottom:16px;">Discover your numerology</h2>
+        <p style="font-size:13px;color:var(--text-dim);margin:0 0 20px;">Enter a date of birth and name to see the Lo Shu grid. Change the name and calculate again to add another tab here for comparison.</p>
+        <div class="field">
+          <label for="dobInput7">Date of birth</label>
+          <input type="date" id="dobInput7">
+        </div>
+        <div class="field-error" id="dobError7" role="alert"></div>
+        <div class="field">
+          <label for="nameInput7">Full name <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+          <input type="text" id="nameInput7" placeholder="As it appears on your birth certificate">
+        </div>
+        <div class="field-error" id="nameError7" role="alert"></div>
+        <div class="field">
+          <label>Name numerology system</label>
+          <div class="system-toggle" id="systemToggle7">
+            <button type="button" data-system="chaldean" class="active">Chaldean</button>
+            <button type="button" data-system="pythagorean">Pythagorean</button>
+          </div>
+        </div>
+        <button class="calc-btn" id="calcBtn7">Calculate my numbers</button>
+      </div>
+
+      <div>
+        <div id="subTabsBar7" class="subtabs-bar" style="display:none;"></div>
+        <div id="tab7Empty" style="color:var(--text-dim);font-size:14px;padding:60px 24px;text-align:center;border:1px dashed var(--border-strong);border-radius:12px;">Enter your details and calculate to see your Lo Shu grid here.</div>
+        <div id="tab7GridDisplay" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap" style="padding-bottom:56px;display:none;" id="tab7DetailWrap">
+    <p style="font-size:13px;color:var(--text-dim);margin:0 0 20px;">Full profile for the selected tab above:</p>
+<main id="resultsRoot7">
+  <div class="wrap">
+
+    <section class="block" id="resultsAnchor7">
+      <p class="eyebrow">Your numerology profile</p>
+      <div class="primary-cards">
+        <button class="primary-card" id="driverCard7" aria-expanded="false" aria-controls="driverPanel">
+          <div class="pc-label">Driver Number</div>
+          <div class="pc-value" id="driverValue7">&nbsp;</div>
+          <div class="pc-alt">Mulank &bull; Psychic Number &bull; Birth Number</div>
+          <div class="pc-hint">Tap to see the calculation</div>
+        </button>
+        <button class="primary-card" id="conductorCard7" aria-expanded="false" aria-controls="conductorPanel">
+          <div class="pc-label">Conductor Number</div>
+          <div class="pc-value" id="conductorValue7">&nbsp;</div>
+          <div class="pc-alt">Bhagyank &bull; Life Path Number &bull; Destiny Number</div>
+          <div class="pc-hint">Tap to see the calculation</div>
+        </button>
+        <button class="primary-card" id="loshuCard7">
+          <div class="pc-label">Lo Shu Grid</div>
+          <div class="pc-value" style="font-size:20px;" id="loshuMini7"></div>
+          <div class="pc-alt">Your birth-date number map</div>
+          <div class="pc-hint">Tap to view the grid</div>
+        </button>
+      </div>
+      <div class="calc-panel" id="driverPanel7"><div class="calc-panel-inner" id="driverSteps7"></div></div>
+      <div class="calc-panel" id="conductorPanel7"><div class="calc-panel-inner" id="conductorSteps7"></div></div>
+    </section>
+
+    <section class="block" id="driverProfileSection7">
+      <p class="eyebrow">Your Driver Number</p>
+      <div class="profile-card">
+        <div class="ph-num" id="dpNum7"></div>
+        <div class="ph-name" id="dpName7"></div>
+        <p class="ph-meaning" id="dpMeaning7"></p>
+        <h4>Personality</h4><p id="dpPersonality7"></p>
+        <h4>Strengths</h4><ul id="dpStrengths7"></ul>
+        <h4>Challenges</h4><ul id="dpChallenges7"></ul>
+        <h4>Career tendencies</h4><ul id="dpCareer7"></ul>
+        <h4>Relationships</h4><p id="dpRelationships7"></p>
+        <div class="lucky-row" id="dpPlanetRow7" style="display:none;">
+          <div class="lucky-item">Chaldean planetary ruler: <b id="dpPlanet7"></b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="conductorProfileSection7">
+      <p class="eyebrow">Your Conductor Number</p>
+      <div class="profile-card">
+        <div class="ph-num" id="cpNum7"></div>
+        <div class="ph-name" id="cpName7"></div>
+        <p class="ph-meaning" id="cpMeaning7"></p>
+        <h4>Personality</h4><p id="cpPersonality7"></p>
+        <h4>Strengths</h4><ul id="cpStrengths7"></ul>
+        <h4>Challenges</h4><ul id="cpChallenges7"></ul>
+        <h4>Career tendencies</h4><ul id="cpCareer7"></ul>
+        <h4>Relationships</h4><p id="cpRelationships7"></p>
+        <div class="lucky-row" id="cpPlanetRow7" style="display:none;">
+          <div class="lucky-item">Chaldean planetary ruler: <b id="cpPlanet7"></b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="loshuSection7">
+      <p class="eyebrow">Lo Shu grid analysis</p>
+      <div class="loshu-wrap">
+        <div>
+          <div class="loshu-grid" id="loshuGrid7" role="group" aria-label="Lo Shu grid, click a number to learn more"></div>
+          <div class="loshu-legend">
+            <span><i class="swatch" style="background:var(--gold)"></i>Present</span>
+            <span><i class="swatch" style="background:var(--danger)"></i>Repeated</span>
+            <span><i class="swatch" style="background:var(--text-muted)"></i>Missing</span>
+          </div>
+          <div id="loshuInfo7" role="status"></div>
+        </div>
+        <div class="loshu-summary">
+          <div class="sumline"><div class="k">Numbers present</div><div class="taglist" id="presentTags7"></div></div>
+          <div class="sumline"><div class="k">Numbers missing</div><div class="taglist" id="missingTags7"></div></div>
+          <div class="sumline"><div class="k">Repeated numbers</div><div class="taglist" id="repeatTags7"></div></div>
+        </div>
+      </div>
+      <div style="margin-top:28px;">
+        <div class="sumline"><div class="k">What your missing and repeated numbers suggest</div></div>
+        <div id="interpList7" style="margin-top:10px;font-size:14px;color:var(--text-dim);"></div>
+      </div>
+    </section>
+
+    <details class="block section-accordion" id="nameNumerologySection7" style="display:none;"><summary class="section-accordion-summary">Name numerology</summary><div class="section-accordion-body">
+      <div class="profile-grid">
+        <div class="profile-card">
+          <div class="ph-num" id="nnChaldeanVal7"></div>
+          <div class="ph-name">Chaldean name number</div>
+          <p class="ph-meaning" id="nnChaldeanMeaning7"></p>
+        </div>
+        <div class="profile-card">
+          <div class="ph-num" id="nnPythagoreanVal7"></div>
+          <div class="ph-name">Pythagorean name number</div>
+          <p class="ph-meaning" id="nnPythagoreanMeaning7"></p>
+        </div>
+      </div>
+      <div class="numgrid five" style="margin-top:16px;">
+        <div class="numcard"><div class="label">Soul Urge</div><div class="value" id="nnSoulUrge7"></div></div>
+        <div class="numcard"><div class="label">Personality</div><div class="value" id="nnPersonality7"></div></div>
+        <div class="numcard"><div class="label">Expression</div><div class="value" id="nnExpression7"></div></div>
+      </div>
+      <details class="calc" style="margin-top:16px;">
+        <summary>Show name calculation steps</summary>
+        <div class="steps" id="nnSteps7"></div>
+        <div class="letterrow" id="nnLetterBreakdown7"></div>
+      </details>
+      <div style="margin-top:16px;">
+        <div class="sumline"><div class="k">Karmic lesson numbers</div></div>
+        <p id="nnKarmicText7" style="font-size:14px;color:var(--text-dim);margin-top:8px;"></p>
+      </div>
+
+      <div class="combo-card" style="margin-top:24px;">
+        <h3>Name correction &mdash; try other spellings</h3>
+        <p style="font-size:13px;color:var(--text-dim);margin:6px 0 16px;">Your Driver and Conductor numbers, and your Lo Shu grid, stay fixed &mdash; they come from your birth date only. What changes with the name below are your Name Number, Soul Urge, Personality, Favorable Numbers, Colors, and Crystal Compatibility. Try a spelling, then click "Use this name" on the one you like to see your whole profile update.</p>
+        <div class="field">
+          <label for="nameCorrectionInput7">Name spellings to compare <span style="color:var(--text-muted);font-weight:400;">(comma-separated, up to 10)</span></label>
+          <input type="text" id="nameCorrectionInput7" placeholder="e.g. Mahender Potluri, Mahendar Potluri">
+        </div>
+        <div class="field-error" id="nameCorrectionError7" role="alert"></div>
+        <button class="calc-btn" id="nameCorrectionBtn7">Compare names</button>
+        <div id="nameCorrectionResults7" style="margin-top:16px;"></div>
+
+        <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);">
+          <p style="font-size:13px;color:var(--text-dim);margin:0 0 12px;">Or let us try small variations of your name automatically &mdash; each suggestion adds or doubles just one letter, so it stays close to your real name. You be the judge of which ones still sound right.</p>
+          <button class="btn-ghost" id="nameSuggestBtn7" style="width:100%;">Suggest variations of my name</button>
+          <div id="nameSuggestResults7" style="margin-top:16px;"></div>
+        </div>
+      </div>
+    </div></details>
+
+    <details class="block section-accordion" id="missingNumbersSection7"><summary class="section-accordion-summary">Missing numbers</summary><div class="section-accordion-body">
+      <div id="missingNumbersContainer7" class="interp-grid"></div>
+    </div></details>
+
+    <details class="block section-accordion" id="repeatedNumbersSection7"><summary class="section-accordion-summary">Repeated numbers</summary><div class="section-accordion-body">
+      <div id="repeatedNumbersContainer7" class="interp-grid"></div>
+    </div></details>
+
+    <details class="block section-accordion" id="planesSection7"><summary class="section-accordion-summary">Planes</summary><div class="section-accordion-body">
+      <div id="planesContainer7" class="ref-grid"></div>
+    </div></details>
+
+    <details class="block section-accordion" id="arrowsSection7"><summary class="section-accordion-summary">Arrows</summary><div class="section-accordion-body">
+      <div id="arrowsContainer7" class="ref-grid"></div>
+    </div></details>
+
+    <details class="block section-accordion" id="combinedInterpretationSection7"><summary class="section-accordion-summary">Combined interpretation</summary><div class="section-accordion-body">
+      <div class="combo-card">
+        <h3>Overall profile</h3>
+        <p id="ciOverallProfile7"></p>
+        <h3 style="margin-top:16px;">Strengths</h3>
+        <div class="taglist" id="ciStrengths7"></div>
+        <h3 style="margin-top:16px;">Traditional guidance</h3>
+        <p id="ciGuidance7"></p>
+      </div>
+    </div></details>
+
+    <details class="block section-accordion" id="numbersColorsSection7"><summary class="section-accordion-summary">Numbers &amp; colors</summary><div class="section-accordion-body">
+
+      <h3 style="font-size:16px;margin-bottom:8px;">Favorable numbers</h3>
+      <div id="favorableNumbersContainer7" style="margin-bottom:20px;"></div>
+
+      <h3 style="font-size:16px;margin-bottom:8px;">Challenging numbers</h3>
+      <div id="challengingNumbersContainer7" style="margin-bottom:20px;"></div>
+
+      <h3 style="font-size:16px;margin-bottom:8px;">Supportive combinations</h3>
+      <div class="taglist" id="supportiveCombosContainer7" style="margin-bottom:24px;"></div>
+
+      <h3 style="font-size:16px;margin-bottom:12px;">Colors by number</h3>
+      <div id="colorsByNumberContainer7" style="margin-bottom:24px;"></div>
+
+      <div class="combo-card">
+        <h3>My colors</h3>
+        <p style="font-size:12px;color:var(--text-dim);margin:4px 0 16px;">Numerology is a traditional belief system; color associations here are for personal interest, not medical, financial, or guaranteed-outcome claims.</p>
+        <div class="sumline"><div class="k">Best colors</div></div>
+        <div id="myColorsBest7" style="margin:10px 0 16px;"></div>
+        <div class="sumline"><div class="k">Use moderately</div></div>
+        <div id="myColorsModerate7" style="margin:10px 0 16px;"></div>
+        <div class="sumline"><div class="k">Personal palette</div></div>
+        <div id="myColorsPalette7" style="margin-top:10px;"></div>
+      </div>
+    </div></details>
+
+    <details class="block section-accordion" id="numberLibrarySection7"><summary class="section-accordion-summary">Meaning of every number, 1&ndash;9</summary><div class="section-accordion-body">
+      <div class="interp-grid" id="interpGrid7"></div>
+    </div></details>
+
+    <details class="block section-accordion" id="videoSection7"><summary class="section-accordion-summary">Explore more about your numbers</summary><div class="section-accordion-body">
+      <div id="videoContainer7"></div>
+    </div></details>
+
+    <details class="block section-accordion" id="referenceSection7"><summary class="section-accordion-summary">Reference library</summary><div class="section-accordion-body">
+      <p style="font-size:13px;color:var(--text-dim);margin:0 0 16px;">Open, freely-licensed background reading on your numbers, sourced from Wikipedia (CC BY-SA 4.0).</p>
+      <div id="referenceContainer7"></div>
+    </div></details>
+
+    <details class="block section-accordion" id="bookInsightsSection7"><summary class="section-accordion-summary">Book insights &mdash; 360&deg; case analysis</summary><div class="section-accordion-body">
+      <p style="font-size:13px;color:var(--text-dim);margin:0 0 16px;">What your uploaded books actually say about your numbers, with page citations. Each book's perspective is shown separately &mdash; nothing here is invented or merged into a single &ldquo;answer.&rdquo;</p>
+      <div id="bookInsightsContainer7"></div>
+    </div></details>
+
+    <details class="block section-accordion" id="sourcesSection7"><summary class="section-accordion-summary">Sources &amp; references</summary><div class="section-accordion-body">
+      <p style="font-size:13px;color:var(--text-dim);margin:0 0 16px;">Where the interpretation content on this page comes from.</p>
+      <div id="sourcesContainer7" class="ref-grid"></div>
+    </div></details>
+
+    <p class="disclaimer">Numerology is a traditional belief system and is provided for educational, cultural and entertainment purposes. Interpretations should not be treated as scientific, medical, legal or financial advice.</p>
+  </div>
+</main>
+
+  </div>
+</div>
+
+
+
+
+<footer>Vedic numerology calculator &middot; calculations shown in full &middot; for personal interest only</footer>
+
+<div class="modal-overlay" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="mtitle" id="modalTitle"></span>
+      <button class="modal-close" id="modalClose" aria-label="Close video">&times;</button>
+    </div>
+    <div class="modal-player" id="modalPlayer"></div>
+    <div class="modal-footer"><a id="modalYoutubeLink" href="#" target="_blank" rel="noopener">Open on YouTube &#8599;</a></div>
+  </div>
+</div>
+
+<script>
+const dobInput = document.getElementById('dobInput');
+const dobError = document.getElementById('dobError');
+const calcBtn = document.getElementById('calcBtn');
+const resultsRoot = document.getElementById('resultsRoot');
+
+// Elements for the "Lo Shu Numerology (2)" comparison tab (Tab 7) --
+// fully independent from Tab 1 above.
+const dobInput7 = document.getElementById('dobInput7');
+const dobError7 = document.getElementById('dobError7');
+const calcBtn7 = document.getElementById('calcBtn7');
+
+const todayStr = new Date().toISOString().split('T')[0];
+dobInput.setAttribute('max', todayStr);
+dobInput7.setAttribute('max', todayStr);
+
+function showError(msg) {
+  dobError.textContent = msg;
+  dobError.classList.add('show');
+}
+function clearError() {
+  dobError.classList.remove('show');
+  dobError.textContent = '';
+}
+dobInput.addEventListener('input', clearError);
+
+function showError7(msg) {
+  dobError7.textContent = msg;
+  dobError7.classList.add('show');
+}
+function clearError7() {
+  dobError7.classList.remove('show');
+  dobError7.textContent = '';
+}
+dobInput7.addEventListener('input', clearError7);
+
+function animateReveal(el, delay) {
+  el.style.animationDelay = delay + 'ms';
+  el.classList.add('reveal');
+}
+
+function renderNumberCard(prefix, numberData, record, role, ns = '') {
+  document.getElementById(prefix + 'Num' + ns).textContent = numberData.value;
+  document.getElementById(prefix + 'Name' + ns).textContent = record.keywords.slice(0, 2).map(k => k.charAt(0).toUpperCase() + k.slice(1)).join(' & ');
+  document.getElementById(prefix + 'Meaning' + ns).textContent = role === 'driver' ? record.driverInterpretation : record.conductorInterpretation;
+  document.getElementById(prefix + 'Personality' + ns).textContent = record.personalityThemes;
+  const strEl = document.getElementById(prefix + 'Strengths' + ns); strEl.innerHTML = '';
+  record.strengths.forEach(s => { const li = document.createElement('li'); li.textContent = s; strEl.appendChild(li); });
+  const chEl = document.getElementById(prefix + 'Challenges' + ns); chEl.innerHTML = '';
+  record.challenges.forEach(s => { const li = document.createElement('li'); li.textContent = s; chEl.appendChild(li); });
+  const carEl = document.getElementById(prefix + 'Career' + ns); carEl.innerHTML = '';
+  record.careerThemes.forEach(s => { const li = document.createElement('li'); li.textContent = s; carEl.appendChild(li); });
+  document.getElementById(prefix + 'Relationships' + ns).textContent = record.relationshipThemes;
+  const planetRow = document.getElementById(prefix + 'PlanetRow' + ns);
+  if (record.chaldeanPlanet) {
+    document.getElementById(prefix + 'Planet' + ns).textContent = record.chaldeanPlanet;
+    planetRow.style.display = 'flex';
+  } else {
+    planetRow.style.display = 'none';
+  }
+}
+
+function renderInterpretationLibrary(numberKnowledgeBase, ns = '') {
+  const grid = document.getElementById('interpGrid' + ns);
+  grid.innerHTML = '';
+  Object.keys(numberKnowledgeBase).sort((a, b) => a - b).forEach(n => {
+    const p = numberKnowledgeBase[n];
+    const card = document.createElement('div');
+    card.className = 'interp-card';
+    card.innerHTML = `
+      <div class="num">${n}</div>
+      <div class="nm">${p.keywords.slice(0, 2).join(' & ')}</div>
+      <div class="lbl">Meaning</div><p>${p.keywords.join(', ')}</p>
+      <div class="lbl">Strength</div><p>${p.strengths[0]}</p>
+      <div class="lbl">Possible challenge</div><p>${p.challenges[0]}</p>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function renderLoShu(loShuGrid, numberKnowledgeBase, ns = '') {
+  const layout = loShuGrid.layout.flat();
+  const grid = document.getElementById('loshuGrid' + ns);
+  grid.innerHTML = '';
+  layout.forEach(digit => {
+    const count = loShuGrid.counts[digit];
+    const cell = document.createElement('button');
+    cell.type = 'button';
+    cell.className = 'loshu-cell' + (count === 0 ? ' missing' : count > 1 ? ' repeated' : '');
+    cell.setAttribute('aria-label', count === 0 ? `${digit}, missing from your grid` : `${digit}, appears ${count} time${count > 1 ? 's' : ''}`);
+    if (count === 0) {
+      cell.textContent = '\u2013';
+    } else {
+      const wrap = document.createElement('div');
+      wrap.className = 'digits';
+      for (let i = 0; i < count; i++) { const d = document.createElement('span'); d.className = 'd'; d.textContent = digit; wrap.appendChild(d); }
+      cell.appendChild(wrap);
+    }
+    cell.addEventListener('click', () => {
+      const info = document.getElementById('loshuInfo' + ns);
+      const p = numberKnowledgeBase[digit];
+      info.innerHTML = `<b>${digit} &mdash; ${p.keywords.slice(0, 2).join(' & ')}</b><br>${p.loshuInterpretation} ${count === 0 ? '<br><em>Missing from your grid.</em>' : count > 1 ? `<br><em>Appears ${count} times in your grid.</em>` : ''}`;
+      info.classList.add('show');
+    });
+    grid.appendChild(cell);
+  });
+
+  function fmtTag(id, nums, cls) {
+    const el = document.getElementById(id); el.innerHTML = '';
+    if (nums.length === 0) { const s = document.createElement('span'); s.className = 'tag'; s.textContent = 'None'; el.appendChild(s); return; }
+    nums.forEach(n => { const s = document.createElement('span'); s.className = 'tag ' + cls; s.textContent = n; el.appendChild(s); });
+  }
+  fmtTag('presentTags' + ns, loShuGrid.present, 'present');
+  fmtTag('missingTags' + ns, loShuGrid.missing, '');
+  fmtTag('repeatTags' + ns, loShuGrid.repeated, 'repeat');
+}
+
+function renderInterpretationList(missingThemes, repeatedThemes, ns = '') {
+  const el = document.getElementById('interpList' + ns);
+  const items = [...missingThemes.map(m => m.interpretation), ...repeatedThemes.map(r => r.interpretation)];
+  if (items.length === 0) { el.textContent = 'Every number 1\u20139 appears exactly once \u2014 an unusually balanced grid.'; return; }
+  el.innerHTML = items.map(text => `<div style="margin-bottom:8px;">${text}</div>`).join('');
+}
+
+function renderMissingRepeatedSections(missingThemes, repeatedThemes, ns = '') {
+  const missingEl = document.getElementById('missingNumbersContainer' + ns);
+  missingEl.innerHTML = '';
+  if (missingThemes.length === 0) {
+    missingEl.innerHTML = '<p class="ref-empty">No missing numbers \u2014 every digit 1\u20139 appears at least once.</p>';
+  } else {
+    missingThemes.forEach(m => {
+      const card = document.createElement('div');
+      card.className = 'interp-card';
+      card.innerHTML = `<div class="num">${m.number}</div><div class="nm">Missing</div><p>${m.interpretation}</p>`;
+      missingEl.appendChild(card);
+    });
+  }
+
+  const repeatedEl = document.getElementById('repeatedNumbersContainer' + ns);
+  repeatedEl.innerHTML = '';
+  if (repeatedThemes.length === 0) {
+    repeatedEl.innerHTML = '<p class="ref-empty">No repeated numbers in this grid.</p>';
+  } else {
+    repeatedThemes.forEach(r => {
+      const card = document.createElement('div');
+      card.className = 'interp-card';
+      card.innerHTML = `<div class="num">${r.number}</div><div class="nm">${r.occurrences}\u00d7 \u2014 ${r.strength}</div><p>${r.interpretation}</p>`;
+      repeatedEl.appendChild(card);
+    });
+  }
+}
+
+function renderPlanesAndArrows(planes, arrows, ns = '') {
+  const planesEl = document.getElementById('planesContainer' + ns);
+  planesEl.innerHTML = '';
+  planes.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'ref-card';
+    card.innerHTML = `<div class="ref-label">${p.complete ? 'Complete' : 'Incomplete'}</div><h4>${p.name}</h4><p>${p.interpretation}</p>`;
+    planesEl.appendChild(card);
+  });
+
+  const arrowsEl = document.getElementById('arrowsContainer' + ns);
+  arrowsEl.innerHTML = '';
+  arrows.forEach(a => {
+    const card = document.createElement('div');
+    card.className = 'ref-card';
+    card.innerHTML = `<div class="ref-label">${a.active ? 'Present' : 'Not present'}</div><h4>${a.name}</h4><p>${a.interpretation}</p>`;
+    arrowsEl.appendChild(card);
+  });
+}
+
+function renderNameNumerology(result, ns = '') {
+  const section = document.getElementById('nameNumerologySection' + ns);
+  if (!result.name || !result.chaldeanNameNumber) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+
+  document.getElementById('nnChaldeanVal' + ns).textContent = result.chaldeanNameNumber.value;
+  document.getElementById('nnChaldeanMeaning' + ns).textContent = result.numberKnowledgeBase[result.chaldeanNameNumber.value]?.nameInterpretation || '';
+  document.getElementById('nnPythagoreanVal' + ns).textContent = result.pythagoreanNameNumber.value;
+  document.getElementById('nnPythagoreanMeaning' + ns).textContent = result.numberKnowledgeBase[result.pythagoreanNameNumber.value]?.nameInterpretation || '';
+
+  document.getElementById('nnSoulUrge' + ns).textContent = result.soulUrgeNumber.value;
+  document.getElementById('nnPersonality' + ns).textContent = result.personalityNumber.value;
+  document.getElementById('nnExpression' + ns).textContent = result.expressionNumber.value;
+
+  document.getElementById('nnSteps' + ns).textContent = result.nameNumber.steps;
+  const letterBox = document.getElementById('nnLetterBreakdown' + ns);
+  letterBox.innerHTML = '';
+  result.nameNumber.breakdown.forEach(b => {
+    const chip = document.createElement('div');
+    chip.className = 'letterchip';
+    chip.innerHTML = `<span class="l">${b.letter}</span><span class="v">${b.value}</span>`;
+    letterBox.appendChild(chip);
+  });
+
+  const karmicText = document.getElementById('nnKarmicText' + ns);
+  karmicText.textContent = result.interpretations.nameVibration ? result.interpretations.nameVibration.karmicInterpretation : '';
+}
+
+document.getElementById('nameCorrectionBtn').addEventListener('click', async () => {
+  const errorEl = document.getElementById('nameCorrectionError');
+  const btn = document.getElementById('nameCorrectionBtn');
+  const resultsEl = document.getElementById('nameCorrectionResults');
+  errorEl.classList.remove('show');
+
+  if (!currentReading) { errorEl.textContent = 'Calculate your numbers first.'; errorEl.classList.add('show'); return; }
+  const raw = document.getElementById('nameCorrectionInput').value.trim();
+  if (!raw) { errorEl.textContent = 'Enter at least one name to compare.'; errorEl.classList.add('show'); return; }
+  const names = raw.split(',').map(n => n.trim()).filter(Boolean);
+
+  btn.disabled = true; btn.textContent = 'Comparing\u2026';
+  resultsEl.innerHTML = '<p class="loading-note">Scoring each name\u2026</p>';
+
+  try {
+    const res = await fetch('/api/name-correction/compare', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ day: currentReading.day, month: currentReading.month, year: currentReading.year, system: currentSystem, names }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errorEl.textContent = data.error || 'Could not compare these names.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return; }
+
+    resultsEl.innerHTML = data.results.map(r => `
+      <div class="name-compare-card">
+        <div class="nc-header">
+          <span class="nc-name">${r.name}</span>
+          <span class="compare-label ${r.classification}">${r.classification}</span>
+        </div>
+        <div class="nc-numbers">Name Number ${r.nameNumber} &middot; Soul Urge ${r.soulUrge} &middot; Personality ${r.personality}</div>
+        <div class="nc-reasons">${r.reasons.map(x => `<div>${x.points > 0 ? '+' : ''}${x.points} &mdash; ${x.text}</div>`).join('')}</div>
+        <button class="use-name-btn btn-ghost" data-name="${r.name}" style="margin-top:10px;padding:6px 12px;font-size:12px;">Use this name &rarr;</button>
+      </div>
+    `).join('');
+
+    if (data.bookInsights && data.bookInsights.length > 0) {
+      const bookDiv = document.createElement('div');
+      bookDiv.style.marginTop = '16px';
+      renderBookInsightsInto(bookDiv, data.bookInsights);
+      resultsEl.appendChild(bookDiv);
+    }
+  } catch (err) {
+    errorEl.textContent = 'Could not reach the server. Try again.';
+    errorEl.classList.add('show');
+    resultsEl.innerHTML = '';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Compare names';
+  }
+});
+
+document.getElementById('nameSuggestBtn').addEventListener('click', async () => {
+  const errorEl = document.getElementById('nameCorrectionError');
+  const btn = document.getElementById('nameSuggestBtn');
+  const resultsEl = document.getElementById('nameSuggestResults');
+  errorEl.classList.remove('show');
+
+  if (!currentReading) { errorEl.textContent = 'Calculate your numbers first.'; errorEl.classList.add('show'); return; }
+  const baseName = document.getElementById('nameInput').value.trim();
+  if (!baseName) { errorEl.textContent = 'Enter your name above in the main form first.'; errorEl.classList.add('show'); return; }
+
+  btn.disabled = true; btn.textContent = 'Generating and scoring\u2026';
+  resultsEl.innerHTML = '<p class="loading-note">Trying small variations\u2026</p>';
+
+  try {
+    const res = await fetch('/api/name-correction/suggest', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ day: currentReading.day, month: currentReading.month, year: currentReading.year, system: currentSystem, baseName }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errorEl.textContent = data.error || 'Could not generate suggestions.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return; }
+
+    resultsEl.innerHTML = data.results.map(r => `
+      <div class="name-compare-card" style="${r.isOriginal ? 'border-color:var(--border-strong);' : ''}">
+        <div class="nc-header">
+          <span class="nc-name">${r.isOriginal ? '\u2605 Your current name: ' : ''}${r.name}</span>
+          <span class="compare-label ${r.classification}">${r.classification}</span>
+        </div>
+        <div class="nc-numbers">Name Number ${r.nameNumber} &middot; Soul Urge ${r.soulUrge} &middot; Personality ${r.personality}</div>
+        <div class="nc-reasons">${r.reasons.map(x => `<div>${x.points > 0 ? '+' : ''}${x.points} &mdash; ${x.text}</div>`).join('')}</div>
+        ${r.isOriginal ? '' : `<button class="use-name-btn btn-ghost" data-name="${r.name}" style="margin-top:10px;padding:6px 12px;font-size:12px;">Use this name &rarr;</button>`}
+      </div>
+    `).join('');
+  } catch (err) {
+    errorEl.textContent = 'Could not reach the server. Try again.';
+    errorEl.classList.add('show');
+    resultsEl.innerHTML = '';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Suggest variations of my name';
+  }
+});
+
+// Loads a candidate name into the main form and reruns the full
+// calculation, so the whole profile (Name Number, Colors, Favorable
+// Numbers, Crystal Compatibility, Karmic Numbers) updates together. The
+// Driver, Conductor, and Lo Shu grid stay exactly the same, since those
+// depend only on the date of birth, which hasn't changed.
+async function useThisName(name) {
+  document.getElementById('nameInput').value = name;
+  await calculate();
+}
+document.getElementById('nameCorrectionResults').addEventListener('click', (e) => {
+  const btn = e.target.closest('.use-name-btn');
+  if (!btn) return;
+  useThisName(btn.dataset.name);
+});
+document.getElementById('nameSuggestResults').addEventListener('click', (e) => {
+  const btn = e.target.closest('.use-name-btn');
+  if (!btn) return;
+  useThisName(btn.dataset.name);
+});
+
+function renderCombinedInterpretation(interpretations, ns = '') {
+  document.getElementById('ciOverallProfile' + ns).textContent = interpretations.overallProfile.summary;
+  document.getElementById('ciGuidance' + ns).textContent = interpretations.traditionalGuidance;
+  const strEl = document.getElementById('ciStrengths' + ns);
+  strEl.innerHTML = '';
+  interpretations.strengths.forEach(s => {
+    const tag = document.createElement('span');
+    tag.className = 'tag present';
+    tag.textContent = s;
+    strEl.appendChild(tag);
+  });
+}
+
+const COLOR_CSS_MAP = {
+  'red': 'red', 'orange': 'orange', 'gold': '#D4AF37', 'white': '#F5F3EF', 'cream': '#FFFDD0',
+  'silver': '#C0C0C0', 'yellow': '#F0D64A', 'purple': '#8E5FBF', 'pink': '#E893B8', 'grey': '#8A8A94',
+  'electric blue': '#4FC3F7', 'navy': '#1B2A4A', 'light green': '#8FD19E', 'light grey': '#C9C9D1',
+  'blue': '#4A72D6', 'sea green': '#2E8B67', 'light yellow': '#F5EFA0', 'black': '#2A2A32',
+  'dark blue': '#1F3A6E', 'maroon': '#7A1F2B', 'crimson': '#C23B4E', 'violet': '#9B6FD6',
+  'earth tones': '#A0805A', 'rose gold': '#C98F92',
+};
+function colorToCss(name) { return COLOR_CSS_MAP[name.toLowerCase()] || '#999'; }
+
+function renderColorsAndNumbers(numbersAnalysis, colorProfile, ns = '') {
+  const fmtNumberList = (container, entries, cls) => {
+    container.innerHTML = '';
+    if (entries.length === 0) { container.innerHTML = '<p class="insight-none">None identified.</p>'; return; }
+    entries.forEach(e => {
+      const item = document.createElement('div');
+      item.className = 'fav-num-item' + (cls === 'chal' ? ' chal-num-item' : '');
+      item.style.display = 'inline-flex';
+      item.innerHTML = `<div class="fn-num">${e.number}</div><div class="fn-reason">${e.reasons[0]}</div>`;
+      container.appendChild(item);
+    });
+  };
+  fmtNumberList(document.getElementById('favorableNumbersContainer' + ns), numbersAnalysis.favorableNumbers, 'fav');
+  fmtNumberList(document.getElementById('challengingNumbersContainer' + ns), numbersAnalysis.challengingNumbers, 'chal');
+
+  const comboEl = document.getElementById('supportiveCombosContainer' + ns);
+  comboEl.innerHTML = '';
+  if (numbersAnalysis.supportiveCombinations.length === 0) {
+    comboEl.innerHTML = '<span class="tag">None</span>';
+  } else {
+    numbersAnalysis.supportiveCombinations.forEach(combo => {
+      const tag = document.createElement('span');
+      tag.className = 'tag present';
+      tag.textContent = combo;
+      comboEl.appendChild(tag);
+    });
+  }
+
+  const byNumberEl = document.getElementById('colorsByNumberContainer' + ns);
+  byNumberEl.innerHTML = '';
+  const roleLabels = { driver: 'Driver Number', conductor: 'Conductor Number', name: 'Name Number' };
+  Object.entries(colorProfile.byNumber).forEach(([role, c]) => {
+    const card = document.createElement('div');
+    card.className = 'number-color-card';
+    const swatches = [c.primaryColor, ...c.supportingColors].map(color => `
+      <div class="swatch-item">
+        <div class="swatch-circle" style="background:${colorToCss(color)};"></div>
+        <div class="swatch-label">${color}</div>
+      </div>
+    `).join('');
+    card.innerHTML = `<div class="ncc-label">${roleLabels[role]} ${c.number}</div><div>${swatches}</div><p style="font-size:13px;color:var(--text-dim);margin-top:8px;">${c.meaning}</p>`;
+    byNumberEl.appendChild(card);
+  });
+
+  const bestEl = document.getElementById('myColorsBest' + ns);
+  bestEl.innerHTML = colorProfile.best.map(b => `
+    <div class="swatch-item">
+      <div class="swatch-circle" style="background:${colorToCss(b.color)};"></div>
+      <div class="swatch-label">${b.color}</div>
+      <div class="swatch-source">${b.source}</div>
+    </div>
+  `).join('');
+
+  const modEl = document.getElementById('myColorsModerate' + ns);
+  modEl.innerHTML = colorProfile.useModerately.length === 0
+    ? '<p class="insight-none">None flagged.</p>'
+    : colorProfile.useModerately.map(u => `
+      <div class="swatch-item">
+        <div class="swatch-circle" style="background:${colorToCss(u.color)};"></div>
+        <div class="swatch-label">${u.color}</div>
+        <div class="swatch-source">${u.source}</div>
+      </div>
+    `).join('');
+
+  const paletteEl = document.getElementById('myColorsPalette' + ns);
+  paletteEl.innerHTML = colorProfile.palette.map(p => `
+    <div class="swatch-item">
+      <div class="swatch-circle" style="background:${colorToCss(p.color)};width:44px;height:44px;"></div>
+      <div class="swatch-label">${p.color}</div>
+    </div>
+  `).join('');
+}
+
+function renderSources(result, ns = '') {
+  const container = document.getElementById('sourcesContainer' + ns);
+  container.innerHTML = '';
+  const seen = new Map();
+  const relevantNumbers = [result.driverNumber.value, result.conductorNumber.value];
+  if (result.nameNumber) relevantNumbers.push(result.nameNumber.value);
+  relevantNumbers.forEach(n => {
+    const rec = result.numberKnowledgeBase[n];
+    if (!rec || !rec.sources) return;
+    rec.sources.forEach(src => { if (!seen.has(src.title)) seen.set(src.title, src); });
+  });
+  seen.forEach(src => {
+    const card = document.createElement('div');
+    card.className = 'ref-card';
+    const bylineParts = [src.author, src.year].filter(Boolean).join(', ');
+    card.innerHTML = `
+      <div class="ref-label">${src.sourceType.replace(/_/g, ' ')}</div>
+      <h4>${src.title}</h4>
+      ${bylineParts ? `<p>${bylineParts}</p>` : ''}
+      <div class="ref-source">
+        <span>${src.license}</span>
+        ${src.url ? `<a href="${src.url}" target="_blank" rel="noopener">View source &#8599;</a>` : ''}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function setupCardToggles(ns) {
+  document.getElementById('driverCard' + ns).addEventListener('click', function () {
+    const panel = document.getElementById('driverPanel' + ns);
+    const open = panel.classList.toggle('open');
+    this.setAttribute('aria-expanded', open);
+  });
+  document.getElementById('conductorCard' + ns).addEventListener('click', function () {
+    const panel = document.getElementById('conductorPanel' + ns);
+    const open = panel.classList.toggle('open');
+    this.setAttribute('aria-expanded', open);
+  });
+  document.getElementById('loshuCard' + ns).addEventListener('click', () => {
+    document.getElementById('loshuSection' + ns).scrollIntoView({ behavior: 'smooth' });
+  });
+}
+setupCardToggles('');
+setupCardToggles('7');
+
+let currentReading = null;
+
+let currentSystem = 'chaldean';
+let currentSystem7 = 'chaldean'; // independent state for the Lo Shu comparison tab
+function syncSystemToggles(activeSystem) {
+  document.querySelectorAll('#systemToggle button, #systemToggle3 button, #systemToggle4 button').forEach((b) => b.classList.toggle('active', b.dataset.system === activeSystem));
+}
+document.getElementById('systemToggle').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-system]');
+  if (!btn) return;
+  currentSystem = btn.dataset.system;
+  syncSystemToggles(currentSystem);
+});
+document.getElementById('systemToggle3').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-system]');
+  if (!btn) return;
+  currentSystem = btn.dataset.system;
+  syncSystemToggles(currentSystem);
+});
+document.getElementById('systemToggle4').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-system]');
+  if (!btn) return;
+  currentSystem = btn.dataset.system;
+  syncSystemToggles(currentSystem);
+});
+
+document.getElementById('systemToggle7').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-system]');
+  if (!btn) return;
+  currentSystem7 = btn.dataset.system;
+  document.querySelectorAll('#systemToggle7 button').forEach((b) => b.classList.toggle('active', b.dataset.system === currentSystem7));
+});
+
+document.getElementById('tabNav').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-tab]');
+  if (!btn) return;
+  document.querySelectorAll('.tab-btn').forEach((b) => b.classList.toggle('active', b === btn));
+  document.getElementById('tab0Content').style.display = btn.dataset.tab === 'tab0' ? 'block' : 'none';
+  document.getElementById('tab1Content').style.display = btn.dataset.tab === 'tab1' ? 'block' : 'none';
+  document.getElementById('tab2Content').style.display = btn.dataset.tab === 'tab2' ? 'block' : 'none';
+  document.getElementById('tab3Content').style.display = btn.dataset.tab === 'tab3' ? 'block' : 'none';
+  document.getElementById('tab4Content').style.display = btn.dataset.tab === 'tab4' ? 'block' : 'none';
+  document.getElementById('tab5Content').style.display = btn.dataset.tab === 'tab5' ? 'block' : 'none';
+  document.getElementById('tab6Content').style.display = btn.dataset.tab === 'tab6' ? 'block' : 'none';
+  document.getElementById('tab7Content').style.display = btn.dataset.tab === 'tab7' ? 'block' : 'none';
+  document.getElementById('tab9Content').style.display = btn.dataset.tab === 'tab9' ? 'block' : 'none';
+  syncSystemToggles(currentSystem);
+  // Carry the DOB/name already entered on Tab 1 over to whichever tab is
+  // opened, so the person doesn't have to retype it.
+  if (btn.dataset.tab === 'tab2') {
+    const analyzeDob = document.getElementById('analyzeDobInput');
+    const analyzeName = document.getElementById('analyzeNameInput');
+    if (!analyzeDob.value && dobInput.value) analyzeDob.value = dobInput.value;
+    if (!analyzeName.value && document.getElementById('nameInput').value) analyzeName.value = document.getElementById('nameInput').value;
+  }
+  if (btn.dataset.tab === 'tab3') {
+    const crystalDob = document.getElementById('crystalDobInput');
+    const crystalName = document.getElementById('crystalNameInput');
+    if (!crystalDob.value && dobInput.value) crystalDob.value = dobInput.value;
+    if (!crystalName.value && document.getElementById('nameInput').value) crystalName.value = document.getElementById('nameInput').value;
+  }
+  if (btn.dataset.tab === 'tab4') {
+    const bizDob = document.getElementById('businessOwnerDobInput');
+    if (!bizDob.value && dobInput.value) bizDob.value = dobInput.value;
+  }
+  if (btn.dataset.tab === 'tab5') {
+    const genDob = document.getElementById('genericDobInput');
+    if (!genDob.value && dobInput.value) genDob.value = dobInput.value;
+  }
+  if (btn.dataset.tab === 'tab6') {
+    const relADob = document.getElementById('relADob');
+    const relAName = document.getElementById('relAName');
+    if (!relADob.value && dobInput.value) relADob.value = dobInput.value;
+    if (!relAName.value && document.getElementById('nameInput').value) relAName.value = document.getElementById('nameInput').value;
+  }
+  if (btn.dataset.tab === 'tab7') {
+    if (!dobInput7.value && dobInput.value) dobInput7.value = dobInput.value;
+  }
+  if (btn.dataset.tab === 'tab0') {
+    checkDashboardLogin();
+  }
+  if (btn.dataset.tab === 'tab9') {
+    loadNews();
+  }
+  window.scrollTo(0, 0);
+});
+
+async function calculate() {
+  clearError();
+  const raw = dobInput.value;
+  if (!raw) { showError('Please enter a valid date of birth.'); return; }
+  const [y, m, d] = raw.split('-').map(Number);
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const dobDate = new Date(y, m - 1, d);
+  if (dobDate.getTime() > today.getTime()) { showError('Date of birth cannot be in the future.'); return; }
+
+  const nameVal = document.getElementById('nameInput').value.trim();
+  const nameErrorEl = document.getElementById('nameError');
+  nameErrorEl.classList.remove('show');
+  if (nameVal && !/^[a-zA-Z\s'-]+$/.test(nameVal)) {
+    nameErrorEl.textContent = 'Enter a name using letters only, or leave it blank.';
+    nameErrorEl.classList.add('show');
+    return;
+  }
+
+  calcBtn.disabled = true;
+  calcBtn.textContent = 'Calculating\u2026';
+
+  try {
+    const res = await fetch('/api/readings', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: nameVal || undefined, day: d, month: m, year: y, system: currentSystem }),
+    });
+    const data = await res.json();
+    if (!res.ok) { showError(data.error || 'Please enter a valid date of birth.'); return; }
+
+    currentReading = data.result;
+    renderResults(data.result);
+  } catch (err) {
+    showError('Could not reach the server. Please try again.');
+  } finally {
+    calcBtn.disabled = false;
+    calcBtn.textContent = 'Calculate my numbers';
+  }
+}
+
+// --- Tab 7: Lo Shu Numerology comparison, with dynamic local sub-tabs ---
+// Each calculation with a new name/DOB combo opens as its own sub-tab
+// within this page only -- the main tab bar above is never touched.
+let tab7Profiles = [];
+let tab7ActiveIndex = -1;
+const TAB7_LOSHU_LAYOUT = [[4, 9, 2], [3, 5, 7], [8, 1, 6]];
+
+function renderTab7Grid(loShuGrid) {
+  const grid = document.createElement('div');
+  grid.className = 'loshu-grid';
+  TAB7_LOSHU_LAYOUT.flat().forEach((digit) => {
+    const count = loShuGrid.counts[digit];
+    const cell = document.createElement('div');
+    cell.className = 'loshu-cell' + (count === 0 ? ' missing' : count > 1 ? ' repeated' : '');
+    if (count === 0) {
+      cell.textContent = digit;
+    } else {
+      const digitsWrap = document.createElement('div');
+      digitsWrap.className = 'digits';
+      for (let i = 0; i < count; i++) {
+        const d = document.createElement('span');
+        d.className = 'd';
+        d.textContent = digit;
+        digitsWrap.appendChild(d);
+      }
+      cell.appendChild(digitsWrap);
+    }
+    grid.appendChild(cell);
+  });
+  return grid;
+}
+
+function renderTab7SubTabs() {
+  const bar = document.getElementById('subTabsBar7');
+  bar.innerHTML = '';
+  if (tab7Profiles.length === 0) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  tab7Profiles.forEach((p, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'subtab-btn' + (i === tab7ActiveIndex ? ' active' : '');
+    const label = document.createElement('span');
+    label.textContent = p.label;
+    btn.appendChild(label);
+    if (tab7Profiles.length > 1) {
+      const x = document.createElement('span');
+      x.className = 'close-x';
+      x.textContent = '\u2715';
+      x.addEventListener('click', (e) => {
+        e.stopPropagation();
+        tab7Profiles.splice(i, 1);
+        if (tab7ActiveIndex >= tab7Profiles.length) tab7ActiveIndex = tab7Profiles.length - 1;
+        renderTab7SubTabs();
+        showTab7Active();
+      });
+      btn.appendChild(x);
+    }
+    btn.addEventListener('click', () => {
+      tab7ActiveIndex = i;
+      renderTab7SubTabs();
+      showTab7Active();
+    });
+    bar.appendChild(btn);
+  });
+}
+
+function showTab7Active() {
+  const displayEl = document.getElementById('tab7GridDisplay');
+  const emptyEl = document.getElementById('tab7Empty');
+  const detailWrap = document.getElementById('tab7DetailWrap');
+  const profile = tab7Profiles[tab7ActiveIndex];
+  if (!profile) {
+    displayEl.style.display = 'none';
+    emptyEl.style.display = 'block';
+    detailWrap.style.display = 'none';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  displayEl.style.display = 'block';
+  displayEl.innerHTML = '';
+  const heading = document.createElement('p');
+  heading.style.cssText = 'font-size:13px;color:var(--text-dim);margin-bottom:12px;';
+  heading.textContent = `Driver ${profile.result.driverNumber.value} \u00b7 Conductor ${profile.result.conductorNumber.value}` +
+    (profile.result.nameNumber ? ` \u00b7 Name Number ${profile.result.nameNumber.value}` : '');
+  displayEl.appendChild(heading);
+  displayEl.appendChild(renderTab7Grid(profile.result.loShuGrid));
+
+  // Full profile sections below -- reuses the exact same tested render
+  // functions Tab 1 uses, just targeting the '7'-suffixed elements.
+  detailWrap.style.display = 'block';
+  renderResults(profile.result, '7');
+}
+
+calcBtn7.addEventListener('click', async () => {
+  clearError7();
+  const raw = dobInput7.value;
+  if (!raw) { showError7('Please enter a valid date of birth.'); return; }
+  const [y, m, d] = raw.split('-').map(Number);
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const dobDate = new Date(y, m - 1, d);
+  if (dobDate.getTime() > today.getTime()) { showError7('Date of birth cannot be in the future.'); return; }
+
+  const nameVal = document.getElementById('nameInput7').value.trim();
+  const nameErrorEl = document.getElementById('nameError7');
+  nameErrorEl.classList.remove('show');
+  if (nameVal && !/^[a-zA-Z\s'-]+$/.test(nameVal)) {
+    nameErrorEl.textContent = 'Enter a name using letters only, or leave it blank.';
+    nameErrorEl.classList.add('show');
+    return;
+  }
+
+  calcBtn7.disabled = true;
+  calcBtn7.textContent = 'Calculating\u2026';
+
+  try {
+    const res = await fetch('/api/readings', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: nameVal || undefined, day: d, month: m, year: y, system: currentSystem7 }),
+    });
+    const data = await res.json();
+    if (!res.ok) { showError7(data.error || 'Please enter a valid date of birth.'); return; }
+
+    // Recalculating the exact same name+DOB updates that tab instead of adding a duplicate
+    const existingIndex = tab7Profiles.findIndex((p) => p.day === d && p.month === m && p.year === y && p.name === (nameVal || ''));
+    if (existingIndex !== -1) {
+      tab7Profiles[existingIndex].result = data.result;
+      tab7ActiveIndex = existingIndex;
+    } else {
+      const label = nameVal || `Profile ${tab7Profiles.length + 1}`;
+      tab7Profiles.push({ day: d, month: m, year: y, name: nameVal || '', label, result: data.result });
+      tab7ActiveIndex = tab7Profiles.length - 1;
+    }
+    renderTab7SubTabs();
+    showTab7Active();
+  } catch (err) {
+    showError7('Could not reach the server. Please try again.');
+  } finally {
+    calcBtn7.disabled = false;
+    calcBtn7.textContent = 'Calculate my numbers';
+  }
+});
+
+calcBtn.addEventListener('click', calculate);
+
+document.getElementById('saveToDashboardBtn').addEventListener('click', (e) => {
+  if (!currentReading) return;
+  const r = currentReading;
+  const summary = `Driver ${r.driverNumber.value}, Conductor ${r.conductorNumber.value}` + (r.nameNumber ? `, Name Number ${r.nameNumber.value}` : '');
+  saveToDashboard({
+    name: r.name || '', day: r.day, month: r.month, year: r.year, system: r.system,
+    tabSource: 'lo-shu', driverNumber: r.driverNumber.value, conductorNumber: r.conductorNumber.value,
+    nameNumber: r.nameNumber ? r.nameNumber.value : null, autoSummary: summary,
+  }, e.target);
+});
+
+function renderResults(result, ns = '') {
+  document.getElementById('driverValue' + ns).textContent = result.driverNumber.value;
+  document.getElementById('conductorValue' + ns).textContent = result.conductorNumber.value;
+  document.getElementById('driverSteps' + ns).textContent = result.driverNumber.steps;
+  document.getElementById('conductorSteps' + ns).textContent = result.conductorNumber.steps;
+  document.getElementById('loshuMini' + ns).textContent = result.loShuGrid.present.join(' \u00b7 ');
+
+  renderNumberCard('dp', result.driverNumber, result.numberKnowledgeBase[result.driverNumber.value], 'driver', ns);
+  renderNumberCard('cp', result.conductorNumber, result.numberKnowledgeBase[result.conductorNumber.value], 'conductor', ns);
+
+  renderLoShu(result.loShuGrid, result.numberKnowledgeBase, ns);
+  renderInterpretationList(result.interpretations.missingNumberThemes, result.interpretations.repeatedNumberThemes, ns);
+  renderMissingRepeatedSections(result.interpretations.missingNumberThemes, result.interpretations.repeatedNumberThemes, ns);
+  renderPlanesAndArrows(result.interpretations.planes, result.interpretations.arrows, ns);
+  renderNameNumerology(result, ns);
+  renderCombinedInterpretation(result.interpretations, ns);
+  renderColorsAndNumbers(result.numbersAnalysis, result.colorProfile, ns);
+  renderInterpretationLibrary(result.numberKnowledgeBase, ns);
+  renderSources(result, ns);
+
+  const resultsRootEl = document.getElementById('resultsRoot' + ns);
+  resultsRootEl.style.display = 'block';
+  resultsRootEl.querySelectorAll('section.block').forEach((el, i) => animateReveal(el, i * 60));
+
+  document.getElementById('resultsAnchor' + ns).scrollIntoView({ behavior: 'smooth' });
+
+  const arrowParam = (result.interpretations.arrows.find(a => a.active) || {}).name;
+  loadVideos(result.driverNumber.value, result.conductorNumber.value, result.day, result.month, result.year, result.loShuGrid.missing, result.loShuGrid.repeated, arrowParam, ns);
+  loadReferences(result.driverNumber.value, result.conductorNumber.value, ns);
+  loadBookInsights(result.driverNumber.value, result.conductorNumber.value, result.loShuGrid.missing, result.loShuGrid.repeated, result.nameNumber ? result.nameNumber.value : null, ns);
+}
+
+function skeletonRow() {
+  let html = '<div class="skeleton-row">';
+  for (let i = 0; i < 3; i++) html += '<div class="skeleton-card"><div class="skeleton-thumb"></div><div class="skeleton-line" style="width:80%;"></div><div class="skeleton-line" style="width:50%;"></div></div>';
+  return html + '</div>';
+}
+
+const CATEGORY_TITLES = {
+  driver: (d) => `Videos about Driver Number ${d}`,
+  conductor: (c) => `Videos about Conductor Number ${c}`,
+  loshu: () => 'Videos about your Lo Shu grid',
+  combined: (d, c) => `Videos about Driver ${d} + Conductor ${c}`,
+  missing: (d, c, missing) => `Videos about missing number${missing.length > 1 ? 's' : ''} ${missing.join(', ')}`,
+  repeated: (d, c, missing, repeated) => `Videos about repeated number${repeated.length > 1 ? 's' : ''} ${repeated.join(', ')}`,
+  arrow: (d, c, missing, repeated, arrowName) => `Videos about your ${arrowName}`,
+};
+
+async function loadVideos(driver, conductor, day, month, year, missing = [], repeated = [], arrowName = null, ns = '') {
+  const container = document.getElementById('videoContainer' + ns);
+  const categories = ['driver', 'conductor', 'loshu', 'combined'];
+  if (missing.length) categories.push('missing');
+  if (repeated.length) categories.push('repeated');
+  if (arrowName) categories.push('arrow');
+
+  const titleFor = (cat) => CATEGORY_TITLES[cat](driver, conductor, missing, repeated, arrowName);
+
+  container.innerHTML = `<p class="loading-note">Finding videos for your numbers\u2026</p>` +
+    categories.map(cat => `<div class="video-section"><h3>${titleFor(cat)}</h3>${skeletonRow()}</div>`).join('');
+
+  try {
+    const params = new URLSearchParams();
+    if (missing.length) params.set('missing', missing.join(','));
+    if (repeated.length) params.set('repeated', repeated.join(','));
+    if (arrowName) params.set('arrow', arrowName);
+    const qs = params.toString();
+    const res = await fetch(`/api/videos/${driver}/${conductor}/${day}/${month}/${year}${qs ? '?' + qs : ''}`);
+    const data = await res.json();
+
+    if (data.warning) {
+      container.innerHTML = `<p class="video-warning">${data.warning}</p>`;
+      return;
+    }
+
+    container.innerHTML = '';
+    categories.forEach(cat => {
+      const section = document.createElement('div');
+      section.className = 'video-section';
+      const heading = document.createElement('h3');
+      heading.textContent = titleFor(cat);
+      section.appendChild(heading);
+
+      const videos = (data.categories[cat] && data.categories[cat].videos) || [];
+      if (videos.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'video-empty';
+        empty.textContent = 'No relevant videos were found for this combination.';
+        section.appendChild(empty);
+      } else {
+        const row = document.createElement('div');
+        row.className = 'video-row';
+        videos.forEach(v => row.appendChild(buildVideoCard(v)));
+        section.appendChild(row);
+      }
+      container.appendChild(section);
+    });
+  } catch (err) {
+    container.innerHTML = '<p class="video-warning">Video recommendations are temporarily unavailable. Your numerology results are still available.</p>';
+  }
+}
+
+function buildVideoCard(v) {
+  const card = document.createElement('button');
+  card.type = 'button';
+  card.className = 'video-card';
+  card.setAttribute('aria-label', `Play video: ${v.title}`);
+  const published = v.publishedAt ? new Date(v.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+  card.innerHTML = `
+    <div class="thumb"><img src="${v.thumbnail}" alt="" loading="lazy"><div class="play-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="11" fill="rgba(10,12,24,0.55)"/><path d="M10 8l6 4-6 4V8z"/></svg>
+    </div></div>
+    <div class="vmeta"><div class="vtitle">${v.title}</div><div class="vchannel">${v.channelTitle}</div><div class="vdate">${published}</div></div>
+  `;
+  card.addEventListener('click', () => openVideoModal(v));
+  return card;
+}
+
+async function loadReferences(driver, conductor, ns = '') {
+  const container = document.getElementById('referenceContainer' + ns);
+  container.innerHTML = '<p class="loading-note">Loading reference material\u2026</p>';
+
+  try {
+    const res = await fetch(`/api/reference/${driver}/${conductor}`);
+    const data = await res.json();
+
+    container.innerHTML = '';
+    if (data.warning) {
+      const warn = document.createElement('p');
+      warn.className = 'video-warning';
+      warn.textContent = data.warning;
+      container.appendChild(warn);
+    }
+
+    const grid = document.createElement('div');
+    grid.className = 'ref-grid';
+    (data.entries || []).forEach((entry) => {
+      const card = document.createElement('div');
+      card.className = 'ref-card';
+      if (entry.error) {
+        card.innerHTML = `<div class="ref-label">${entry.label}</div><p class="ref-empty">Reference material unavailable for this topic right now.</p>`;
+      } else {
+        card.innerHTML = `
+          <div class="ref-label">${entry.label}</div>
+          <h4>${entry.title}</h4>
+          <p>${entry.extract}</p>
+          <div class="ref-source">
+            <span>Source: Wikipedia \u00b7 ${data.license}</span>
+            <a href="${entry.sourceUrl}" target="_blank" rel="noopener">Read full article &#8599;</a>
+          </div>
+        `;
+      }
+      grid.appendChild(card);
+    });
+    container.appendChild(grid);
+  } catch (err) {
+    container.innerHTML = '<p class="video-warning">Reference material is temporarily unavailable.</p>';
+  }
+}
+
+// --- Book insights (360 analysis) ---
+
+async function loadBookInsights(driver, conductor, missing, repeated, nameNumber, ns = '') {
+  const container = document.getElementById('bookInsightsContainer' + ns);
+  container.innerHTML = '<p class="loading-note">Searching your book library\u2026</p>';
+
+  try {
+    const res = await fetch('/api/book-insights', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ driver, conductor, missing, repeated, nameNumber }),
+    });
+    const data = await res.json();
+    container.innerHTML = '';
+
+    if (!data.hasAnyBooks) {
+      container.innerHTML = '<p class="insight-none">No book coverage found for this reading yet \u2014 upload numerology books above to see citations here.</p>';
+      return;
+    }
+
+    data.insights.forEach(topic => {
+      const section = document.createElement('div');
+      section.className = 'insight-topic';
+      if (topic.sourceCount === 0) return; // skip empty topics entirely, don't clutter the page
+      section.innerHTML = `<h3>${topic.label}</h3><div class="source-count">${topic.sourceCount} source${topic.sourceCount > 1 ? 's' : ''} found</div>`;
+      topic.books.forEach(b => {
+        const bookDiv = document.createElement('div');
+        bookDiv.className = 'insight-book';
+        let excerptsHtml = b.excerpts.map(e => `<div class="insight-excerpt"><div class="ie-page">Page ${e.page}</div>${e.excerpt}</div>`).join('');
+        bookDiv.innerHTML = `<div class="ib-title">${b.bookTitle}</div><div class="ib-author">${b.bookAuthor || 'Unknown author'}</div>${excerptsHtml}`;
+        section.appendChild(bookDiv);
+      });
+      container.appendChild(section);
+    });
+
+    if (container.innerHTML === '') {
+      container.innerHTML = '<p class="insight-none">No book coverage found for this specific reading.</p>';
+    }
+  } catch (err) {
+    container.innerHTML = '<p class="video-warning">Book insights are temporarily unavailable.</p>';
+  }
+}
+
+// --- Business Name Numerology (Tab 4) ---
+
+document.getElementById('businessNameBtn').addEventListener('click', async () => {
+  const errorEl = document.getElementById('businessNameError');
+  const btn = document.getElementById('businessNameBtn');
+  const resultsEl = document.getElementById('businessNameResults');
+  errorEl.classList.remove('show');
+
+  const raw = document.getElementById('businessNamesInput').value.trim();
+  if (!raw) { errorEl.textContent = 'Enter at least one business name.'; errorEl.classList.add('show'); return; }
+  const names = raw.split(',').map(n => n.trim()).filter(Boolean);
+  const ownerDobRaw = document.getElementById('businessOwnerDobInput').value;
+
+  const body = { names, system: currentSystem };
+  if (ownerDobRaw) {
+    const [y, m, d] = ownerDobRaw.split('-').map(Number);
+    body.ownerDay = d; body.ownerMonth = m; body.ownerYear = y;
+  }
+
+  btn.disabled = true; btn.textContent = 'Analyzing\u2026';
+  resultsEl.innerHTML = '<p class="loading-note">Scoring business name(s)\u2026</p>';
+
+  try {
+    const res = await fetch('/api/business-name/compare', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) { errorEl.textContent = data.error || 'Could not analyze these names.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return; }
+
+    resultsEl.innerHTML = data.results.map(r => `
+      <div class="name-compare-card">
+        <div class="nc-header">
+          <span class="nc-name">${r.businessName}</span>
+          ${r.ownerCompatibility ? `<span class="compare-label ${r.ownerCompatibility.classification}">${r.ownerCompatibility.classification}</span>` : ''}
+        </div>
+        <div class="nc-numbers">Name Number ${r.nameNumber}${r.isMaster ? ' (master number)' : ''}</div>
+        <div class="nc-reasons"><div><strong>Career themes:</strong> ${r.careerThemes.join(', ')}</div><div><strong>Money themes:</strong> ${r.moneyThemes}</div></div>
+        ${r.ownerCompatibility ? `<div class="nc-reasons" style="margin-top:8px;">${r.ownerCompatibility.reasons.map(x => `<div>${x.points > 0 ? '+' : ''}${x.points} &mdash; ${x.text}</div>`).join('')}</div>` : ''}
+      </div>
+    `).join('');
+  } catch (err) {
+    errorEl.textContent = 'Could not reach the server. Try again.';
+    errorEl.classList.add('show');
+    resultsEl.innerHTML = '';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Analyze business name(s)';
+  }
+});
+
+// --- Generic Number Compatibility (Tab 5) ---
+
+document.getElementById('genericNumberBtn').addEventListener('click', async () => {
+  const errorEl = document.getElementById('genericNumberError');
+  const btn = document.getElementById('genericNumberBtn');
+  const resultsEl = document.getElementById('genericNumberResults');
+  errorEl.classList.remove('show');
+
+  const dobRaw = document.getElementById('genericDobInput').value;
+  if (!dobRaw) { errorEl.textContent = 'Enter a date of birth.'; errorEl.classList.add('show'); return; }
+  const value = document.getElementById('genericValueInput').value.trim();
+  if (!value) { errorEl.textContent = 'Enter a number to analyze.'; errorEl.classList.add('show'); return; }
+  const type = document.getElementById('genericTypeInput').value;
+
+  const [y, m, d] = dobRaw.split('-').map(Number);
+
+  btn.disabled = true; btn.textContent = 'Analyzing\u2026';
+  resultsEl.innerHTML = '<p class="loading-note">Scoring this number\u2026</p>';
+
+  try {
+    const res = await fetch('/api/numbers/analyze', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ day: d, month: m, year: y, value, type }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errorEl.textContent = data.error || 'Could not analyze this number.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return; }
+
+    const r = data.result;
+    resultsEl.innerHTML = `
+      <div class="name-compare-card">
+        <div class="nc-header">
+          <span class="nc-name">${r.typeLabel}: ${r.value}</span>
+          <span class="cc-score" style="font-size:22px;">${r.score}/100</span>
+        </div>
+        <div class="nc-numbers">Total ${r.analysis.total} &middot; Final digit ${r.analysis.finalDigit} &middot; First digit ${r.analysis.firstDigit} &middot; Last digit ${r.analysis.lastDigit}</div>
+        <div class="nc-reasons">${r.breakdown.map(x => `<div>${x.points > 0 ? '+' : ''}${x.points} &mdash; ${x.reason}</div>`).join('') || '<div>No specific compatibility factors found; neutral baseline score.</div>'}</div>
+      </div>
+    `;
+  } catch (err) {
+    errorEl.textContent = 'Could not reach the server. Try again.';
+    errorEl.classList.add('show');
+    resultsEl.innerHTML = '';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Analyze this number';
+  }
+});
+
+// --- Relationship Compatibility (Tab 6) ---
+
+document.getElementById('relationshipBtn').addEventListener('click', async () => {
+  const errorEl = document.getElementById('relationshipError');
+  const btn = document.getElementById('relationshipBtn');
+  const resultsEl = document.getElementById('relationshipResults');
+  errorEl.classList.remove('show');
+
+  const aDobRaw = document.getElementById('relADob').value;
+  const bDobRaw = document.getElementById('relBDob').value;
+  if (!aDobRaw || !bDobRaw) { errorEl.textContent = 'Enter both people\u2019s dates of birth.'; errorEl.classList.add('show'); return; }
+
+  const [ay, am, ad] = aDobRaw.split('-').map(Number);
+  const [by, bm, bd] = bDobRaw.split('-').map(Number);
+
+  const personA = { label: document.getElementById('relALabel').value.trim() || 'Person A', day: ad, month: am, year: ay, name: document.getElementById('relAName').value.trim() || undefined, system: currentSystem };
+  const personB = { label: document.getElementById('relBLabel').value.trim() || 'Person B', day: bd, month: bm, year: by, name: document.getElementById('relBName').value.trim() || undefined, system: currentSystem };
+
+  btn.disabled = true; btn.textContent = 'Checking\u2026';
+  resultsEl.innerHTML = '<p class="loading-note">Comparing profiles\u2026</p>';
+
+  try {
+    const res = await fetch('/api/relationship/compare', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ personA, personB }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errorEl.textContent = data.error || 'Could not compare these profiles.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return; }
+
+    resultsEl.innerHTML = `
+      <div class="combo-card">
+        <h3>Compatibility: <span class="compare-label ${data.compatibility.classification}" style="font-size:16px;">${data.compatibility.classification}</span></h3>
+        <div class="mobile-analysis-grid" style="margin-top:16px;">
+          <div class="numcard"><div class="label">${data.profileA.label} \u2014 Driver</div><div class="value">${data.profileA.driver}</div></div>
+          <div class="numcard"><div class="label">${data.profileA.label} \u2014 Conductor</div><div class="value">${data.profileA.conductor}</div></div>
+          <div class="numcard"><div class="label">${data.profileB.label} \u2014 Driver</div><div class="value">${data.profileB.driver}</div></div>
+          <div class="numcard"><div class="label">${data.profileB.label} \u2014 Conductor</div><div class="value">${data.profileB.conductor}</div></div>
+        </div>
+        <div class="nc-reasons" style="margin-top:16px;">${data.compatibility.reasons.map(x => `<div>${x.points > 0 ? '+' : ''}${x.points} &mdash; ${x.text}</div>`).join('')}</div>
+      </div>
+    `;
+  } catch (err) {
+    errorEl.textContent = 'Could not reach the server. Try again.';
+    errorEl.classList.add('show');
+    resultsEl.innerHTML = '';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Check compatibility';
+  }
+});
+
+function renderBookInsightsInto(container, insights) {
+  container.innerHTML = '';
+  const withSources = insights.filter(t => t.sourceCount > 0);
+  if (withSources.length === 0) {
+    container.innerHTML = '<p class="insight-none">No book coverage found for this yet &mdash; upload numerology books via the admin panel to see citations here.</p>';
+    return;
+  }
+  withSources.forEach(topic => {
+    const section = document.createElement('div');
+    section.className = 'insight-topic';
+    section.innerHTML = `<h3>${topic.label}</h3><div class="source-count">${topic.sourceCount} source${topic.sourceCount > 1 ? 's' : ''} found</div>`;
+    topic.books.forEach(b => {
+      const bookDiv = document.createElement('div');
+      bookDiv.className = 'insight-book';
+      const excerptsHtml = b.excerpts.map(e => `<div class="insight-excerpt"><div class="ie-page">Page ${e.page}</div>${e.excerpt}</div>`).join('');
+      bookDiv.innerHTML = `<div class="ib-title">${b.bookTitle}</div><div class="ib-author">${b.bookAuthor || 'Unknown author'}</div>${excerptsHtml}`;
+      section.appendChild(bookDiv);
+    });
+    container.appendChild(section);
+  });
+}
+
+// --- Mobile number analysis (auto, when provided on the main form) ---
+
+async function loadMobileAnalysis(day, month, year, name, system, mobileNumber) {
+  const section = document.getElementById('mobileAnalysisSection');
+  section.style.display = 'block';
+  try {
+    const res = await fetch('/api/mobile/analyze', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ day, month, year, name: name || undefined, system, mobileNumber }),
+    });
+    const data = await res.json();
+    if (!res.ok) { document.getElementById('maVerdict').innerHTML = `<span class="insight-none">${data.error || 'Could not analyze this number.'}</span>`; return; }
+
+    document.getElementById('maWelcome').textContent = name ? `\u{1F31F} Welcome, ${name}!` : '\u{1F31F} Here are your results!';
+
+    const digits = data.analysis.digits.join(' + ');
+    document.getElementById('maBreakdownEquation').textContent = `${digits} = ${data.analysis.total} \u2192 ${data.analysis.finalDigit}`;
+
+    const isLucky = data.compatibilityScore >= 50;
+    const verdictEl = document.getElementById('maVerdict');
+    verdictEl.textContent = `Your phone number (${data.analysis.raw}) is ${isLucky ? 'LUCKY' : 'UNLUCKY'}!`;
+    verdictEl.style.color = isLucky ? 'var(--gold)' : 'var(--danger)';
+
+    const corrEl = document.getElementById('maCorroboration');
+    if (data.corroboration && data.corroboration.length > 0) {
+      corrEl.innerHTML = `
+        <p style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">This specific number-pair compatibility is also published by:</p>
+        ${data.corroboration.map(s => `<a href="${s.url}" target="_blank" rel="noopener" style="display:block;font-size:12px;color:var(--violet);margin-bottom:3px;">${s.author} \u2014 ${s.title} &#8599;</a>`).join('')}
+      `;
+    } else {
+      corrEl.innerHTML = '';
+    }
+  } catch (err) {
+    document.getElementById('maVerdict').innerHTML = '<span class="insight-none">Could not analyze this number right now.</span>';
+  }
+}
+
+document.getElementById('analyzeMobileBtn').addEventListener('click', () => {
+  const dobRaw = document.getElementById('analyzeDobInput').value;
+  const errorEl = document.getElementById('analyzeMobileError');
+  errorEl.classList.remove('show');
+
+  if (!dobRaw) { errorEl.textContent = 'Enter a date of birth.'; errorEl.classList.add('show'); return; }
+  const mobileVal = document.getElementById('analyzeMobileInput').value.trim();
+  if (!mobileVal || !/^[0-9\s()+-]{7,20}$/.test(mobileVal)) {
+    errorEl.textContent = 'Enter a valid mobile number.'; errorEl.classList.add('show'); return;
+  }
+
+  const [y, m, d] = dobRaw.split('-').map(Number);
+  const name = document.getElementById('analyzeNameInput').value.trim();
+  loadMobileAnalysis(d, m, y, name, currentSystem, mobileVal);
+});
+
+// --- Crystal compatibility (Tab 3) ---
+
+let lastCrystalResult = null;
+
+document.getElementById('crystalAnalyzeBtn').addEventListener('click', async () => {
+  const dobRaw = document.getElementById('crystalDobInput').value;
+  const errorEl = document.getElementById('crystalError');
+  const btn = document.getElementById('crystalAnalyzeBtn');
+  const resultsEl = document.getElementById('crystalResultsContainer');
+  errorEl.classList.remove('show');
+
+  if (!dobRaw) { errorEl.textContent = 'Enter a date of birth.'; errorEl.classList.add('show'); return; }
+  const [y, m, d] = dobRaw.split('-').map(Number);
+  const name = document.getElementById('crystalNameInput').value.trim();
+  const purpose = document.getElementById('crystalPurposeInput').value;
+
+  btn.disabled = true; btn.textContent = 'Analyzing\u2026';
+  resultsEl.innerHTML = '<p class="loading-note">Scoring crystals against your profile\u2026</p>';
+  document.getElementById('crystalBookInsightsContainer').innerHTML = '';
+  document.getElementById('crystalSaveBtnWrap').style.display = 'none';
+
+  try {
+    const res = await fetch('/api/crystals/analyze', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ day: d, month: m, year: y, name: name || undefined, system: currentSystem, purpose: purpose || undefined }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errorEl.textContent = data.error || 'Could not analyze crystal compatibility.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return; }
+
+    const summaryLine = `<p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Based on Driver ${data.coreNumbers.driverNumber}, Conductor ${data.coreNumbers.conductorNumber}${data.coreNumbers.nameNumber ? `, Name Number ${data.coreNumbers.nameNumber}` : ''}${data.loshuMissing.length ? `, and missing Lo Shu numbers ${data.loshuMissing.join(', ')}` : ''}.</p>`;
+
+    const cards = data.compatibility.map(c => `
+      <div class="crystal-card ${c.classification}">
+        <div class="cr-header">
+          <span class="cr-name">${c.crystal}</span>
+          <span><span class="cr-stars">${'\u2b50'.repeat(c.stars)}${'\u2606'.repeat(5 - c.stars)}</span><span class="cr-label ${c.classification}">${c.classification}</span></span>
+        </div>
+        <div class="cr-reasons">${c.reasons.map(r => `<div>${r.points > 0 ? '+' : ''}${r.points} &mdash; ${r.text}</div>`).join('')}</div>
+      </div>
+    `).join('');
+
+    resultsEl.innerHTML = summaryLine + cards;
+
+    lastCrystalResult = { name, day: d, month: m, year: y, system: currentSystem, coreNumbers: data.coreNumbers, topCrystal: data.compatibility[0] ? data.compatibility[0].crystal : '' };
+    document.getElementById('crystalSaveBtnWrap').style.display = 'block';
+
+    const videosEl = document.getElementById('crystalVideosContainer');
+    if (data.videos && data.videos.length > 0) {
+      videosEl.innerHTML = '<p class="eyebrow" style="margin-bottom:12px;">Recommended videos</p><div class="video-row"></div>';
+      const row = videosEl.querySelector('.video-row');
+      data.videos.forEach(v => row.appendChild(buildVideoCard(v)));
+    } else {
+      videosEl.innerHTML = '';
+    }
+
+    renderBookInsightsInto(document.getElementById('crystalBookInsightsContainer'), data.bookInsights);
+  } catch (err) {
+    errorEl.textContent = 'Could not reach the server. Try again.';
+    errorEl.classList.add('show');
+    resultsEl.innerHTML = '';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Find compatible crystals';
+  }
+});
+
+document.getElementById('crystalSaveToDashboardBtn').addEventListener('click', (e) => {
+  if (!lastCrystalResult) return;
+  const r = lastCrystalResult;
+  const summary = `Driver ${r.coreNumbers.driverNumber}, Conductor ${r.coreNumbers.conductorNumber}${r.coreNumbers.nameNumber ? `, Name Number ${r.coreNumbers.nameNumber}` : ''}, top crystal ${r.topCrystal}`;
+  saveToDashboard({
+    name: r.name || '', day: r.day, month: r.month, year: r.year, system: r.system,
+    tabSource: 'crystal', driverNumber: r.coreNumbers.driverNumber, conductorNumber: r.coreNumbers.conductorNumber,
+    nameNumber: r.coreNumbers.nameNumber, crystalSuggestion: r.topCrystal, autoSummary: summary,
+  }, e.target);
+});
+
+const videoModal = document.getElementById('videoModal');
+const modalPlayer = document.getElementById('modalPlayer');
+const modalTitle = document.getElementById('modalTitle');
+const modalYoutubeLink = document.getElementById('modalYoutubeLink');
+let lastFocusedEl = null;
+
+function openVideoModal(v) {
+  lastFocusedEl = document.activeElement;
+  modalTitle.textContent = v.title;
+  modalPlayer.innerHTML = `<iframe src="https://www.youtube.com/embed/${v.videoId}?autoplay=1" title="${v.title.replace(/"/g, '&quot;')}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  modalYoutubeLink.href = `https://www.youtube.com/watch?v=${v.videoId}`;
+  videoModal.classList.add('open');
+  document.getElementById('modalClose').focus();
+  document.addEventListener('keydown', onModalKeydown);
+}
+function closeVideoModal() {
+  videoModal.classList.remove('open');
+  modalPlayer.innerHTML = '';
+  document.removeEventListener('keydown', onModalKeydown);
+  if (lastFocusedEl) lastFocusedEl.focus();
+}
+function onModalKeydown(e) {
+  if (e.key === 'Escape') closeVideoModal();
+}
+document.getElementById('modalClose').addEventListener('click', closeVideoModal);
+videoModal.addEventListener('click', (e) => { if (e.target === videoModal) closeVideoModal(); });
+
+// --- Dashboard (Tab 0) ---
+
+async function checkDashboardLogin() {
+  try {
+    const res = await fetch('/api/admin/me');
+    const data = await res.json();
+    if (data.loggedIn) {
+      document.getElementById('dashboardLoginGate').style.display = 'none';
+      document.getElementById('dashboardContent').style.display = 'block';
+      loadDashboard();
+    } else {
+      document.getElementById('dashboardLoginGate').style.display = 'block';
+      document.getElementById('dashboardContent').style.display = 'none';
+    }
+  } catch (err) {
+    document.getElementById('dashboardLoginError').textContent = 'Could not check login status.';
+    document.getElementById('dashboardLoginError').classList.add('show');
+  }
+}
+
+document.getElementById('dashboardLoginBtn').addEventListener('click', async () => {
+  const password = document.getElementById('dashboardPasswordInput').value;
+  const errorEl = document.getElementById('dashboardLoginError');
+  errorEl.classList.remove('show');
+  try {
+    const res = await fetch('/api/admin/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errorEl.textContent = data.error || 'Incorrect password.'; errorEl.classList.add('show'); return; }
+    document.getElementById('dashboardPasswordInput').value = '';
+    checkDashboardLogin();
+  } catch (err) {
+    errorEl.textContent = 'Could not reach the server.'; errorEl.classList.add('show');
+  }
+});
+
+document.getElementById('dashboardLogoutBtn').addEventListener('click', async () => {
+  await fetch('/api/admin/logout', { method: 'POST' });
+  checkDashboardLogin();
+});
+
+document.getElementById('dashboardNewsLink').addEventListener('click', (e) => {
+  e.preventDefault();
+  document.querySelector('[data-tab="tab9"]').click();
+});
+
+async function loadDashboard() {
+  loadSavedProfiles();
+  loadCommonNumbers();
+}
+
+async function loadNews() {
+  const panel = document.getElementById('newsPanel');
+  try {
+    const res = await fetch('/api/news');
+    const data = await res.json();
+    if (!data.items || data.items.length === 0) {
+      panel.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">No news available right now.</p>';
+      return;
+    }
+    panel.innerHTML = '';
+    data.items.forEach((item) => {
+      const a = document.createElement('a');
+      a.className = 'news-item';
+      a.href = item.link;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      const dateStr = item.pubDate ? new Date(item.pubDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+      a.innerHTML = `${item.title}<span class="news-meta">${item.source}${dateStr ? ' \u00b7 ' + dateStr : ''}</span>`;
+      panel.appendChild(a);
+    });
+  } catch (err) {
+    panel.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Could not load news right now.</p>';
+  }
+}
+
+async function loadSavedProfiles() {
+  const container = document.getElementById('savedProfilesTable');
+  try {
+    const res = await fetch('/api/dashboard/list');
+    const data = await res.json();
+    renderSavedProfilesTable(data.profiles || []);
+  } catch (err) {
+    container.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Could not load saved profiles right now.</p>';
+  }
+}
+
+function renderSavedProfilesTable(profiles) {
+  const container = document.getElementById('savedProfilesTable');
+  if (profiles.length === 0) {
+    container.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">No profiles saved yet.</p>';
+    return;
+  }
+  const rows = profiles.map((p) => {
+    const dob = (p.day && p.month && p.year) ? `${String(p.day).padStart(2, '0')}/${String(p.month).padStart(2, '0')}/${p.year}` : '\u2014';
+    return `
+      <tr data-id="${p._id}">
+        <td>${p.name || '\u2014'}</td>
+        <td>${dob}</td>
+        <td>${p.crystalSuggestion || '\u2014'}</td>
+        <td>
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:6px;">${p.autoSummary || ''}</div>
+          <textarea class="notes-input" placeholder="Your notes...">${p.userNotes || ''}</textarea>
+        </td>
+        <td>
+          <div class="row-actions">
+            <button type="button" class="save-notes-btn">Save</button>
+            <button type="button" class="delete-profile-btn">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  container.innerHTML = `
+    <table class="saved-table">
+      <thead><tr><th>Name</th><th>DOB</th><th>Crystal suggestion</th><th>Description</th><th>Actions</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+
+  container.querySelectorAll('.save-notes-btn').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      const row = e.target.closest('tr');
+      const id = row.dataset.id;
+      const notes = row.querySelector('.notes-input').value;
+      btn.disabled = true; btn.textContent = 'Saving\u2026';
+      try {
+        await fetch('/api/dashboard/' + id, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userNotes: notes }),
+        });
+        btn.textContent = 'Saved!';
+        setTimeout(() => { btn.textContent = 'Save'; btn.disabled = false; }, 1200);
+      } catch (err) {
+        btn.textContent = 'Failed'; btn.disabled = false;
+      }
+    });
+  });
+
+  container.querySelectorAll('.delete-profile-btn').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      const row = e.target.closest('tr');
+      const id = row.dataset.id;
+      if (!confirm('Delete this saved profile? This cannot be undone.')) return;
+      try {
+        await fetch('/api/dashboard/' + id, { method: 'DELETE' });
+        row.remove();
+        loadCommonNumbers();
+        if (container.querySelectorAll('tbody tr').length === 0) {
+          container.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">No profiles saved yet.</p>';
+        }
+      } catch (err) {
+        alert('Could not delete this profile. Try again.');
+      }
+    });
+  });
+}
+
+async function loadCommonNumbers() {
+  const panel = document.getElementById('commonNumbersPanel');
+  try {
+    const res = await fetch('/api/dashboard/common-numbers');
+    const data = await res.json();
+    document.getElementById('sidebarTotalCount').textContent = data.totalProfiles || 0;
+    if (!data.totalProfiles || data.totalProfiles === 0) {
+      panel.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Save a few profiles to see patterns here.</p>';
+      return;
+    }
+    const buildCol = (title, entries) => {
+      if (entries.length === 0) return `<div class="common-numbers-col"><h4>${title}</h4><p style="font-size:12px;color:var(--text-dim);">No data yet.</p></div>`;
+      const bars = entries.slice(0, 5).map((e) => `<div class="cn-bar"><span class="cn-num">${e.number}</span> appears ${e.count}\u00d7</div>`).join('');
+      return `<div class="common-numbers-col"><h4>${title}</h4>${bars}</div>`;
+    };
+    panel.innerHTML = `
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:16px;">Based on ${data.totalProfiles} saved profile${data.totalProfiles === 1 ? '' : 's'}.</p>
+      <div class="common-numbers-grid">
+        ${buildCol('Driver numbers', data.driverNumbers)}
+        ${buildCol('Conductor numbers', data.conductorNumbers)}
+        ${buildCol('Name numbers', data.nameNumbers)}
+      </div>
+    `;
+  } catch (err) {
+    panel.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Could not load this right now.</p>';
+  }
+}
+
+async function saveToDashboard(payload, btn) {
+  const originalText = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Saving\u2026';
+  try {
+    const res = await fetch('/api/dashboard/save', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error('save failed');
+    btn.textContent = 'Saved to Dashboard \u2713';
+    setTimeout(() => { btn.textContent = originalText; btn.disabled = false; }, 2000);
+  } catch (err) {
+    btn.textContent = 'Could not save \u2014 try again';
+    setTimeout(() => { btn.textContent = originalText; btn.disabled = false; }, 2000);
+  }
+}
+
+checkDashboardLogin();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch((err) => {
+      console.error('Service worker registration failed:', err);
+    });
+  });
+}
+
+</script>
+</body>
+</html>
