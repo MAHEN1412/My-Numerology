@@ -6,6 +6,14 @@ const dotenv = require('dotenv');
 // which depends on the process's current working directory) and print
 // exactly what happened — this turns "it's missing but the file looks
 // right" into a concrete, visible fact instead of a guessing game.
+//
+// Important: a missing .env FILE is completely normal and expected on
+// cloud platforms like Render, Heroku, or Railway — they inject
+// environment variables directly into process.env at container startup,
+// with no physical .env file involved at all. So if the file isn't
+// found, this checks whether the variables are already present in
+// process.env (the platform-injected case) before concluding anything
+// is actually wrong.
 const envPath = path.join(__dirname, '..', '.env');
 console.log('[env] Looking for .env at:', envPath);
 console.log('[env] File exists at that path:', fs.existsSync(envPath));
@@ -15,7 +23,15 @@ if (fs.existsSync(envPath)) {
   Object.assign(process.env, parsed);
   console.log('[env] Keys found in file:', Object.keys(parsed).join(', ') || '(none)');
 } else {
-  console.log('[env] No .env file found at the path above \u2014 that\'s the actual problem.');
+  const REQUIRED_KEYS = ['MONGODB_URI', 'PORT', 'YOUTUBE_API_KEY', 'ADMIN_PASSWORD', 'SESSION_SECRET'];
+  const alreadyPresent = REQUIRED_KEYS.filter((k) => process.env[k]);
+  const stillMissing = REQUIRED_KEYS.filter((k) => !process.env[k]);
+  if (alreadyPresent.length > 0) {
+    console.log('[env] No .env file, but found these already set directly in the environment (expected on cloud platforms like Render):', alreadyPresent.join(', '));
+  }
+  if (stillMissing.length > 0) {
+    console.log('[env] These keys are NOT set anywhere (not in a file, not in the environment) — this is the actual problem, if any of these are required:', stillMissing.join(', '));
+  }
 }
 const express = require('express');
 const mongoose = require('mongoose');
@@ -33,6 +49,7 @@ const businessNameRouter = require('./routes/businessName');
 const genericNumberRouter = require('./routes/genericNumber');
 const relationshipRouter = require('./routes/relationship');
 const dashboardRouter = require('./routes/dashboard');
+const newsRouter = require('./routes/news');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -91,6 +108,7 @@ app.use('/api/business-name', businessNameRouter);
 app.use('/api/numbers', genericNumberRouter);
 app.use('/api/relationship', relationshipRouter);
 app.use('/api/dashboard', dashboardRouter);
+app.use('/api/news', newsRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, dbState: mongoose.connection.readyState });
