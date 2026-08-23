@@ -105,20 +105,23 @@ async function searchYouTubeOnce(query) {
 
 const RELEVANCE_TERMS = ['driver number', 'mulank', 'psychic number', 'birth number', 'conductor number', 'bhagyank', 'life path number', 'destiny number', 'lo shu grid', 'lo shu', 'main planet', 'ruling planet', 'missing number', 'repeated number', 'arrow of', 'mobile number', 'phone number', 'lucky mobile', 'lucky phone', 'crystal', 'gemstone', 'gem stone', 'ruby', 'moonstone', 'emerald', 'sapphire', 'diamond', 'coral', 'hessonite', 'cat\'s eye'];
 
-function scoreRelevance(video, expectedNumbers, requireNumberMatch = true) {
+function scoreRelevance(video, expectedNumbers, requireNumberMatch = true, requireAllNumbers = false) {
   const title = (video.title || '').toLowerCase();
   const desc = (video.description || '').toLowerCase();
   const combined = title + ' ' + desc;
   let score = RELEVANCE_TERMS.reduce((s, term) => (combined.includes(term) ? s + 1 : s), 0);
+  const matchedNumbers = expectedNumbers.filter((n) => new RegExp(`(^|[^0-9])${n}([^0-9]|$)`).test(combined));
   if (requireNumberMatch) {
     // A relevance-term match is necessary but not sufficient — a video titled
     // "Life Path Number 9" showing up for Driver Number 3 is still wrong.
     // Require at least one of the actual expected numbers to appear too,
     // as a standalone digit (word boundary) so "3" doesn't match inside "13".
-    const numberMatch = expectedNumbers.some((n) => new RegExp(`(^|[^0-9])${n}([^0-9]|$)`).test(combined));
+    const numberMatch = requireAllNumbers
+      ? matchedNumbers.length === expectedNumbers.length // combination mode: BOTH numbers must appear, not just one
+      : matchedNumbers.length > 0;
     if (!numberMatch) score = 0;
   }
-  return score;
+  return { score, matchedNumbers };
 }
 
 function expectedNumbersFor(category, params) {
@@ -135,7 +138,7 @@ function expectedNumbersFor(category, params) {
   }
 }
 
-async function fetchCategoryVideos(category, params) {
+async function fetchCategoryVideos(category, params, requireAllNumbers = false) {
   const queries = buildQueries(category, params);
   if (queries.length === 0) return [];
 
@@ -150,10 +153,13 @@ async function fetchCategoryVideos(category, params) {
     results.forEach((v) => { if (!seen.has(v.videoId)) seen.set(v.videoId, v); });
   }
 
-  const scored = Array.from(seen.values()).map((v) => ({ ...v, _score: scoreRelevance(v, expectedNumbers, requireNumberMatch) }));
+  const scored = Array.from(seen.values()).map((v) => {
+    const { score, matchedNumbers } = scoreRelevance(v, expectedNumbers, requireNumberMatch, requireAllNumbers);
+    return { ...v, _score: score, matchedNumbers };
+  });
   // Only keep videos that actually matched relevant terminology (and the
-  // right number, where applicable) — anything scoring 0 is dropped rather
-  // than shown as filler.
+  // right number(s), where applicable) — anything scoring 0 is dropped
+  // rather than shown as filler.
   const relevant = scored.filter((v) => v._score > 0);
 
   return relevant
@@ -161,6 +167,23 @@ async function fetchCategoryVideos(category, params) {
     .slice(0, RESULTS_PER_CATEGORY)
     .map(({ _score, ...v }) => v);
 }
+
+// GET /api/videos/combination/:driver/:conductor
+// Stricter than the 'combined' category above: requires BOTH numbers to
+// appear in the same video (not just one), for the comparison-table view
+// where the person wants videos specifically about their exact pairing.
+router.get('/combination/:driver/:conductor', async (req, res) => {
+  const driver = Number(req.params.driver);
+  const conductor = Number(req.params.conductor);
+
+  if (![driver, conductor].every((n) => n >= 1 && n <= 9)) {
+    return res.status(400).json({ error: 'Driver and conductor must each be 1-9.' });
+  }
+
+  const cacheKey = `combination-strict:${driver}:${conductor}`;
+  const result = await getVideosForCategory('combined', { driver, conductor }, cacheKey, true);
+  res.json({ driver, conductor, videos: result.videos || [], requireAllNumbers: true });
+});
 
 // GET /api/videos/:driver/:conductor/:day/:month/:year
 // Optional query params: ?missing=3,4,5&repeated=1,2&arrow=Arrow%20of%20determination
@@ -235,13 +258,13 @@ router.get('/:driver/:conductor/:day/:month/:year', async (req, res) => {
  * routes (e.g. mobile.js) that want a video recommendation without going
  * through the full multi-category endpoint above.
  */
-async function getVideosForCategory(category, params, cacheKey) {
+async function getVideosForCategory(category, params, cacheKey, requireAllNumbers = false) {
   try {
     const cached = await VideoCache.findOne({ key: cacheKey });
     if (cached && isFresh(cached.fetchedAt) && cached.videos.length > 0) {
       return { videos: cached.videos, cached: true };
     }
-    const videos = await fetchCategoryVideos(category, params);
+    const videos = await fetchCategoryVideos(category, params, requireAllNumbers);
     if (videos.length > 0) {
       await VideoCache.findOneAndUpdate(
         { key: cacheKey },

@@ -28,12 +28,12 @@
 </script>
 <style>
   :root{
-    --navy:#0A0C18; --navy-2:#12142B; --surface:#181B38; --surface-2:#1F2347;
-    --border:rgba(255,255,255,0.08); --border-strong:rgba(255,255,255,0.16);
-    --indigo:#7C6FF0; --violet:#9D7BFF; --gold:#D4AF6A;
-    --text:#F3F1FA; --text-dim:#B7B2D6; --text-muted:#7B7699;
-    --danger:#F0836B; --danger-bg:rgba(240,131,107,0.12);
-    --glow: radial-gradient(circle, rgba(157,123,255,0.28), transparent 70%);
+    --navy:#FAFAF7; --navy-2:#F2F1EA; --surface:#FFFFFF; --surface-2:#F7F6F1;
+    --border:rgba(26,26,46,0.10); --border-strong:rgba(26,26,46,0.18);
+    --indigo:#3B3486; --violet:#5A4FCF; --gold:#E8A33D;
+    --text:#1A1A2E; --text-dim:#4A4A63; --text-muted:#83839A;
+    --danger:#C23B4E; --danger-bg:rgba(194,59,78,0.08);
+    --glow: radial-gradient(circle, rgba(90,79,207,0.10), transparent 70%);
   }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
@@ -59,7 +59,7 @@
   .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;}
 
   #dobSection{padding:0 24px 64px;}
-  .dob-card{max-width:480px;margin:-40px auto 0;position:relative;box-shadow:0 30px 60px -30px rgba(0,0,0,0.6);}
+  .dob-card{max-width:480px;margin:32px auto 0;position:relative;box-shadow:0 30px 60px -30px rgba(26,26,46,0.18);}
   .dob-card h2{font-size:24px;text-align:center;margin-bottom:8px;}
   .dob-card p{text-align:center;color:var(--text-dim);font-size:14px;margin:0 0 24px;}
   .field label{display:block;font-size:13px;font-weight:500;margin-bottom:8px;color:var(--text);}
@@ -68,7 +68,7 @@
     padding:13px 14px;color:var(--text);font-size:16px;font-family:'Inter',sans-serif;color-scheme:dark;
   }
   .field input[type="text"]::placeholder{color:var(--text-muted);}
-  .field input:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(157,123,255,0.2);}
+  .field input:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(90,79,207,0.2);}
   .field-error{color:var(--danger);font-size:13px;margin-top:8px;display:none;}
   .field-error.show{display:block;}
 
@@ -98,6 +98,13 @@
   .news-item:hover{border-color:var(--gold);}
   .news-item .news-meta{display:block;font-size:11px;color:var(--text-muted);margin-top:4px;}
   .saved-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .video-compare-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .video-compare-table th{text-align:left;padding:8px 10px;color:var(--text-dim);font-weight:600;border-bottom:1px solid var(--border-strong);font-size:12px;}
+  .video-compare-table td{padding:10px;border-bottom:1px solid var(--border);vertical-align:top;}
+  .video-compare-table a{color:var(--violet);text-decoration:none;font-weight:500;}
+  .video-compare-table a:hover{text-decoration:underline;}
+  .video-compare-table .vc-matched{display:flex;gap:4px;}
+  .video-compare-table .vc-num{width:20px;height:20px;border-radius:50%;background:var(--gold);color:var(--navy);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
   .saved-table th{text-align:left;padding:10px 12px;color:var(--text-dim);font-weight:600;border-bottom:1px solid var(--border-strong);}
   .saved-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
   .saved-table textarea{width:100%;min-height:50px;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:6px;color:var(--text);font-size:12px;padding:6px;font-family:inherit;}
@@ -190,7 +197,7 @@
   .lucky-item{font-size:13px;color:var(--text-dim);}
   .lucky-item b{color:var(--text);}
 
-  .combo-card{background:linear-gradient(135deg, rgba(124,111,240,0.12), rgba(157,123,255,0.06));border:1px solid var(--border-strong);border-radius:16px;padding:28px;}
+  .combo-card{background:linear-gradient(135deg, rgba(59,52,134,0.08), rgba(90,79,207,0.04));border:1px solid var(--border-strong);border-radius:16px;padding:28px;}
   .combo-card h3{font-size:20px;margin-bottom:12px;}
   .combo-card p{font-size:14px;color:var(--text-dim);margin:0 0 10px;}
 
@@ -239,7 +246,7 @@
   .insight-none{font-size:13px;color:var(--text-muted);}
 
   .candidate-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:16px;}
-  .candidate-card.top-pick{border-color:var(--gold);background:linear-gradient(135deg, rgba(212,175,106,0.08), transparent);}
+  .candidate-card.top-pick{border-color:var(--gold);background:linear-gradient(135deg, rgba(232,163,61,0.08), transparent);}
   .candidate-card .cc-number{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600;letter-spacing:0.03em;}
   .candidate-card .cc-badge{font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--gold);margin-bottom:4px;}
   .candidate-card .cc-score{font-size:24px;font-weight:700;color:var(--gold);font-family:'Cormorant Garamond',serif;}
@@ -268,9 +275,9 @@
   .compare-table th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border-strong);color:var(--text-secondary);font-weight:500;font-size:12px;}
   .compare-table td{padding:8px 10px;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;}
   .compare-label{padding:2px 8px;border-radius:6px;font-size:11px;font-family:'Inter',sans-serif;}
-  .compare-label.Favorable{background:var(--accent-light, rgba(212,175,106,0.15));color:var(--gold);}
-  .compare-label.Neutral{background:rgba(255,255,255,0.06);color:var(--text-dim);}
-  .compare-label.Challenging{background:rgba(240,131,107,0.12);color:var(--danger);}
+  .compare-label.Favorable{background:var(--accent-light, rgba(232,163,61,0.15));color:var(--gold);}
+  .compare-label.Neutral{background:rgba(26,26,46,0.06);color:var(--text-dim);}
+  .compare-label.Challenging{background:rgba(194,59,78,0.10);color:var(--danger);}
 
   .crystal-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;}
   .crystal-card.Compatible{border-color:var(--gold);}
@@ -279,9 +286,9 @@
   .crystal-card .cr-name{font-size:16px;font-weight:600;}
   .crystal-card .cr-stars{font-size:14px;letter-spacing:1px;}
   .crystal-card .cr-label{font-size:11px;padding:2px 8px;border-radius:6px;margin-left:8px;}
-  .crystal-card .cr-label.Compatible{background:rgba(212,175,106,0.15);color:var(--gold);}
-  .crystal-card .cr-label.Neutral{background:rgba(255,255,255,0.06);color:var(--text-dim);}
-  .crystal-card .cr-label.Avoid{background:rgba(240,131,107,0.12);color:var(--danger);}
+  .crystal-card .cr-label.Compatible{background:rgba(232,163,61,0.15);color:var(--gold);}
+  .crystal-card .cr-label.Neutral{background:rgba(26,26,46,0.06);color:var(--text-dim);}
+  .crystal-card .cr-label.Avoid{background:rgba(194,59,78,0.10);color:var(--danger);}
   .crystal-card .cr-reasons{font-size:12px;color:var(--text-dim);}
   .crystal-card .cr-reasons div{margin-bottom:3px;}
 
@@ -321,15 +328,6 @@
 </style>
 </head>
 <body>
-
-<header class="hero">
-  <div class="sacred-lines" aria-hidden="true"></div>
-  <div class="hero-inner">
-    <p class="kicker">Vedic numerology calculator</p>
-    <h1>Discover what your birth date reveals</h1>
-    <p class="lead">Calculate your Driver Number (Mulank), Conductor Number (Bhagyank), and full Lo Shu Grid analysis &mdash; with videos matched to your exact numbers.</p>
-  </div>
-</header>
 
 <div class="wrap" style="padding-top:0;">
   <div class="tab-nav" id="tabNav">
@@ -634,6 +632,12 @@
 
     <details class="block section-accordion" id="videoSection"><summary class="section-accordion-summary">Explore more about your numbers</summary><div class="section-accordion-body">
       <div id="videoContainer"></div>
+
+      <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
+        <p style="font-weight:500;font-size:14px;margin:0 0 4px;color:var(--text);">Videos about your exact combination</p>
+        <p style="font-size:12px;color:var(--text-dim);margin:0 0 14px;">Only videos mentioning BOTH your Driver and Conductor numbers together, not just one.</p>
+        <div id="combinationVideoTable"></div>
+      </div>
     </div></details>
 
     <details class="block section-accordion" id="referenceSection"><summary class="section-accordion-summary">Reference library</summary><div class="section-accordion-body">
@@ -1980,6 +1984,42 @@ async function loadVideos(driver, conductor, day, month, year, missing = [], rep
     });
   } catch (err) {
     container.innerHTML = '<p class="video-warning">Video recommendations are temporarily unavailable. Your numerology results are still available.</p>';
+  }
+
+  loadCombinationVideoTable(driver, conductor, ns);
+}
+
+async function loadCombinationVideoTable(driver, conductor, ns = '') {
+  const el = document.getElementById('combinationVideoTable' + ns);
+  if (!el) return;
+  el.innerHTML = '<p class="loading-note">Checking for combination-specific videos\u2026</p>';
+  try {
+    const res = await fetch(`/api/videos/combination/${driver}/${conductor}`);
+    const data = await res.json();
+    if (!data.videos || data.videos.length === 0) {
+      el.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">No videos found discussing both numbers together \u2014 try the general recommendations above instead.</p>';
+      return;
+    }
+    const rows = data.videos.map(v => {
+      const published = v.publishedAt ? new Date(v.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '\u2014';
+      const matched = (v.matchedNumbers || []).map(n => `<span class="vc-num">${n}</span>`).join('');
+      return `
+        <tr>
+          <td><a href="https://www.youtube.com/watch?v=${v.videoId}" target="_blank" rel="noopener">${v.title}</a></td>
+          <td>${v.channelTitle || '\u2014'}</td>
+          <td>${published}</td>
+          <td><div class="vc-matched">${matched}</div></td>
+        </tr>
+      `;
+    }).join('');
+    el.innerHTML = `
+      <table class="video-compare-table">
+        <thead><tr><th>Video</th><th>Channel</th><th>Published</th><th>Matches</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+  } catch (err) {
+    el.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Could not load this right now.</p>';
   }
 }
 
