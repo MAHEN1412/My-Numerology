@@ -7,12 +7,14 @@ const mongoose = require('mongoose');
  */
 const SavedProfileSchema = new mongoose.Schema({
   name: { type: String, trim: true, maxlength: 120 },
+  phone: { type: String, trim: true, maxlength: 20 },
   day: { type: Number, min: 1, max: 31 },
   month: { type: Number, min: 1, max: 12 },
   year: { type: Number, min: 1000, max: 9999 },
   system: { type: String, enum: ['chaldean', 'pythagorean'], default: 'chaldean' },
 
   tabSource: { type: String, required: true }, // e.g. 'lo-shu', 'crystal', 'mobile'
+  status: { type: String, enum: ['Active', 'Review', 'Completed', 'Follow-up'], default: 'Active' },
 
   // Core numbers, stored flat for fast "common numbers" aggregation
   driverNumber: { type: Number },
@@ -20,6 +22,7 @@ const SavedProfileSchema = new mongoose.Schema({
   nameNumber: { type: Number },
 
   crystalSuggestion: { type: String, trim: true, maxlength: 200 }, // top recommended crystal, if applicable
+  matchScore: { type: Number }, // compatibility score, when the source tool computed one (mobile, crystal, relationship)
 
   autoSummary: { type: String, trim: true, maxlength: 500 }, // auto-generated, regenerated on save
   userNotes: { type: String, trim: true, maxlength: 2000, default: '' }, // person's own editable notes

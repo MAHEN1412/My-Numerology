@@ -117,6 +117,16 @@
   .common-numbers-col .cn-num{width:22px;height:22px;border-radius:50%;background:var(--gold);color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;}
   .dashboard-layout{display:grid;grid-template-columns:220px 1fr;gap:32px;align-items:start;}
   @media (max-width:800px){.dashboard-layout{grid-template-columns:1fr;}}
+  .kpi-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
+  .kpi-card{background:var(--surface);border:1px solid var(--border-strong);border-radius:12px;padding:16px;}
+  .kpi-card .kpi-num{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--indigo);line-height:1;}
+  .kpi-card .kpi-label{font-size:12px;color:var(--text-dim);margin-top:4px;}
+  .status-pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+  .status-pill.Active{background:rgba(90,79,207,0.12);color:var(--violet);}
+  .status-pill.Review{background:rgba(232,163,61,0.15);color:var(--gold);}
+  .status-pill.Completed{background:rgba(70,140,90,0.12);color:#2E7D4F;}
+  .status-pill.Follow-up{background:rgba(194,59,78,0.10);color:var(--danger);}
+  .status-select{font-size:12px;padding:4px 6px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface);color:var(--text);}
   .dashboard-sidebar{display:flex;flex-direction:column;gap:8px;position:sticky;top:24px;}
   .sidebar-link{display:block;padding:12px 16px;background:var(--surface);border:1px solid var(--border-strong);border-radius:8px;color:var(--text);text-decoration:none;font-size:14px;font-weight:600;text-align:left;cursor:pointer;font-family:inherit;}
   .sidebar-link:hover{border-color:var(--gold);color:var(--gold);}
@@ -253,10 +263,16 @@
   .candidate-card .cc-score-label{font-size:10px;color:var(--text-muted);text-align:center;margin-top:2px;}
   .candidate-detail{margin-top:10px;font-size:12px;color:var(--text-dim);}
 
-  .tab-nav{display:flex;gap:8px;padding:20px 0 0;border-bottom:1px solid var(--border);}
-  .tab-btn{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:14px;font-weight:600;padding:12px 4px;margin-right:24px;cursor:pointer;}
-  .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
-  .tab-btn:hover:not(.active){color:var(--text-dim);}
+  .app-shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh;}
+  @media (max-width:900px){.app-shell{grid-template-columns:1fr;}.sidebar-nav{position:static;flex-direction:row;flex-wrap:wrap;padding:16px;}.sidebar-brand{display:none;}}
+  .sidebar-nav{display:flex;flex-direction:column;gap:2px;padding:24px 16px;background:var(--surface);border-right:1px solid var(--border);position:sticky;top:0;height:100vh;overflow-y:auto;}
+  .sidebar-brand{padding:0 12px 20px;margin-bottom:8px;border-bottom:1px solid var(--border);}
+  .sidebar-brand-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--indigo);margin:0;}
+  .sidebar-brand-sub{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin:2px 0 0;}
+  .tab-btn{background:transparent;border:none;border-left:3px solid transparent;color:var(--text-dim);font-size:14px;font-weight:500;padding:11px 12px;text-align:left;cursor:pointer;border-radius:0 8px 8px 0;}
+  .tab-btn.active{color:var(--indigo);border-left-color:var(--indigo);background:var(--bg-accent, rgba(59,52,134,0.06));font-weight:600;}
+  .tab-btn:hover:not(.active){color:var(--text);background:var(--navy-2);}
+  .main-content{min-width:0;padding-bottom:40px;}
   .candidate-detail div{margin-bottom:3px;}
   .mobile-analysis-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
 
@@ -329,8 +345,12 @@
 </head>
 <body>
 
-<div class="wrap" style="padding-top:0;">
-  <div class="tab-nav" id="tabNav">
+<div class="app-shell">
+  <aside class="sidebar-nav" id="tabNav">
+    <div class="sidebar-brand">
+      <p class="sidebar-brand-title">Numerology</p>
+      <p class="sidebar-brand-sub">Consultant Engine</p>
+    </div>
     <button type="button" class="tab-btn active" data-tab="tab0">Dashboard</button>
     <button type="button" class="tab-btn" data-tab="tab1">Lo Shu Numerology</button>
     <button type="button" class="tab-btn" data-tab="tab2">Mobile Compatibility</button>
@@ -340,8 +360,9 @@
     <button type="button" class="tab-btn" data-tab="tab6">Relationship Match</button>
     <button type="button" class="tab-btn" data-tab="tab7">Name correction Lo shu</button>
     <button type="button" class="tab-btn" data-tab="tab9">Numerology News</button>
-  </div>
-</div>
+  </aside>
+
+  <div class="main-content">
 
 <div id="tab0Content">
   <header class="hero" style="padding-top:56px;padding-bottom:56px;">
@@ -377,12 +398,15 @@
         </aside>
 
         <div class="dashboard-main">
-          <p class="eyebrow" style="margin-bottom:12px;">Common numbers across your saved profiles</p>
+          <p class="eyebrow" style="margin-bottom:12px;">Overview</p>
+          <div id="kpiCards" class="kpi-cards"></div>
+
+          <p class="eyebrow" style="margin:32px 0 12px;">Common numbers across your saved profiles</p>
           <div id="commonNumbersPanel">
             <p style="font-size:13px;color:var(--text-dim);">Save a few profiles to see patterns here.</p>
           </div>
 
-          <p class="eyebrow" style="margin:32px 0 12px;">Saved profiles</p>
+          <p class="eyebrow" style="margin:32px 0 12px;">Client cases</p>
           <div id="savedProfilesTable">
             <p style="font-size:13px;color:var(--text-dim);">No profiles saved yet.</p>
           </div>
@@ -1137,6 +1161,9 @@
 
 
 
+
+  </div>
+</div>
 
 <footer>Vedic numerology calculator &middot; calculations shown in full &middot; for personal interest only</footer>
 
@@ -2496,8 +2523,31 @@ document.getElementById('dashboardNewsLink').addEventListener('click', (e) => {
 });
 
 async function loadDashboard() {
+  loadKPIs();
   loadSavedProfiles();
   loadCommonNumbers();
+}
+
+const TAB_SOURCE_LABELS = {
+  'lo-shu': 'Lo Shu cases', 'crystal': 'Crystal cases', 'mobile': 'Mobile cases',
+  'business-name': 'Business Name cases', 'number-compatibility': 'Number cases',
+  'relationship': 'Relationship cases', 'name-correction': 'Name Correction cases',
+};
+
+async function loadKPIs() {
+  const el = document.getElementById('kpiCards');
+  try {
+    const res = await fetch('/api/dashboard/kpis');
+    const data = await res.json();
+    const cards = [
+      { num: data.totalCases, label: 'Total cases' },
+      ...Object.entries(data.bySource || {}).map(([source, count]) => ({ num: count, label: TAB_SOURCE_LABELS[source] || source })),
+      { num: data.crystalSuggestions, label: 'Crystal suggestions' },
+    ];
+    el.innerHTML = cards.map((c) => `<div class="kpi-card"><div class="kpi-num">${c.num}</div><div class="kpi-label">${c.label}</div></div>`).join('');
+  } catch (err) {
+    el.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Could not load overview right now.</p>';
+  }
 }
 
 async function loadNews() {
@@ -2542,17 +2592,22 @@ function renderSavedProfilesTable(profiles) {
     container.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">No profiles saved yet.</p>';
     return;
   }
+  const statuses = ['Active', 'Review', 'Completed', 'Follow-up'];
   const rows = profiles.map((p) => {
     const dob = (p.day && p.month && p.year) ? `${String(p.day).padStart(2, '0')}/${String(p.month).padStart(2, '0')}/${p.year}` : '\u2014';
+    const status = p.status || 'Active';
+    const statusOptions = statuses.map((s) => `<option value="${s}" ${s === status ? 'selected' : ''}>${s}</option>`).join('');
     return `
       <tr data-id="${p._id}">
         <td>${p.name || '\u2014'}</td>
+        <td>${p.phone || '\u2014'}</td>
         <td>${dob}</td>
         <td>${p.crystalSuggestion || '\u2014'}</td>
         <td>
           <div style="font-size:12px;color:var(--text-dim);margin-bottom:6px;">${p.autoSummary || ''}</div>
           <textarea class="notes-input" placeholder="Your notes...">${p.userNotes || ''}</textarea>
         </td>
+        <td><select class="status-select">${statusOptions}</select></td>
         <td>
           <div class="row-actions">
             <button type="button" class="save-notes-btn">Save</button>
@@ -2565,7 +2620,7 @@ function renderSavedProfilesTable(profiles) {
 
   container.innerHTML = `
     <table class="saved-table">
-      <thead><tr><th>Name</th><th>DOB</th><th>Crystal suggestion</th><th>Description</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Name</th><th>Phone</th><th>DOB</th><th>Crystal suggestion</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
   `;
@@ -2575,12 +2630,14 @@ function renderSavedProfilesTable(profiles) {
       const row = e.target.closest('tr');
       const id = row.dataset.id;
       const notes = row.querySelector('.notes-input').value;
+      const status = row.querySelector('.status-select').value;
       btn.disabled = true; btn.textContent = 'Saving\u2026';
       try {
         await fetch('/api/dashboard/' + id, {
-          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userNotes: notes }),
+          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userNotes: notes, status }),
         });
         btn.textContent = 'Saved!';
+        loadKPIs();
         setTimeout(() => { btn.textContent = 'Save'; btn.disabled = false; }, 1200);
       } catch (err) {
         btn.textContent = 'Failed'; btn.disabled = false;
@@ -2597,6 +2654,7 @@ function renderSavedProfilesTable(profiles) {
         await fetch('/api/dashboard/' + id, { method: 'DELETE' });
         row.remove();
         loadCommonNumbers();
+        loadKPIs();
         if (container.querySelectorAll('tbody tr').length === 0) {
           container.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">No profiles saved yet.</p>';
         }

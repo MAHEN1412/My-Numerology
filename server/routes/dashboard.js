@@ -7,21 +7,24 @@ const router = express.Router();
 // POST /api/dashboard/save — save a profile snapshot (explicit action only)
 router.post('/save', requireAdmin, async (req, res) => {
   try {
-    const { name, day, month, year, system, tabSource, driverNumber, conductorNumber, nameNumber, crystalSuggestion, autoSummary, userNotes } = req.body;
+    const { name, phone, day, month, year, system, tabSource, driverNumber, conductorNumber, nameNumber, crystalSuggestion, matchScore, autoSummary, userNotes, status } = req.body;
 
     if (!tabSource) return res.status(400).json({ error: 'Missing tab source.' });
 
     const profile = await SavedProfile.create({
       name: name || '',
+      phone: phone || '',
       day: day || undefined,
       month: month || undefined,
       year: year || undefined,
       system: system === 'pythagorean' ? 'pythagorean' : 'chaldean',
       tabSource,
+      status: ['Active', 'Review', 'Completed', 'Follow-up'].includes(status) ? status : 'Active',
       driverNumber: driverNumber ?? undefined,
       conductorNumber: conductorNumber ?? undefined,
       nameNumber: nameNumber ?? undefined,
       crystalSuggestion: crystalSuggestion || '',
+      matchScore: matchScore ?? undefined,
       autoSummary: autoSummary || '',
       userNotes: userNotes || '',
     });
@@ -44,15 +47,15 @@ router.get('/list', requireAdmin, async (req, res) => {
   }
 });
 
-// PUT /api/dashboard/:id — edit user notes (only notes are editable; everything else is a historical record)
+// PUT /api/dashboard/:id — edit user notes and/or status (everything else is a historical record)
 router.put('/:id', requireAdmin, async (req, res) => {
   try {
-    const { userNotes } = req.body;
-    const profile = await SavedProfile.findByIdAndUpdate(
-      req.params.id,
-      { userNotes: userNotes || '', updatedAt: new Date() },
-      { new: true }
-    );
+    const { userNotes, status } = req.body;
+    const update = { updatedAt: new Date() };
+    if (userNotes !== undefined) update.userNotes = userNotes || '';
+    if (status !== undefined && ['Active', 'Review', 'Completed', 'Follow-up'].includes(status)) update.status = status;
+
+    const profile = await SavedProfile.findByIdAndUpdate(req.params.id, update, { new: true });
     if (!profile) return res.status(404).json({ error: 'Profile not found.' });
     res.json({ profile });
   } catch (err) {
@@ -95,6 +98,31 @@ router.get('/common-numbers', requireAdmin, async (req, res) => {
   } catch (err) {
     console.error('Common numbers analysis failed:', err.message);
     res.status(500).json({ error: 'Could not analyze saved profiles right now.' });
+  }
+});
+
+// GET /api/dashboard/kpis — case counts by source tool and status, for the KPI cards
+router.get('/kpis', requireAdmin, async (req, res) => {
+  try {
+    const profiles = await SavedProfile.find().select('tabSource status crystalSuggestion');
+    const bySource = {};
+    let crystalSuggestions = 0;
+    profiles.forEach((p) => {
+      bySource[p.tabSource] = (bySource[p.tabSource] || 0) + 1;
+      if (p.crystalSuggestion) crystalSuggestions += 1;
+    });
+    const byStatus = {};
+    profiles.forEach((p) => { byStatus[p.status] = (byStatus[p.status] || 0) + 1; });
+
+    res.json({
+      totalCases: profiles.length,
+      bySource,
+      byStatus,
+      crystalSuggestions,
+    });
+  } catch (err) {
+    console.error('KPI calculation failed:', err.message);
+    res.status(500).json({ error: 'Could not calculate KPIs right now.' });
   }
 });
 
