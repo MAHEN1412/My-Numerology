@@ -36,6 +36,57 @@ function truncateExcerpt(text) {
  * search for "missing number 4" purely because "4" appears as a
  * substring/token. requiredNumber + requiredKeyword close that gap).
  */
+/**
+ * Combination topics: search for passages that genuinely discuss MULTIPLE
+ * of the person's numbers together, not just each in isolation. Uses
+ * requiredNumbers (plural, ALL must match in the same passage) rather
+ * than requiredNumber, so a hit here means the book actually addresses
+ * this specific pairing -- not two separate single-number facts stitched
+ * together by this code, which would misrepresent what the source says.
+ */
+function buildCombinationTopicList(params) {
+  const { driver, conductor, nameNumber } = params;
+  const topics = [
+    {
+      // Concept-level, NOT number-value-specific: we can't safely claim a
+      // given book's own "Life Path" or "Destiny" calculation matches
+      // this app's Conductor/Name Number formulas, since different
+      // authors define these terms differently. This surfaces whatever
+      // any book says about the two CONCEPTS together, without implying
+      // it's about this person's specific calculated numbers.
+      key: 'combo:lifepath-destiny-concept',
+      label: 'Life Path + Destiny (concept-level, any source\u2019s own terms)',
+      terms: ['life path destiny', 'life path number destiny number', 'destiny number life path'],
+      requiredAllKeywords: ['life path', 'destiny'],
+      isConceptLevel: true,
+    },
+    {
+      key: 'combo:driver-conductor',
+      label: `Driver ${driver} + Conductor ${conductor} combination`,
+      terms: [`driver ${driver} conductor ${conductor}`, `mulank ${driver} bhagyank ${conductor}`, `psychic ${driver} destiny ${conductor}`, `birth number ${driver} life path ${conductor}`],
+      requiredNumbers: [driver, conductor],
+      requiredKeywords: ['driver', 'conductor', 'mulank', 'bhagyank', 'psychic', 'destiny', 'life path', 'combination'],
+    },
+  ];
+  if (nameNumber) {
+    topics.push({
+      key: 'combo:driver-name',
+      label: `Driver ${driver} + Name Number ${nameNumber} combination`,
+      terms: [`driver ${driver} name number ${nameNumber}`, `mulank ${driver} expression ${nameNumber}`],
+      requiredNumbers: [driver, nameNumber],
+      requiredKeywords: ['driver', 'name number', 'mulank', 'expression', 'combination'],
+    });
+    topics.push({
+      key: 'combo:conductor-name',
+      label: `Conductor ${conductor} + Name Number ${nameNumber} combination`,
+      terms: [`conductor ${conductor} name number ${nameNumber}`, `bhagyank ${conductor} expression ${nameNumber}`],
+      requiredNumbers: [conductor, nameNumber],
+      requiredKeywords: ['conductor', 'name number', 'bhagyank', 'expression', 'combination'],
+    });
+  }
+  return topics;
+}
+
 function buildTopicList(params) {
   const { driver, conductor, missing = [], repeated = [], nameNumber, system } = params;
   const topics = [
@@ -120,7 +171,7 @@ async function buildCrystalBookInsights({ driver, conductor, nameNumber, missing
   return results;
 }
 
-module.exports = { buildTopicList, buildMobileTopicList, buildCrystalTopicList, searchTopic, buildBookInsights, buildMobileBookInsights, buildCrystalBookInsights, truncateExcerpt };
+module.exports = { buildTopicList, buildCombinationTopicList, buildMobileTopicList, buildCrystalTopicList, searchTopic, buildBookInsights, buildMobileBookInsights, buildCrystalBookInsights, truncateExcerpt };
 
 
 function isRelevant(text, topic) {
@@ -129,9 +180,25 @@ function isRelevant(text, topic) {
     const numberMatch = new RegExp(`(^|[^0-9])${topic.requiredNumber}([^0-9]|$)`).test(lower);
     if (!numberMatch) return false;
   }
+  // For combination topics: ALL listed numbers must genuinely appear
+  // together in this same passage -- not just any one of them. This is
+  // what makes a "combination" search honest rather than just reusing a
+  // single-number match and implying it covers the pairing.
+  if (topic.requiredNumbers && topic.requiredNumbers.length > 0) {
+    const allPresent = topic.requiredNumbers.every((n) => new RegExp(`(^|[^0-9])${n}([^0-9]|$)`).test(lower));
+    if (!allPresent) return false;
+  }
   if (topic.requiredKeywords && topic.requiredKeywords.length > 0) {
     const anyMatch = topic.requiredKeywords.some((kw) => lower.includes(kw));
     if (!anyMatch) return false;
+  }
+  // For concept-level combinations (no specific number value attached,
+  // since we can't safely assume a book's own calculation for a term
+  // like "Life Path" matches this app's Conductor formula) -- ALL of
+  // these keywords must appear together, not just any one.
+  if (topic.requiredAllKeywords && topic.requiredAllKeywords.length > 0) {
+    const allMatch = topic.requiredAllKeywords.every((kw) => lower.includes(kw));
+    if (!allMatch) return false;
   }
   return true;
 }
@@ -194,13 +261,14 @@ async function searchTopic(topic, bookIds) {
  * than silently omitting sections.
  */
 async function buildBookInsights(params, bookIds) {
-  const topics = buildTopicList(params);
+  const topics = [...buildTopicList(params), ...buildCombinationTopicList(params).map((t) => ({ ...t, isCombination: true }))];
   const results = [];
   for (const topic of topics) {
     try {
-      results.push(await searchTopic(topic, bookIds));
+      const result = await searchTopic(topic, bookIds);
+      results.push({ ...result, isCombination: !!topic.isCombination });
     } catch (err) {
-      results.push({ topic: topic.key, label: topic.label, sourceCount: 0, books: [], error: err.message });
+      results.push({ topic: topic.key, label: topic.label, sourceCount: 0, books: [], error: err.message, isCombination: !!topic.isCombination });
     }
   }
   return results;
