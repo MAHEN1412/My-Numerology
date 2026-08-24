@@ -323,6 +323,15 @@
   .insight-excerpt{font-size:13px;color:var(--text-dim);border-left:2px solid var(--border-strong);padding-left:12px;margin-bottom:8px;}
   .insight-excerpt .ie-page{font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;}
   .insight-none{font-size:13px;color:var(--text-muted);}
+  .book-stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:20px;}
+  .book-stats-bar .bs-card{background:var(--navy-2);border-radius:10px;padding:12px 14px;text-align:center;}
+  .book-stats-bar .bs-num{font-size:22px;font-weight:800;color:var(--indigo);line-height:1;}
+  .book-stats-bar .bs-label{font-size:11px;color:var(--text-muted);margin-top:4px;}
+  .insight-topic-header{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:10px 0;}
+  .insight-topic-header:hover h3{color:var(--indigo);}
+  .insight-topic-toggle{font-size:12px;color:var(--violet);font-weight:600;}
+  .insight-evidence-body{display:none;margin-top:8px;}
+  .insight-evidence-body.expanded{display:block;}
 
   .candidate-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:16px;}
   .candidate-card.top-pick{border-color:var(--gold);background:linear-gradient(135deg, rgba(202,138,4,0.08), transparent);}
@@ -2358,31 +2367,13 @@ async function loadBookInsights(driver, conductor, missing, repeated, nameNumber
       body: JSON.stringify({ driver, conductor, missing, repeated, nameNumber }),
     });
     const data = await res.json();
-    container.innerHTML = '';
 
     if (!data.hasAnyBooks) {
       container.innerHTML = '<p class="insight-none">No book coverage found for this reading yet \u2014 upload numerology books above to see citations here.</p>';
       return;
     }
 
-    data.insights.forEach(topic => {
-      const section = document.createElement('div');
-      section.className = 'insight-topic';
-      if (topic.sourceCount === 0) return; // skip empty topics entirely, don't clutter the page
-      section.innerHTML = `<h3>${topic.label}</h3><div class="source-count">${topic.sourceCount} source${topic.sourceCount > 1 ? 's' : ''} found</div>`;
-      topic.books.forEach(b => {
-        const bookDiv = document.createElement('div');
-        bookDiv.className = 'insight-book';
-        let excerptsHtml = b.excerpts.map(e => `<div class="insight-excerpt"><div class="ie-page">Page ${e.page}</div>${e.excerpt}</div>`).join('');
-        bookDiv.innerHTML = `<div class="ib-title">${b.bookTitle}</div><div class="ib-author">${b.bookAuthor || 'Unknown author'}</div>${excerptsHtml}`;
-        section.appendChild(bookDiv);
-      });
-      container.appendChild(section);
-    });
-
-    if (container.innerHTML === '') {
-      container.innerHTML = '<p class="insight-none">No book coverage found for this specific reading.</p>';
-    }
+    renderBookInsightsInto(container, data.insights);
   } catch (err) {
     container.innerHTML = '<p class="video-warning">Book insights are temporarily unavailable.</p>';
   }
@@ -2537,22 +2528,60 @@ document.getElementById('relationshipBtn').addEventListener('click', async () =>
 function renderBookInsightsInto(container, insights) {
   container.innerHTML = '';
   const withSources = insights.filter(t => t.sourceCount > 0);
+  const withoutSources = insights.filter(t => t.sourceCount === 0);
+
   if (withSources.length === 0) {
     container.innerHTML = '<p class="insight-none">No book coverage found for this yet &mdash; upload numerology books via the admin panel to see citations here.</p>';
     return;
   }
-  withSources.forEach(topic => {
+
+  // Summary stats bar -- real, computed counts (books consulted is a
+  // genuine deduplicated count across every topic, not an estimate).
+  const allBookIds = new Set();
+  withSources.forEach(t => t.books.forEach(b => allBookIds.add(b.bookId)));
+  const statsBar = document.createElement('div');
+  statsBar.className = 'book-stats-bar';
+  statsBar.innerHTML = `
+    <div class="bs-card"><div class="bs-num">${allBookIds.size}</div><div class="bs-label">Books consulted</div></div>
+    <div class="bs-card"><div class="bs-num">${withSources.length}</div><div class="bs-label">Topics with evidence</div></div>
+    <div class="bs-card"><div class="bs-num">${withoutSources.length}</div><div class="bs-label">Topics needing more sources</div></div>
+  `;
+  container.appendChild(statsBar);
+
+  withSources.forEach((topic) => {
     const section = document.createElement('div');
     section.className = 'insight-topic';
-    section.innerHTML = `<h3>${topic.label}</h3><div class="source-count">${topic.sourceCount} source${topic.sourceCount > 1 ? 's' : ''} found</div>`;
-    topic.books.forEach(b => {
-      const bookDiv = document.createElement('div');
-      bookDiv.className = 'insight-book';
-      const excerptsHtml = b.excerpts.map(e => `<div class="insight-excerpt"><div class="ie-page">Page ${e.page}</div>${e.excerpt}</div>`).join('');
-      bookDiv.innerHTML = `<div class="ib-title">${b.bookTitle}</div><div class="ib-author">${b.bookAuthor || 'Unknown author'}</div>${excerptsHtml}`;
-      section.appendChild(bookDiv);
-    });
+    const bookWord = topic.sourceCount > 1 ? 'books address' : 'book addresses';
+
+    const excerptsHtml = topic.books.map(b => {
+      const excerpts = b.excerpts.map(e => `<div class="insight-excerpt"><div class="ie-page">Page ${e.page}</div>${e.excerpt}</div>`).join('');
+      return `<div class="insight-book"><div class="ib-title">${b.bookTitle}</div><div class="ib-author">${b.bookAuthor || 'Unknown author'}</div>${excerpts}</div>`;
+    }).join('');
+
+    section.innerHTML = `
+      <div class="insight-topic-header">
+        <div>
+          <h3 style="margin:0;">${topic.label}</h3>
+          <div class="source-count" style="margin:4px 0 0;">${topic.sourceCount} ${bookWord} this topic</div>
+        </div>
+        <span class="insight-topic-toggle">\u{1F4D6} View Book Evidence</span>
+      </div>
+      <div class="insight-evidence-body">${excerptsHtml}</div>
+    `;
     container.appendChild(section);
+  });
+
+  // DOM traversal (relative to each clicked header) instead of global
+  // getElementById -- this function can run for several containers on the
+  // page at once (a tab in the background plus an open drawer, or several
+  // tools' book-insight panels), so index-based global IDs would collide.
+  container.querySelectorAll('.insight-topic-header').forEach((header) => {
+    header.addEventListener('click', () => {
+      const body = header.nextElementSibling;
+      const toggle = header.querySelector('.insight-topic-toggle');
+      const isOpen = body.classList.toggle('expanded');
+      toggle.textContent = isOpen ? '\u25B4 Hide Book Evidence' : '\u{1F4D6} View Book Evidence';
+    });
   });
 }
 
