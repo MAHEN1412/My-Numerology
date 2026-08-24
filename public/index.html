@@ -3119,16 +3119,33 @@ async function runCaseDrawerNameCorrection(p) {
 
   resultsEl.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Comparing\u2026</p>';
   try {
-    const res = await fetch('/api/name-correction/compare', {
+    // Recalculate the FULL reading with this candidate name -- the Lo Shu
+    // grid genuinely changes based on the name's compound digits (same
+    // mechanism Tab 7's name comparison uses), not just a text verdict.
+    const res = await fetch('/api/readings', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ day: p.day, month: p.month, year: p.year, system: p.system || 'chaldean', names: [candidateName] }),
+      body: JSON.stringify({ day: p.day, month: p.month, year: p.year, name: candidateName, system: p.system || 'chaldean' }),
     });
     const data = await res.json();
     if (!res.ok) { resultsEl.innerHTML = `<p class="wizard-skip-note">${data.error}</p>`; return; }
-    const result = data.results[0];
+    const result = data.result;
+
+    // The Lo Shu grid element only exists once the full 360 analysis has
+    // finished loading (it's fetched asynchronously when the drawer
+    // opens) -- guard against clicking Compare in that brief window.
+    if (!document.getElementById('loshuGridDrawer')) {
+      resultsEl.innerHTML = '<p class="wizard-skip-note">Still loading the full analysis \u2014 wait a moment and try again.</p>';
+      return;
+    }
+
+    // Update the actual Lo Shu grid already shown in this drawer's full
+    // analysis, so the person sees it visually change with the name --
+    // reuses the same tested renderer, just re-invoked with new data.
+    renderLoShu(result.loShuGrid, result.numberKnowledgeBase, 'Drawer');
+
     resultsEl.innerHTML = `
-      <div class="wizard-result-row"><span>${result.name}</span><b>Name Number ${result.nameNumber}</b></div>
-      <div class="wizard-result-row"><span>Compatibility</span><b>${result.compatibilityLabel || result.label || '\u2014'}</b></div>
+      <div class="wizard-result-row"><span>${candidateName}</span><b>Name Number ${result.nameNumber ? result.nameNumber.value : '\u2014'}</b></div>
+      <p class="wizard-skip-note" style="margin-top:8px;">Lo Shu grid above updated to reflect this name.</p>
     `;
   } catch (err) {
     resultsEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';
