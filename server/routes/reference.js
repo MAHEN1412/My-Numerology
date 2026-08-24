@@ -179,4 +179,67 @@ router.get('/todays-birthdays', async (req, res) => {
   }
 });
 
+// GET /api/reference/indian-celebrities
+// A SEPARATE, deliberately more limited feature from todays-birthdays above:
+// wishiy.com's celebrity API is purpose-built for actors/politicians/
+// sportspeople and covers many more Indian names than Wikipedia's feed,
+// but its documented output has no birth date/year field at all -- so
+// numerology cannot be computed for these entries. Shown as name +
+// occupation only, clearly labeled as such on the frontend.
+async function fetchIndianCelebrities() {
+  const now = new Date();
+  const cacheKey = `indian-celebs:${now.getMonth() + 1}-${now.getDate()}`;
+
+  const cached = await ReferenceCache.findOne({ key: cacheKey });
+  if (cached && isFresh(cached.fetchedAt) && cached.extract) {
+    try { return JSON.parse(cached.extract); } catch (e) { /* fall through and refetch */ }
+  }
+
+  const res = await fetch('http://wishiy.com/page/api/today', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'response=JSON&limit=100',
+  });
+  if (!res.ok) throw new Error(`wishiy.com API returned HTTP ${res.status}`);
+  const data = await res.json();
+
+  // Defensive about the exact shape -- this is a small, unmaintained
+  // third-party API (its GitHub docs were archived), so field names and
+  // wrapper structure aren't guaranteed to be exactly as documented.
+  const rawList = Array.isArray(data) ? data : (data.data || data.results || data.celebrities || []);
+
+  const isIndian = (person) => {
+    const iso = (person.country_iso || person.countryiso || person['country iso'] || '').toString().toUpperCase();
+    const country = (person.country || '').toString().toLowerCase();
+    return iso === 'IN' || country === 'india';
+  };
+
+  const people = rawList
+    .filter(isIndian)
+    .slice(0, 20)
+    .map((person) => ({
+      name: [person.first_name || person['first name'], person.last_name || person['last name']].filter(Boolean).join(' ') || person.name || 'Unknown',
+      occupation: person.occupation || '',
+      birthplace: person.birthplace || '',
+    }));
+
+  await ReferenceCache.findOneAndUpdate(
+    { key: cacheKey },
+    { key: cacheKey, title: 'indian-celebs-cache', extract: JSON.stringify(people), sourceUrl: 'http://wishiy.com/page/api', thumbnail: '', fetchedAt: new Date() },
+    { upsert: true }
+  );
+
+  return people;
+}
+
+router.get('/indian-celebrities', async (req, res) => {
+  try {
+    const people = await fetchIndianCelebrities();
+    res.json({ people, note: 'Name and occupation only -- this source does not provide birth dates, so numerology cannot be computed for these entries.' });
+  } catch (err) {
+    console.error('[reference] indian-celebrities failed:', err.message);
+    res.json({ people: [], error: true });
+  }
+});
+
 module.exports = router;

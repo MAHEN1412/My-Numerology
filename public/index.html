@@ -406,6 +406,65 @@
     .profile-grid{grid-template-columns:1fr;}
     .loshu-grid{grid-template-columns:repeat(3,72px);grid-template-rows:repeat(3,72px);}
     .video-row{grid-auto-flow:column;grid-auto-columns:80%;overflow-x:auto;grid-template-columns:none;padding-bottom:8px;}
+
+    /* ===== Native app experience on mobile only -- desktop is untouched ===== */
+
+    /* Top bar: drop the search field and shrink to essentials, like a native app header */
+    .topbar{padding:0 14px;gap:10px;height:60px;}
+    .topbar-logo-sub{display:none;}
+    .topbar-search{display:none;}
+    .topbar-newcase{padding:8px 12px;font-size:12px;}
+    .topbar-account-name{display:none;}
+
+    /* Sidebar becomes a fixed bottom tab bar -- the single biggest native-app signal.
+       Horizontally scrollable since there are more tabs than comfortably fit at once,
+       same swipeable pattern used in many real apps with deep navigation. */
+    .app-shell{grid-template-columns:1fr;padding-bottom:64px;}
+    .sidebar-nav{
+      position:fixed;bottom:0;left:0;right:0;top:auto;height:auto;
+      flex-direction:row;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;
+      padding:8px 6px calc(8px + env(safe-area-inset-bottom));gap:2px;
+      background:var(--surface);border-right:none;border-top:1px solid var(--border);
+      z-index:40;box-shadow:0 -2px 12px rgba(15,23,42,0.06);
+      -webkit-overflow-scrolling:touch;
+    }
+    .sidebar-navtitle{display:none;}
+    .tab-btn{flex:0 0 auto;text-align:center;font-size:10px;padding:8px 12px;border-radius:10px;white-space:nowrap;}
+    .tab-btn.active{border-left:none;}
+
+    /* Dashboard: reference panel becomes its own full-width block below the
+       main content instead of just vanishing, so nothing is actually lost */
+    .dashboard-layout{grid-template-columns:1fr !important;}
+    .reference-panel{display:block !important;margin-top:24px;}
+    #tab0Content .wrap{padding:0 16px;}
+
+    /* Case detail drawer becomes a bottom sheet, not a cramped side panel --
+       slides up from the bottom with rounded top corners, the standard
+       native mobile pattern for "view details" */
+    .case-drawer{
+      left:0;right:0;top:auto;bottom:0;width:100%;max-width:100%;height:88vh;
+      border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));
+      box-shadow:0 -12px 30px rgba(15,23,42,0.15);
+    }
+
+    /* Client cases table -> stacked cards instead of a cramped horizontal
+       table, using the data-label technique so each value keeps its
+       column context without needing horizontal scrolling */
+    .saved-table thead{display:none;}
+    .saved-table, .saved-table tbody, .saved-table tr, .saved-table td{display:block;width:100%;}
+    .saved-table tr{border:1px solid var(--border-strong);border-radius:12px;margin-bottom:12px;padding:12px;}
+    .saved-table td{border-bottom:none;padding:6px 0;text-align:left;}
+    .saved-table td::before{content:attr(data-label);display:block;font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+
+    .video-compare-table thead{display:none;}
+    .video-compare-table, .video-compare-table tbody, .video-compare-table tr, .video-compare-table td{display:block;width:100%;}
+    .video-compare-table tr{border:1px solid var(--border-strong);border-radius:12px;margin-bottom:12px;padding:12px;}
+    .video-compare-table td{border-bottom:none;padding:6px 0;}
+    .video-compare-table td::before{content:attr(data-label);display:block;font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+
+    /* Touch-friendly minimum tap targets throughout */
+    .tab-btn, .topbar-newcase, .calc-btn, button, select, input{min-height:40px;}
+    .status-select{min-height:36px;}
   }
 </style>
 </head>
@@ -502,6 +561,12 @@
           </div>
           <div id="todaysBirthdaysList"><p style="font-size:12px;color:var(--text-muted);">Loading&hellip;</p></div>
           <div class="rp-divider"></div>
+
+          <p class="rp-section-label">INDIAN CELEBRITIES</p>
+          <p style="font-size:11px;color:var(--text-muted);margin:0 0 10px;">Name &amp; occupation only &mdash; this source doesn't provide birth dates, so numerology can't be computed here.</p>
+          <div id="indianCelebritiesList"><p style="font-size:12px;color:var(--text-muted);">Loading&hellip;</p></div>
+          <div class="rp-divider"></div>
+
           <p class="rp-section-label">NUMEROLOGY NEWS</p>
           <div class="rp-item" onclick="document.querySelector('[data-tab=tab9]').click()"><b>Latest headlines</b><span>Read insights \u2192</span></div>
         </aside>
@@ -2132,10 +2197,10 @@ async function loadCombinationVideoTable(driver, conductor, ns = '') {
       const matched = (v.matchedNumbers || []).map(n => `<span class="vc-num">${n}</span>`).join('');
       return `
         <tr>
-          <td><a href="https://www.youtube.com/watch?v=${v.videoId}" target="_blank" rel="noopener">${v.title}</a></td>
-          <td>${v.channelTitle || '\u2014'}</td>
-          <td>${published}</td>
-          <td><div class="vc-matched">${matched}</div></td>
+          <td data-label="Video"><a href="https://www.youtube.com/watch?v=${v.videoId}" target="_blank" rel="noopener">${v.title}</a></td>
+          <td data-label="Channel">${v.channelTitle || '\u2014'}</td>
+          <td data-label="Published">${published}</td>
+          <td data-label="Matches"><div class="vc-matched">${matched}</div></td>
         </tr>
       `;
     }).join('');
@@ -2689,6 +2754,28 @@ async function loadDashboard() {
   loadKPIs();
   loadSavedProfiles();
   loadTodaysBirthdays();
+  loadIndianCelebrities();
+}
+
+async function loadIndianCelebrities() {
+  const el = document.getElementById('indianCelebritiesList');
+  if (!el) return;
+  try {
+    const res = await fetch('/api/reference/indian-celebrities');
+    const data = await res.json();
+    if (!data.people || data.people.length === 0) {
+      el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);">Could not load this list right now.</p>';
+      return;
+    }
+    el.innerHTML = data.people.map((p) => `
+      <div class="rp-item">
+        <b>${p.name}</b>
+        <span>${[p.occupation, p.birthplace].filter(Boolean).join(' \u00b7 ') || 'No further details available'}</span>
+      </div>
+    `).join('');
+  } catch (err) {
+    el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);">Could not load this list right now.</p>';
+  }
 }
 
 async function loadTodaysBirthdays(filter = 'world') {
@@ -2823,13 +2910,13 @@ function renderSavedProfilesTable(profiles) {
     const descriptionText = [p.autoSummary, p.userNotes].filter(Boolean).join(' \u2014 ') || '\u2014';
     return `
       <tr data-id="${p._id}" class="case-row">
-        <td>${p.name || '\u2014'}</td>
-        <td>${p.phone || '\u2014'}</td>
-        <td>${dob}</td>
-        <td>${p.crystalSuggestion || '\u2014'}</td>
-        <td style="font-size:12px;color:var(--text-dim);">${descriptionText}</td>
-        <td><select class="status-select" onclick="event.stopPropagation()">${statusOptions}</select></td>
-        <td>
+        <td data-label="Name">${p.name || '\u2014'}</td>
+        <td data-label="Phone">${p.phone || '\u2014'}</td>
+        <td data-label="DOB">${dob}</td>
+        <td data-label="Crystal suggestion">${p.crystalSuggestion || '\u2014'}</td>
+        <td data-label="Description" style="font-size:12px;color:var(--text-dim);">${descriptionText}</td>
+        <td data-label="Status"><select class="status-select" onclick="event.stopPropagation()">${statusOptions}</select></td>
+        <td data-label="Actions">
           <div class="row-actions" onclick="event.stopPropagation()">
             <button type="button" class="delete-profile-btn">Delete</button>
           </div>
