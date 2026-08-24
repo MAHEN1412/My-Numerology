@@ -115,7 +115,10 @@ async function fetchTodaysBirthdays() {
   // an early cutoff applied before filtering.
   const people = (data.births || [])
     .filter((b) => b.year && b.pages && b.pages[0])
-    .slice(0, 50)
+    // No cap here -- keep the ENTIRE day's feed (Wikipedia's onthisday
+    // births list for a single date is small to begin with, typically well
+    // under a couple hundred entries), so the Indian filter below has the
+    // full pool to search rather than being starved by an early cutoff.
     .map((b) => {
       const page = b.pages[0];
       const year = Number(b.year);
