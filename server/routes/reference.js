@@ -1,5 +1,6 @@
 const express = require('express');
 const ReferenceCache = require('../models/ReferenceCache');
+const calc = require('../utils/calculationEngine');
 
 const router = express.Router();
 
@@ -86,6 +87,80 @@ router.get('/:driver/:conductor', async (req, res) => {
     license: 'CC BY-SA 4.0',
     warning: anyError ? 'Reference material is temporarily unavailable for one or more topics.' : null,
   });
+});
+
+async function fetchTodaysBirthdays() {
+  const now = new Date();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const cacheKey = `birthdays:${month}-${day}`;
+
+  const cached = await ReferenceCache.findOne({ key: cacheKey });
+  if (cached && isFresh(cached.fetchedAt) && cached.extract) {
+    try { return JSON.parse(cached.extract); } catch (e) { /* fall through and refetch */ }
+  }
+
+  const url = `https://en.wikipedia.org/api/rest_v1/feed/onthisday/births/${month}/${day}`;
+  const res = await fetch(url, {
+    headers: { 'User-Agent': 'numerology-calculator-app/1.0 (personal project; no contact email set)' },
+  });
+  if (!res.ok) throw new Error(`Wikipedia onthisday API returned HTTP ${res.status}`);
+  const data = await res.json();
+
+  // Only people with a full page + a real birth year -- filters out
+  // ancient/uncertain dates where numerology on the DOB wouldn't be
+  // meaningful anyway, and keeps this to well-documented figures.
+  const people = (data.births || [])
+    .filter((b) => b.year && b.pages && b.pages[0])
+    .slice(0, 10)
+    .map((b) => {
+      const page = b.pages[0];
+      const year = Number(b.year);
+      let numerology = null;
+      // Only compute numerology for plausible modern birth years -- the
+      // Driver/Conductor system is a birth-date calculation, not
+      // meaningful for a figure born in antiquity where the calendar
+      // itself doesn't map cleanly.
+      if (year >= 1000 && year <= now.getFullYear()) {
+        try {
+          numerology = {
+            driver: calc.calculateDriverNumber(Number(day)).value,
+            conductor: calc.calculateConductorNumber(Number(day), Number(month), year).value,
+          };
+        } catch (e) { numerology = null; }
+      }
+      return {
+        name: page.titles?.normalized || page.title || 'Unknown',
+        year,
+        description: (page.description || '').slice(0, 80), // short, factual (job title / one-liner), not a reproduced extract
+        sourceUrl: page.content_urls?.desktop?.page || `https://en.wikipedia.org/wiki/${encodeURIComponent(page.title || '')}`,
+        thumbnail: page.thumbnail?.source || '',
+        numerology,
+      };
+    });
+
+  await ReferenceCache.findOneAndUpdate(
+    { key: cacheKey },
+    { key: cacheKey, title: 'birthdays-cache', extract: JSON.stringify(people), sourceUrl: url, thumbnail: '', fetchedAt: new Date() },
+    { upsert: true }
+  );
+
+  return people;
+}
+
+// GET /api/reference/todays-birthdays
+// Real people who share today's calendar date of birth, sourced from
+// Wikipedia's own "On This Day" feed (same CC BY-SA license as the rest
+// of the Reference Library) -- with their actual Driver/Conductor numbers
+// computed from their real birthdate, not invented.
+router.get('/todays-birthdays', async (req, res) => {
+  try {
+    const people = await fetchTodaysBirthdays();
+    res.json({ people, license: 'CC BY-SA 4.0', source: 'Wikipedia "On this day"' });
+  } catch (err) {
+    console.error('[reference] todays-birthdays failed:', err.message);
+    res.json({ people: [], error: true });
+  }
 });
 
 module.exports = router;

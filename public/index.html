@@ -485,17 +485,9 @@
         </div>
 
         <aside class="reference-panel">
-          <p class="rp-section-label">REFERENCE LIBRARY</p>
-          <h3>\ud83c\uddee\ud83c\uddf3 Indian Personalities</h3>
-          <div class="rp-item"><b>Politicians</b><span>Profiles &amp; DOB analysis</span></div>
-          <div class="rp-item"><b>Artists</b><span>Profiles &amp; DOB analysis</span></div>
-          <div class="rp-item"><b>Actors</b><span>Profiles &amp; DOB analysis</span></div>
-          <div class="rp-item"><b>World Leaders</b><span>Profiles &amp; DOB analysis</span></div>
-          <div class="rp-divider"></div>
-          <p class="rp-section-label">TELUGU PERSONALITIES</p>
-          <div class="rp-item"><b>Telugu Politicians</b><span>Coming soon</span></div>
-          <div class="rp-item"><b>Telugu Actors</b><span>Coming soon</span></div>
-          <div class="rp-item"><b>Telugu Artists</b><span>Coming soon</span></div>
+          <p class="rp-section-label">TODAY'S BIRTHDAYS</p>
+          <p style="font-size:11px;color:var(--text-muted);margin:0 0 12px;">Real people, real numbers &mdash; sourced from Wikipedia, numerology computed from their actual birthdate.</p>
+          <div id="todaysBirthdaysList"><p style="font-size:12px;color:var(--text-muted);">Loading&hellip;</p></div>
           <div class="rp-divider"></div>
           <p class="rp-section-label">NUMEROLOGY NEWS</p>
           <div class="rp-item" onclick="document.querySelector('[data-tab=tab9]').click()"><b>Latest headlines</b><span>Read insights \u2192</span></div>
@@ -2671,6 +2663,32 @@ async function loadDashboard() {
   loadKPIs();
   loadSavedProfiles();
   loadCommonNumbers();
+  loadTodaysBirthdays();
+}
+
+async function loadTodaysBirthdays() {
+  const el = document.getElementById('todaysBirthdaysList');
+  if (!el) return;
+  try {
+    const res = await fetch('/api/reference/todays-birthdays');
+    const data = await res.json();
+    if (!data.people || data.people.length === 0) {
+      el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);">Could not load today\u2019s birthdays right now.</p>';
+      return;
+    }
+    el.innerHTML = data.people.map((p) => {
+      const numText = p.numerology ? `Driver ${p.numerology.driver} \u00b7 Conductor ${p.numerology.conductor}` : 'Numerology unavailable for this birth year';
+      const desc = p.description ? ` \u00b7 ${p.description}` : '';
+      return `
+        <a class="rp-item" href="${p.sourceUrl}" target="_blank" rel="noopener" style="display:block;text-decoration:none;color:inherit;">
+          <b>${p.name} <span style="font-weight:400;color:var(--text-muted);">(${p.year})</span></b>
+          <span>${numText}${desc}</span>
+        </a>
+      `;
+    }).join('');
+  } catch (err) {
+    el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);">Could not load today\u2019s birthdays right now.</p>';
+  }
 }
 
 const TAB_SOURCE_LABELS = {
