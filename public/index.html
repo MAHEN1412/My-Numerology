@@ -227,6 +227,8 @@
 
   .loshu-wrap{display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start;}
   .loshu-grid{display:grid;grid-template-columns:repeat(3,88px);grid-template-rows:repeat(3,88px);gap:2px;background:var(--border);border:1px solid var(--border-strong);border-radius:12px;overflow:hidden;}
+  .nc-compare-grids .loshu-grid{grid-template-columns:repeat(3,56px);grid-template-rows:repeat(3,56px);}
+  .nc-compare-grids .loshu-cell{font-size:12px;}
   .loshu-cell{background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;color:inherit;padding:0;transition:background .15s ease;}
   .loshu-cell:hover{background:var(--surface-2);}
   .loshu-cell .digits{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;max-width:76px;}
@@ -1466,6 +1468,30 @@ function renderInterpretationLibrary(numberKnowledgeBase, ns = '') {
       <div class="lbl">Possible challenge</div><p>${p.challenges[0]}</p>
     `;
     grid.appendChild(card);
+  });
+}
+
+// A lighter version of renderLoShu for the compact side-by-side name
+// comparison view -- just the grid cells, no info panel or tag lists,
+// since those elements don't exist (and shouldn't -- this is a quick
+// visual glance, not a full duplicate analysis) for these two small grids.
+function renderCompactLoShuGrid(loShuGrid, ns) {
+  const grid = document.getElementById('loshuGrid' + ns);
+  if (!grid) return;
+  grid.innerHTML = '';
+  loShuGrid.layout.flat().forEach((digit) => {
+    const count = loShuGrid.counts[digit];
+    const cell = document.createElement('div');
+    cell.className = 'loshu-cell' + (count === 0 ? ' missing' : count > 1 ? ' repeated' : '');
+    if (count === 0) {
+      cell.textContent = '\u2013';
+    } else {
+      const wrap = document.createElement('div');
+      wrap.className = 'digits';
+      for (let i = 0; i < count; i++) { const d = document.createElement('span'); d.className = 'd'; d.textContent = digit; wrap.appendChild(d); }
+      cell.appendChild(wrap);
+    }
+    grid.appendChild(cell);
   });
 }
 
@@ -3067,12 +3093,22 @@ function openCaseDrawer(id) {
 
       <div class="case-panel no-print">
         <h3>Name correction</h3>
-        <p style="font-size:12px;color:var(--text-dim);margin:0 0 10px;">Try alternate spellings and compare them against this client's fixed Driver/Conductor numbers.</p>
+        <p style="font-size:12px;color:var(--text-dim);margin:0 0 10px;">Try alternate spellings and compare them side by side against the original.</p>
         <div style="display:flex;gap:8px;">
           <input type="text" id="caseDrawerNameCorrectionInput" placeholder="Try a name spelling\u2026" style="flex:1;">
           <button type="button" id="caseDrawerNameCorrectionBtn" style="padding:9px 14px;">Compare</button>
         </div>
         <div id="caseDrawerNameCorrectionResults" style="margin-top:12px;"></div>
+        <div class="nc-compare-grids" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+          <div>
+            <p style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin:0 0 8px;text-align:center;">Original</p>
+            <div id="loshuGridDrawerOriginal" class="loshu-grid" style="margin:0 auto;"></div>
+          </div>
+          <div>
+            <p style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin:0 0 8px;text-align:center;" id="ncCorrectedLabel">With correction</p>
+            <div id="loshuGridDrawerCorrected" class="loshu-grid" style="margin:0 auto;"></div>
+          </div>
+        </div>
       </div>
 
       <div class="case-panel">
@@ -3130,22 +3166,14 @@ async function runCaseDrawerNameCorrection(p) {
     if (!res.ok) { resultsEl.innerHTML = `<p class="wizard-skip-note">${data.error}</p>`; return; }
     const result = data.result;
 
-    // The Lo Shu grid element only exists once the full 360 analysis has
-    // finished loading (it's fetched asynchronously when the drawer
-    // opens) -- guard against clicking Compare in that brief window.
-    if (!document.getElementById('loshuGridDrawer')) {
-      resultsEl.innerHTML = '<p class="wizard-skip-note">Still loading the full analysis \u2014 wait a moment and try again.</p>';
-      return;
-    }
-
-    // Update the actual Lo Shu grid already shown in this drawer's full
-    // analysis, so the person sees it visually change with the name --
-    // reuses the same tested renderer, just re-invoked with new data.
-    renderLoShu(result.loShuGrid, result.numberKnowledgeBase, 'Drawer');
+    // Render into the dedicated "corrected" side of the comparison view,
+    // leaving the original grid untouched so both are visible side by side.
+    renderCompactLoShuGrid(result.loShuGrid, 'DrawerCorrected');
+    document.getElementById('ncCorrectedLabel').textContent = `With correction (${candidateName})`;
 
     resultsEl.innerHTML = `
       <div class="wizard-result-row"><span>${candidateName}</span><b>Name Number ${result.nameNumber ? result.nameNumber.value : '\u2014'}</b></div>
-      <p class="wizard-skip-note" style="margin-top:8px;">Lo Shu grid above updated to reflect this name.</p>
+      <p class="wizard-skip-note" style="margin-top:8px;">Compare the two grids below \u2014 original on the left, this name on the right.</p>
     `;
   } catch (err) {
     resultsEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';
@@ -3174,6 +3202,7 @@ async function loadCaseDrawerFullAnalysis(p) {
     container.innerHTML = "    <section class=\"block\" id=\"loshuSectionDrawer\">\n      <p class=\"eyebrow\">Lo Shu grid analysis</p>\n      <div class=\"loshu-wrap\">\n        <div>\n          <div class=\"loshu-grid\" id=\"loshuGridDrawer\" role=\"group\" aria-label=\"Lo Shu grid, click a number to learn more\"></div>\n          <div class=\"loshu-legend\">\n            <span><i class=\"swatch\" style=\"background:var(--gold)\"></i>Present</span>\n            <span><i class=\"swatch\" style=\"background:var(--danger)\"></i>Repeated</span>\n            <span><i class=\"swatch\" style=\"background:var(--text-muted)\"></i>Missing</span>\n          </div>\n          <div id=\"loshuInfoDrawer\" role=\"status\"></div>\n        </div>\n        <div class=\"loshu-summary\">\n          <div class=\"sumline\"><div class=\"k\">Numbers present</div><div class=\"taglist\" id=\"presentTagsDrawer\"></div></div>\n          <div class=\"sumline\"><div class=\"k\">Numbers missing</div><div class=\"taglist\" id=\"missingTagsDrawer\"></div></div>\n          <div class=\"sumline\"><div class=\"k\">Repeated numbers</div><div class=\"taglist\" id=\"repeatTagsDrawer\"></div></div>\n        </div>\n      </div>\n      <div style=\"margin-top:28px;\">\n        <div class=\"sumline\"><div class=\"k\">What your missing and repeated numbers suggest</div></div>\n        <div id=\"interpListDrawer\" style=\"margin-top:10px;font-size:14px;color:var(--text-dim);\"></div>\n      </div>\n    </section>\n\n    <details class=\"block section-accordion\" id=\"videoSectionDrawer\"><summary class=\"section-accordion-summary\">Explore more about your numbers</summary><div class=\"section-accordion-body\">\n      <div id=\"videoContainerDrawer\"></div>\n\n      <div style=\"margin-top:28px;padding-top:20px;border-top:1px solid var(--border);\">\n        <p style=\"font-weight:500;font-size:14px;margin:0 0 4px;color:var(--text);\">Videos about your exact combination</p>\n        <p style=\"font-size:12px;color:var(--text-dim);margin:0 0 14px;\">Only videos mentioning BOTH your Driver and Conductor numbers together, not just one.</p>\n        <div id=\"combinationVideoTableDrawer\"></div>\n      </div>\n    </div></details>\n\n\n\n    <details class=\"block section-accordion\" id=\"missingNumbersSectionDrawer\"><summary class=\"section-accordion-summary\">Missing numbers</summary><div class=\"section-accordion-body\">\n      <div id=\"missingNumbersContainerDrawer\" class=\"interp-grid\"></div>\n    </div></details>\n\n    <details class=\"block section-accordion\" id=\"repeatedNumbersSectionDrawer\"><summary class=\"section-accordion-summary\">Repeated numbers</summary><div class=\"section-accordion-body\">\n      <div id=\"repeatedNumbersContainerDrawer\" class=\"interp-grid\"></div>\n    </div></details>\n\n\n    <details class=\"block section-accordion\" id=\"combinedInterpretationSectionDrawer\"><summary class=\"section-accordion-summary\">Combined interpretation</summary><div class=\"section-accordion-body\">\n      <div class=\"combo-card\">\n        <h3>Overall profile</h3>\n        <p id=\"ciOverallProfileDrawer\"></p>\n        <h3 style=\"margin-top:16px;\">Strengths</h3>\n        <div class=\"taglist\" id=\"ciStrengthsDrawer\"></div>\n        <h3 style=\"margin-top:16px;\">Traditional guidance</h3>\n        <p id=\"ciGuidanceDrawer\"></p>\n      </div>\n    </div></details>\n\n    <details class=\"block section-accordion\" id=\"numbersColorsSectionDrawer\"><summary class=\"section-accordion-summary\">Numbers &amp; colors</summary><div class=\"section-accordion-body\">\n\n      <h3 style=\"font-size:16px;margin-bottom:8px;\">Favorable numbers</h3>\n      <div id=\"favorableNumbersContainerDrawer\" style=\"margin-bottom:20px;\"></div>\n\n      <h3 style=\"font-size:16px;margin-bottom:8px;\">Challenging numbers</h3>\n      <div id=\"challengingNumbersContainerDrawer\" style=\"margin-bottom:20px;\"></div>\n\n      <h3 style=\"font-size:16px;margin-bottom:8px;\">Supportive combinations</h3>\n      <div class=\"taglist\" id=\"supportiveCombosContainerDrawer\" style=\"margin-bottom:24px;\"></div>\n\n      <h3 style=\"font-size:16px;margin-bottom:12px;\">Colors by number</h3>\n      <div id=\"colorsByNumberContainerDrawer\" style=\"margin-bottom:24px;\"></div>\n\n      <div class=\"combo-card\">\n        <h3>My colors</h3>\n        <p style=\"font-size:12px;color:var(--text-dim);margin:4px 0 16px;\">Numerology is a traditional belief system; color associations here are for personal interest, not medical, financial, or guaranteed-outcome claims.</p>\n        <div class=\"sumline\"><div class=\"k\">Best colors</div></div>\n        <div id=\"myColorsBestDrawer\" style=\"margin:10px 0 16px;\"></div>\n        <div class=\"sumline\"><div class=\"k\">Use moderately</div></div>\n        <div id=\"myColorsModerateDrawer\" style=\"margin:10px 0 16px;\"></div>\n        <div class=\"sumline\"><div class=\"k\">Personal palette</div></div>\n        <div id=\"myColorsPaletteDrawer\" style=\"margin-top:10px;\"></div>\n      </div>\n    </div></details>\n\n    <details class=\"block section-accordion\" id=\"numberLibrarySectionDrawer\"><summary class=\"section-accordion-summary\">Meaning of this person's numbers</summary><div class=\"section-accordion-body\">\n      <div class=\"interp-grid\" id=\"interpGridDrawer\"></div>\n    </div></details>\n\n\n    \n\n\n    <details class=\"block section-accordion\" id=\"bookInsightsSectionDrawer\"><summary class=\"section-accordion-summary\">Book insights &mdash; 360&deg; case analysis</summary><div class=\"section-accordion-body\">\n      <p style=\"font-size:13px;color:var(--text-dim);margin:0 0 16px;\">What your uploaded books actually say about your numbers, with page citations. Each book's perspective is shown separately &mdash; nothing here is invented or merged into a single &ldquo;answer.&rdquo;</p>\n      <div id=\"bookInsightsContainerDrawer\"></div>\n    </div></details>\n\n\n";
 
     renderLoShu(result.loShuGrid, result.numberKnowledgeBase, 'Drawer');
+    renderCompactLoShuGrid(result.loShuGrid, 'DrawerOriginal');
     renderInterpretationList(result.interpretations.missingNumberThemes, result.interpretations.repeatedNumberThemes, 'Drawer');
     renderMissingRepeatedSections(result.interpretations.missingNumberThemes, result.interpretations.repeatedNumberThemes, 'Drawer');
     renderCombinedInterpretation(result.interpretations, 'Drawer');
