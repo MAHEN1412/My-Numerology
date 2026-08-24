@@ -127,6 +127,14 @@
   .wizard-result-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--navy-2);font-size:13px;}
   .wizard-result-row:last-child{border-bottom:none;}
   .wizard-skip-note{font-size:12px;color:var(--text-muted);margin-top:10px;}
+
+  @media print{
+    body *{visibility:hidden;}
+    #casePrintArea, #casePrintArea *{visibility:visible;}
+    #casePrintArea{position:absolute;left:0;top:0;width:100%;}
+    .no-print, #videoSectionDrawer, #bookInsightsSectionDrawer, .case-drawer-close, .case-overlay{display:none !important;}
+    .case-drawer{position:static;box-shadow:none;width:100%;max-width:100%;height:auto;padding:0;}
+  }
   .case-panel h3{font-size:13px;margin:0 0 10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;}
   .case-panel p{margin:0 0 6px;font-size:13px;color:var(--text);}
   .case-avatar{width:48px;height:48px;border-radius:50%;background:var(--surface-2);color:var(--indigo);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}
@@ -3043,14 +3051,28 @@ function openCaseDrawer(id) {
             <p style="font-size:12px;color:var(--text-dim);margin:2px 0 0;">${p.phone || 'No phone on file'} \u00b7 ${dob}</p>
           </div>
         </div>
-        <button type="button" class="case-drawer-close" id="caseDrawerCloseBtn">\u2715</button>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <button type="button" class="ghost" id="caseDrawerPrintBtn" style="padding:8px 14px;font-size:13px;">Print / Save as PDF</button>
+          <button type="button" class="case-drawer-close" id="caseDrawerCloseBtn">\u2715</button>
+        </div>
       </div>
 
+      <div id="casePrintArea">
       <div class="case-panel">
         <h3>Numerology</h3>
         <p>Driver Number: <b>${p.driverNumber ?? '\u2014'}</b></p>
         <p>Conductor Number: <b>${p.conductorNumber ?? '\u2014'}</b></p>
         <p>Name Number: <b>${p.nameNumber ?? '\u2014'}</b></p>
+      </div>
+
+      <div class="case-panel no-print">
+        <h3>Name correction</h3>
+        <p style="font-size:12px;color:var(--text-dim);margin:0 0 10px;">Try alternate spellings and compare them against this client's fixed Driver/Conductor numbers.</p>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="caseDrawerNameCorrectionInput" placeholder="Try a name spelling\u2026" style="flex:1;">
+          <button type="button" id="caseDrawerNameCorrectionBtn" style="padding:9px 14px;">Compare</button>
+        </div>
+        <div id="caseDrawerNameCorrectionResults" style="margin-top:12px;"></div>
       </div>
 
       <div class="case-panel">
@@ -3073,13 +3095,44 @@ function openCaseDrawer(id) {
       <div id="caseDrawerFullAnalysis" style="margin-top:12px;">
         <p style="font-size:13px;color:var(--text-dim);padding:24px 0;text-align:center;">Loading full 360\u00b0 analysis\u2026</p>
       </div>
+      </div>
     </div>
   `;
   document.body.appendChild(root);
   document.getElementById('caseDrawerCloseBtn').addEventListener('click', closeCaseDrawer);
   root.querySelector('.case-overlay').addEventListener('click', closeCaseDrawer);
+  document.getElementById('caseDrawerPrintBtn').addEventListener('click', () => window.print());
+  document.getElementById('caseDrawerNameCorrectionBtn').addEventListener('click', () => runCaseDrawerNameCorrection(p));
+  document.getElementById('caseDrawerNameCorrectionInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') runCaseDrawerNameCorrection(p);
+  });
 
   loadCaseDrawerFullAnalysis(p);
+}
+
+async function runCaseDrawerNameCorrection(p) {
+  const input = document.getElementById('caseDrawerNameCorrectionInput');
+  const resultsEl = document.getElementById('caseDrawerNameCorrectionResults');
+  const candidateName = input.value.trim();
+  if (!candidateName) { resultsEl.innerHTML = '<p class="wizard-skip-note">Type a name to compare first.</p>'; return; }
+  if (!p.day || !p.month || !p.year) { resultsEl.innerHTML = '<p class="wizard-skip-note">This case has no date of birth on file.</p>'; return; }
+
+  resultsEl.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Comparing\u2026</p>';
+  try {
+    const res = await fetch('/api/name-correction/compare', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ day: p.day, month: p.month, year: p.year, system: p.system || 'chaldean', names: [candidateName] }),
+    });
+    const data = await res.json();
+    if (!res.ok) { resultsEl.innerHTML = `<p class="wizard-skip-note">${data.error}</p>`; return; }
+    const result = data.results[0];
+    resultsEl.innerHTML = `
+      <div class="wizard-result-row"><span>${result.name}</span><b>Name Number ${result.nameNumber}</b></div>
+      <div class="wizard-result-row"><span>Compatibility</span><b>${result.compatibilityLabel || result.label || '\u2014'}</b></div>
+    `;
+  } catch (err) {
+    resultsEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';
+  }
 }
 
 async function loadCaseDrawerFullAnalysis(p) {
