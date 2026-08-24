@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Numerology">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -28,18 +28,18 @@
 </script>
 <style>
   :root{
-    --navy:#FAFAF7; --navy-2:#F2F1EA; --surface:#FFFFFF; --surface-2:#F7F6F1;
-    --border:rgba(26,26,46,0.10); --border-strong:rgba(26,26,46,0.18);
-    --indigo:#3B3486; --violet:#5A4FCF; --gold:#E8A33D;
-    --text:#1A1A2E; --text-dim:#4A4A63; --text-muted:#83839A;
-    --danger:#C23B4E; --danger-bg:rgba(194,59,78,0.08);
-    --glow: radial-gradient(circle, rgba(90,79,207,0.10), transparent 70%);
+    --navy:#F8FAFC; --navy-2:#F1F5F9; --surface:#FFFFFF; --surface-2:#EEF2FF;
+    --border:#E2E8F0; --border-strong:#CBD5E1;
+    --indigo:#4F46E5; --violet:#4338CA; --gold:#CA8A04;
+    --text:#0F172A; --text-dim:#475569; --text-muted:#94A3B8;
+    --danger:#DC2626; --danger-bg:rgba(220,38,38,0.08);
+    --glow: radial-gradient(circle, rgba(79,70,229,0.10), transparent 70%);
   }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;} }
   body{margin:0;background:var(--navy);color:var(--text);font-family:'Inter',sans-serif;line-height:1.6;}
-  h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:600;margin:0;color:var(--text);}
+  h1,h2,h3{font-family:'Inter',system-ui,-apple-system,sans-serif;font-weight:800;margin:0;color:var(--text);}
   .mono{font-family:'JetBrains Mono',monospace;}
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
   a{color:var(--violet);}
@@ -56,10 +56,10 @@
 
   .sacred-lines{position:absolute;inset:0;opacity:0.15;pointer-events:none;}
 
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;}
+  .card{background:var(--surface);border:1px solid #EDF1F5;border-radius:14px;padding:18px;box-shadow:0 1px 2px rgba(15,23,42,0.03);}
 
   #dobSection{padding:0 24px 64px;}
-  .dob-card{max-width:480px;margin:32px auto 0;position:relative;box-shadow:0 30px 60px -30px rgba(26,26,46,0.18);}
+  .dob-card{max-width:480px;margin:32px auto 0;position:relative;box-shadow:0 30px 60px -30px rgba(15,23,42,0.18);}
   .dob-card h2{font-size:24px;text-align:center;margin-bottom:8px;}
   .dob-card p{text-align:center;color:var(--text-dim);font-size:14px;margin:0 0 24px;}
   .field label{display:block;font-size:13px;font-weight:500;margin-bottom:8px;color:var(--text);}
@@ -68,7 +68,7 @@
     padding:13px 14px;color:var(--text);font-size:16px;font-family:'Inter',sans-serif;color-scheme:dark;
   }
   .field input[type="text"]::placeholder{color:var(--text-muted);}
-  .field input:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(90,79,207,0.2);}
+  .field input:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(67,56,202,0.2);}
   .field-error{color:var(--danger);font-size:13px;margin-top:8px;display:none;}
   .field-error.show{display:block;}
 
@@ -87,7 +87,7 @@
 
   #resultsRoot{display:none;}
   section.block, details.block{padding:56px 0;border-top:1px solid var(--border);}
-  .section-accordion-summary{list-style:none;cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-dim,var(--gold));display:flex;align-items:center;justify-content:space-between;padding-right:4px;}
+  .section-accordion-summary{list-style:none;cursor:pointer;font-family:'Inter',system-ui,-apple-system,sans-serif;font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-dim,var(--gold));display:flex;align-items:center;justify-content:space-between;padding-right:4px;}
   .section-accordion-summary::-webkit-details-marker{display:none;}
   .section-accordion-summary::after{content:'+';font-size:20px;font-weight:400;color:var(--text-muted);transition:transform .2s;flex-shrink:0;margin-left:12px;}
   details.section-accordion[open] > .section-accordion-summary::after{content:'\2212';}
@@ -97,7 +97,16 @@
   .news-item{display:block;padding:12px 16px;background:var(--surface);border:1px solid var(--border-strong);border-radius:8px;color:var(--text);text-decoration:none;font-size:14px;transition:border-color .15s;}
   .news-item:hover{border-color:var(--gold);}
   .news-item .news-meta{display:block;font-size:11px;color:var(--text-muted);margin-top:4px;}
-  .saved-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .saved-table tbody tr{cursor:pointer;}
+  .saved-table tbody tr:hover{background:var(--navy-2);}
+  .case-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.2);z-index:40;}
+  .case-drawer{position:fixed;right:0;top:0;bottom:0;width:500px;max-width:92vw;background:var(--surface);box-shadow:-12px 0 30px rgba(15,23,42,0.094);z-index:50;padding:28px;overflow-y:auto;}
+  .case-drawer-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;}
+  .case-drawer-close{background:var(--navy-2);border:none;border-radius:8px;width:32px;height:32px;font-size:16px;color:var(--text-dim);cursor:pointer;}
+  .case-panel{background:var(--navy-2);border-radius:12px;padding:16px 18px;margin-bottom:14px;}
+  .case-panel h3{font-size:13px;margin:0 0 10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;}
+  .case-panel p{margin:0 0 6px;font-size:13px;color:var(--text);}
+  .case-avatar{width:48px;height:48px;border-radius:50%;background:var(--surface-2);color:var(--indigo);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}
   .video-compare-table{width:100%;border-collapse:collapse;font-size:13px;}
   .video-compare-table th{text-align:left;padding:8px 10px;color:var(--text-dim);font-weight:600;border-bottom:1px solid var(--border-strong);font-size:12px;}
   .video-compare-table td{padding:10px;border-bottom:1px solid var(--border);vertical-align:top;}
@@ -105,8 +114,9 @@
   .video-compare-table a:hover{text-decoration:underline;}
   .video-compare-table .vc-matched{display:flex;gap:4px;}
   .video-compare-table .vc-num{width:20px;height:20px;border-radius:50%;background:var(--gold);color:var(--navy);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
-  .saved-table th{text-align:left;padding:10px 12px;color:var(--text-dim);font-weight:600;border-bottom:1px solid var(--border-strong);}
-  .saved-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+  .saved-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px;}
+  .saved-table th{text-align:left;padding:12px 10px;color:var(--text-muted);font-weight:800;font-size:10px;border-bottom:1px solid var(--border);}
+  .saved-table td{padding:14px 10px;border-bottom:1px solid var(--navy-2);vertical-align:top;}
   .saved-table textarea{width:100%;min-height:50px;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:6px;color:var(--text);font-size:12px;padding:6px;font-family:inherit;}
   .saved-table .row-actions{display:flex;gap:8px;white-space:nowrap;}
   .saved-table .row-actions button{background:none;border:1px solid var(--border-strong);border-radius:6px;padding:4px 10px;color:var(--text-dim);font-size:12px;cursor:pointer;}
@@ -115,23 +125,40 @@
   .common-numbers-col h4{font-size:13px;color:var(--text-dim);margin-bottom:8px;}
   .common-numbers-col .cn-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px;}
   .common-numbers-col .cn-num{width:22px;height:22px;border-radius:50%;background:var(--gold);color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;}
-  .dashboard-layout{display:grid;grid-template-columns:220px 1fr;gap:32px;align-items:start;}
+  .app-login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--navy);padding:24px;}
+  .compat-row{display:grid;grid-template-columns:120px 1fr 50px;align-items:center;gap:14px;padding:10px 0;}
+  .compat-label{font-size:12px;color:var(--text-dim);font-weight:600;}
+  .compat-bar-track{height:8px;background:var(--navy-2);border-radius:20px;overflow:hidden;}
+  .compat-bar-fill{height:100%;background:var(--indigo);border-radius:20px;}
+  .compat-value{font-size:12px;font-weight:700;color:var(--text);text-align:right;}
+  .dashboard-layout{display:grid;grid-template-columns:220px 1fr 288px;gap:28px;align-items:start;}
+  @media (max-width:1200px){.dashboard-layout{grid-template-columns:220px 1fr;}.reference-panel{display:none;}}
   @media (max-width:800px){.dashboard-layout{grid-template-columns:1fr;}}
-  .kpi-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
-  .kpi-card{background:var(--surface);border:1px solid var(--border-strong);border-radius:12px;padding:16px;}
-  .kpi-card .kpi-num{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--indigo);line-height:1;}
-  .kpi-card .kpi-label{font-size:12px;color:var(--text-dim);margin-top:4px;}
-  .status-pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
-  .status-pill.Active{background:rgba(90,79,207,0.12);color:var(--violet);}
-  .status-pill.Review{background:rgba(232,163,61,0.15);color:var(--gold);}
+  .reference-panel{background:var(--surface);border:1px solid var(--border-strong);border-radius:12px;padding:24px;position:sticky;top:24px;}
+  .reference-panel .rp-section-label{font-size:10px;color:var(--text-muted);font-weight:800;letter-spacing:.06em;margin:0 0 10px;}
+  .reference-panel h3{font-size:14px;margin:0 0 15px;}
+  .reference-panel .rp-item{padding:11px 0;border-bottom:1px solid var(--navy-2);cursor:pointer;}
+  .reference-panel .rp-item:last-child{border-bottom:none;}
+  .reference-panel .rp-item b{font-size:12px;display:block;}
+  .reference-panel .rp-item span{display:block;color:var(--text-muted);font-size:10px;margin-top:3px;}
+  .reference-panel .rp-item:hover b{color:var(--indigo);}
+  .reference-panel .rp-divider{height:1px;background:var(--border);margin:16px 0;}
+  .kpi-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;}
+  .kpi-card{background:var(--surface);border:1px solid #EDF1F5;border-radius:14px;padding:18px;box-shadow:0 1px 2px rgba(15,23,42,0.03);}
+  .kpi-card .kpi-num{font-family:'Inter',system-ui,-apple-system,sans-serif;font-size:28px;font-weight:800;color:var(--text);line-height:1;margin:8px 0;}
+  .kpi-card .kpi-label{font-size:12px;color:var(--text-dim);}
+  .status-pill{display:inline-block;padding:5px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+  .status-pill.Active{background:rgba(67,56,202,0.12);color:var(--violet);}
+  .status-pill.Review{background:rgba(202,138,4,0.15);color:var(--gold);}
   .status-pill.Completed{background:rgba(70,140,90,0.12);color:#2E7D4F;}
-  .status-pill.Follow-up{background:rgba(194,59,78,0.10);color:var(--danger);}
+  .status-pill.Follow-up{background:rgba(220,38,38,0.10);color:var(--danger);}
   .status-select{font-size:12px;padding:4px 6px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface);color:var(--text);}
   .dashboard-sidebar{display:flex;flex-direction:column;gap:8px;position:sticky;top:24px;}
   .sidebar-link{display:block;padding:12px 16px;background:var(--surface);border:1px solid var(--border-strong);border-radius:8px;color:var(--text);text-decoration:none;font-size:14px;font-weight:600;text-align:left;cursor:pointer;font-family:inherit;}
   .sidebar-link:hover{border-color:var(--gold);color:var(--gold);}
+  .sidebar-navtitle{font-size:10px;color:var(--text-muted);font-weight:800;letter-spacing:.07em;margin:4px 12px 12px;}
   .sidebar-stat{padding:16px;text-align:center;background:var(--navy-2);border-radius:8px;margin:8px 0;}
-  .sidebar-stat-num{display:block;font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--gold);}
+  .sidebar-stat-num{display:block;font-family:'Inter',system-ui,-apple-system,sans-serif;font-size:32px;color:var(--gold);}
   .sidebar-stat-label{display:block;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;}
   .sidebar-logout{color:var(--text-muted);}
   section.block:first-of-type{border-top:none;}
@@ -147,7 +174,7 @@
   }
   .primary-card:hover{border-color:var(--border-strong);transform:translateY(-2px);}
   .primary-card .pc-label{font-size:12px;color:var(--text-muted);margin-bottom:10px;}
-  .primary-card .pc-value{font-size:48px;font-weight:700;color:var(--gold);font-family:'Cormorant Garamond',serif;line-height:1;}
+  .primary-card .pc-value{font-size:48px;font-weight:700;color:var(--gold);font-family:'Inter',system-ui,-apple-system,sans-serif;line-height:1;}
   .primary-card .pc-alt{font-size:12px;color:var(--text-dim);margin-top:10px;}
   .primary-card .pc-hint{font-size:11px;color:var(--text-muted);margin-top:12px;}
 
@@ -163,7 +190,7 @@
   .loshu-cell{background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;color:inherit;padding:0;transition:background .15s ease;}
   .loshu-cell:hover{background:var(--surface-2);}
   .loshu-cell .digits{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;max-width:76px;}
-  .loshu-cell .d{font-size:26px;font-weight:700;color:var(--gold);font-family:'Cormorant Garamond',serif;}
+  .loshu-cell .d{font-size:26px;font-weight:700;color:var(--gold);font-family:'Inter',system-ui,-apple-system,sans-serif;}
   .loshu-cell.repeated .d{animation:pulse 2s ease-in-out infinite;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.55;}}
   .loshu-cell.missing{color:var(--text-muted);font-size:20px;font-family:'JetBrains Mono',monospace;}
@@ -189,14 +216,14 @@
 
   .interp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
   .interp-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;}
-  .interp-card .num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--gold);}
+  .interp-card .num{font-family:'Inter',system-ui,-apple-system,sans-serif;font-size:28px;font-weight:700;color:var(--gold);}
   .interp-card .nm{font-size:14px;font-weight:600;margin:4px 0 8px;}
   .interp-card p{font-size:13px;color:var(--text-dim);margin:0 0 8px;}
   .interp-card .lbl{font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:4px;}
 
   .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
   .profile-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;}
-  .profile-card .ph-num{font-size:56px;font-weight:700;color:var(--gold);font-family:'Cormorant Garamond',serif;line-height:1;}
+  .profile-card .ph-num{font-size:56px;font-weight:700;color:var(--gold);font-family:'Inter',system-ui,-apple-system,sans-serif;line-height:1;}
   .profile-card .ph-name{font-size:20px;font-weight:600;margin:6px 0 4px;}
   .profile-card .ph-meaning{font-size:13px;color:var(--text-dim);margin-bottom:18px;}
   .profile-card h4{font-size:12px;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin:16px 0 8px;font-family:'Inter',sans-serif;font-weight:600;}
@@ -207,7 +234,7 @@
   .lucky-item{font-size:13px;color:var(--text-dim);}
   .lucky-item b{color:var(--text);}
 
-  .combo-card{background:linear-gradient(135deg, rgba(59,52,134,0.08), rgba(90,79,207,0.04));border:1px solid var(--border-strong);border-radius:16px;padding:28px;}
+  .combo-card{background:linear-gradient(135deg, rgba(79,70,229,0.08), rgba(67,56,202,0.04));border:1px solid var(--border-strong);border-radius:16px;padding:28px;}
   .combo-card h3{font-size:20px;margin-bottom:12px;}
   .combo-card p{font-size:14px;color:var(--text-dim);margin:0 0 10px;}
 
@@ -256,21 +283,40 @@
   .insight-none{font-size:13px;color:var(--text-muted);}
 
   .candidate-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:16px;}
-  .candidate-card.top-pick{border-color:var(--gold);background:linear-gradient(135deg, rgba(232,163,61,0.08), transparent);}
+  .candidate-card.top-pick{border-color:var(--gold);background:linear-gradient(135deg, rgba(202,138,4,0.08), transparent);}
   .candidate-card .cc-number{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600;letter-spacing:0.03em;}
   .candidate-card .cc-badge{font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--gold);margin-bottom:4px;}
-  .candidate-card .cc-score{font-size:24px;font-weight:700;color:var(--gold);font-family:'Cormorant Garamond',serif;}
+  .candidate-card .cc-score{font-size:24px;font-weight:700;color:var(--gold);font-family:'Inter',system-ui,-apple-system,sans-serif;}
   .candidate-card .cc-score-label{font-size:10px;color:var(--text-muted);text-align:center;margin-top:2px;}
   .candidate-detail{margin-top:10px;font-size:12px;color:var(--text-dim);}
 
-  .app-shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh;}
-  @media (max-width:900px){.app-shell{grid-template-columns:1fr;}.sidebar-nav{position:static;flex-direction:row;flex-wrap:wrap;padding:16px;}.sidebar-brand{display:none;}}
-  .sidebar-nav{display:flex;flex-direction:column;gap:2px;padding:24px 16px;background:var(--surface);border-right:1px solid var(--border);position:sticky;top:0;height:100vh;overflow-y:auto;}
+  .topbar{height:72px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:28px;position:sticky;top:0;z-index:30;}
+  .topbar-logo-title{font-size:19px;font-weight:800;color:var(--indigo);letter-spacing:.4px;}
+  .topbar-logo-sub{font-size:9px;color:var(--text-muted);font-weight:700;display:block;margin-top:2px;letter-spacing:.05em;}
+  .topbar-search{width:330px;background:var(--navy-2);border:none;border-radius:10px;padding:11px 15px;margin-left:70px;font-size:13px;color:var(--text);}
+  .topbar-search::placeholder{color:var(--text-muted);}
+  .topbar-spacer{flex:1;}
+  .topbar-newcase{background:var(--indigo);color:#fff;border:none;padding:11px 17px;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer;}
+  .topbar-newcase:hover{background:var(--violet);}
+  .topbar-avatar{width:38px;height:38px;border-radius:50%;background:var(--text);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+  .topbar-account{position:relative;}
+  .topbar-account-btn{display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;padding:4px;border-radius:8px;}
+  .topbar-account-btn:hover{background:var(--navy-2);}
+  .topbar-account-name{font-size:13px;font-weight:600;color:var(--text);}
+  .topbar-account-arrow{font-size:10px;color:var(--text-muted);}
+  .topbar-account-menu{position:absolute;top:calc(100% + 8px);right:0;background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;box-shadow:0 8px 24px rgba(15,23,42,0.12);min-width:160px;padding:6px;z-index:60;}
+  .topbar-menu-item{display:block;width:100%;text-align:left;background:none;border:none;padding:9px 10px;font-size:13px;color:var(--text);border-radius:6px;cursor:pointer;}
+  .topbar-menu-item:hover{background:var(--navy-2);}
+  .topbar-menu-danger{color:var(--danger);}
+  .topbar-menu-divider{height:1px;background:var(--border);margin:6px 2px;}
+  .app-shell{display:grid;grid-template-columns:248px 1fr;min-height:calc(100vh - 72px);}
+  @media (max-width:900px){.app-shell{grid-template-columns:1fr;}.sidebar-nav{position:static;flex-direction:row;flex-wrap:wrap;padding:16px;}.sidebar-brand{display:none;}.topbar-search{width:180px;}}
+  .sidebar-nav{display:flex;flex-direction:column;gap:2px;padding:22px 12px;background:var(--surface);border-right:1px solid var(--border);position:sticky;top:72px;height:calc(100vh - 72px);overflow-y:auto;width:248px;}
   .sidebar-brand{padding:0 12px 20px;margin-bottom:8px;border-bottom:1px solid var(--border);}
-  .sidebar-brand-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--indigo);margin:0;}
+  .sidebar-brand-title{font-family:'Inter',system-ui,-apple-system,sans-serif;font-size:20px;font-weight:600;color:var(--indigo);margin:0;}
   .sidebar-brand-sub{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin:2px 0 0;}
-  .tab-btn{background:transparent;border:none;border-left:3px solid transparent;color:var(--text-dim);font-size:14px;font-weight:500;padding:11px 12px;text-align:left;cursor:pointer;border-radius:0 8px 8px 0;}
-  .tab-btn.active{color:var(--indigo);border-left-color:var(--indigo);background:var(--bg-accent, rgba(59,52,134,0.06));font-weight:600;}
+  .tab-btn{background:transparent;border:none;color:var(--text-dim);font-size:13px;font-weight:500;padding:10px 13px;text-align:left;cursor:pointer;border-radius:8px;}
+  .tab-btn.active{color:var(--violet);background:var(--surface-2);font-weight:700;}
   .tab-btn:hover:not(.active){color:var(--text);background:var(--navy-2);}
   .main-content{min-width:0;padding-bottom:40px;}
   .candidate-detail div{margin-bottom:3px;}
@@ -283,7 +329,7 @@
   .number-color-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:12px;}
   .number-color-card .ncc-label{font-size:12px;color:var(--gold);margin-bottom:10px;}
   .fav-num-item{display:inline-flex;flex-direction:column;align-items:center;background:var(--surface);border:1px solid var(--gold);border-radius:10px;padding:10px 14px;margin:0 8px 8px 0;min-width:60px;}
-  .fav-num-item .fn-num{font-size:20px;font-weight:700;color:var(--gold);font-family:'Cormorant Garamond',serif;}
+  .fav-num-item .fn-num{font-size:20px;font-weight:700;color:var(--gold);font-family:'Inter',system-ui,-apple-system,sans-serif;}
   .fav-num-item .fn-reason{font-size:10px;color:var(--text-muted);text-align:center;margin-top:4px;max-width:110px;}
   .chal-num-item{border-color:var(--danger);}
   .chal-num-item .fn-num{color:var(--danger);}
@@ -291,9 +337,9 @@
   .compare-table th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border-strong);color:var(--text-secondary);font-weight:500;font-size:12px;}
   .compare-table td{padding:8px 10px;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;}
   .compare-label{padding:2px 8px;border-radius:6px;font-size:11px;font-family:'Inter',sans-serif;}
-  .compare-label.Favorable{background:var(--accent-light, rgba(232,163,61,0.15));color:var(--gold);}
-  .compare-label.Neutral{background:rgba(26,26,46,0.06);color:var(--text-dim);}
-  .compare-label.Challenging{background:rgba(194,59,78,0.10);color:var(--danger);}
+  .compare-label.Favorable{background:var(--accent-light, rgba(202,138,4,0.15));color:var(--gold);}
+  .compare-label.Neutral{background:rgba(15,23,42,0.06);color:var(--text-dim);}
+  .compare-label.Challenging{background:rgba(220,38,38,0.10);color:var(--danger);}
 
   .crystal-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;}
   .crystal-card.Compatible{border-color:var(--gold);}
@@ -302,9 +348,9 @@
   .crystal-card .cr-name{font-size:16px;font-weight:600;}
   .crystal-card .cr-stars{font-size:14px;letter-spacing:1px;}
   .crystal-card .cr-label{font-size:11px;padding:2px 8px;border-radius:6px;margin-left:8px;}
-  .crystal-card .cr-label.Compatible{background:rgba(232,163,61,0.15);color:var(--gold);}
-  .crystal-card .cr-label.Neutral{background:rgba(26,26,46,0.06);color:var(--text-dim);}
-  .crystal-card .cr-label.Avoid{background:rgba(194,59,78,0.10);color:var(--danger);}
+  .crystal-card .cr-label.Compatible{background:rgba(202,138,4,0.15);color:var(--gold);}
+  .crystal-card .cr-label.Neutral{background:rgba(15,23,42,0.06);color:var(--text-dim);}
+  .crystal-card .cr-label.Avoid{background:rgba(220,38,38,0.10);color:var(--danger);}
   .crystal-card .cr-reasons{font-size:12px;color:var(--text-dim);}
   .crystal-card .cr-reasons div{margin-bottom:3px;}
 
@@ -345,12 +391,47 @@
 </head>
 <body>
 
+<div id="appLoginScreen" class="app-login-screen">
+  <div class="card" style="max-width:380px;width:100%;">
+    <h2 style="font-size:18px;margin-bottom:6px;">Numerology Consultant Engine</h2>
+    <p style="font-size:13px;color:var(--text-dim);margin:0 0 20px;">Enter your password to continue.</p>
+    <div class="field">
+      <label for="dashboardPasswordInput">Password</label>
+      <input type="password" id="dashboardPasswordInput">
+    </div>
+    <div class="field-error" id="dashboardLoginError" role="alert"></div>
+    <button class="calc-btn" id="dashboardLoginBtn">Log in</button>
+  </div>
+</div>
+
+<div id="appAuthenticatedRoot" style="display:none;">
+
+<header class="topbar">
+  <div class="topbar-logo">
+    <span class="topbar-logo-title">NUMEROLOGY</span>
+    <span class="topbar-logo-sub">CONSULTANT ENGINE</span>
+  </div>
+  <input class="topbar-search" placeholder="Search client, DOB, phone, personality...">
+  <div class="topbar-spacer"></div>
+  <button type="button" class="topbar-newcase" onclick="document.querySelector('[data-tab=tab0]').click()">+ New Case</button>
+  <div class="topbar-account" id="topbarAccount">
+    <button type="button" class="topbar-account-btn" id="topbarAccountBtn">
+      <div class="topbar-avatar" id="topbarAvatar">MP</div>
+      <span class="topbar-account-name" id="topbarAccountName">Consultant</span>
+      <span class="topbar-account-arrow">\u25be</span>
+    </button>
+    <div class="topbar-account-menu" id="topbarAccountMenu" style="display:none;">
+      <button type="button" class="topbar-menu-item" id="topbarSettingsBtn">Settings</button>
+      <button type="button" class="topbar-menu-item" id="topbarThemeBtn">Theme</button>
+      <div class="topbar-menu-divider"></div>
+      <button type="button" class="topbar-menu-item topbar-menu-danger" id="topbarLogoutBtn">Log out</button>
+    </div>
+  </div>
+</header>
+
 <div class="app-shell">
   <aside class="sidebar-nav" id="tabNav">
-    <div class="sidebar-brand">
-      <p class="sidebar-brand-title">Numerology</p>
-      <p class="sidebar-brand-sub">Consultant Engine</p>
-    </div>
+    <div class="sidebar-navtitle">WORKSPACE</div>
     <button type="button" class="tab-btn active" data-tab="tab0">Dashboard</button>
     <button type="button" class="tab-btn" data-tab="tab1">Lo Shu Numerology</button>
     <button type="button" class="tab-btn" data-tab="tab2">Mobile Compatibility</button>
@@ -365,27 +446,8 @@
   <div class="main-content">
 
 <div id="tab0Content">
-  <header class="hero" style="padding-top:56px;padding-bottom:56px;">
-    <div class="sacred-lines" aria-hidden="true"></div>
-    <div class="hero-inner">
-      <p class="kicker">Dashboard</p>
-      <h1>Your saved profiles</h1>
-      <p class="lead">Password-protected. Click "Save to Dashboard" on any tab after calculating to keep a record here.</p>
-    </div>
-  </header>
-
-  <div class="wrap" style="padding-bottom:56px;">
-    <div id="dashboardLoginGate" class="card" style="max-width:380px;margin:0 auto;">
-      <h2 style="font-size:18px;margin-bottom:16px;">Dashboard login</h2>
-      <div class="field">
-        <label for="dashboardPasswordInput">Password</label>
-        <input type="password" id="dashboardPasswordInput">
-      </div>
-      <div class="field-error" id="dashboardLoginError" role="alert"></div>
-      <button class="calc-btn" id="dashboardLoginBtn">Log in</button>
-    </div>
-
-    <div id="dashboardContent" style="display:none;">
+  <div class="wrap" style="padding-bottom:56px;padding-top:28px;">
+    <div id="dashboardContent">
       <div class="dashboard-layout">
         <aside class="dashboard-sidebar">
           <a href="/admin.html" target="_blank" rel="noopener" class="sidebar-link">Manage Books</a>
@@ -401,16 +463,36 @@
           <p class="eyebrow" style="margin-bottom:12px;">Overview</p>
           <div id="kpiCards" class="kpi-cards"></div>
 
+          <p class="eyebrow" style="margin:32px 0 12px;">Compatibility Overview</p>
+          <div id="compatibilityOverview" class="card"></div>
+
           <p class="eyebrow" style="margin:32px 0 12px;">Common numbers across your saved profiles</p>
           <div id="commonNumbersPanel">
             <p style="font-size:13px;color:var(--text-dim);">Save a few profiles to see patterns here.</p>
           </div>
 
-          <p class="eyebrow" style="margin:32px 0 12px;">Client cases</p>
+          <p class="eyebrow" style="margin:32px 0 12px;">My Client Cases</p>
           <div id="savedProfilesTable">
             <p style="font-size:13px;color:var(--text-dim);">No profiles saved yet.</p>
           </div>
         </div>
+
+        <aside class="reference-panel">
+          <p class="rp-section-label">REFERENCE LIBRARY</p>
+          <h3>\ud83c\uddee\ud83c\uddf3 Indian Personalities</h3>
+          <div class="rp-item"><b>Politicians</b><span>Profiles &amp; DOB analysis</span></div>
+          <div class="rp-item"><b>Artists</b><span>Profiles &amp; DOB analysis</span></div>
+          <div class="rp-item"><b>Actors</b><span>Profiles &amp; DOB analysis</span></div>
+          <div class="rp-item"><b>World Leaders</b><span>Profiles &amp; DOB analysis</span></div>
+          <div class="rp-divider"></div>
+          <p class="rp-section-label">TELUGU PERSONALITIES</p>
+          <div class="rp-item"><b>Telugu Politicians</b><span>Coming soon</span></div>
+          <div class="rp-item"><b>Telugu Actors</b><span>Coming soon</span></div>
+          <div class="rp-item"><b>Telugu Artists</b><span>Coming soon</span></div>
+          <div class="rp-divider"></div>
+          <p class="rp-section-label">NUMEROLOGY NEWS</p>
+          <div class="rp-item" onclick="document.querySelector('[data-tab=tab9]').click()"><b>Latest headlines</b><span>Read insights \u2192</span></div>
+        </aside>
       </div>
     </div>
   </div>
@@ -1166,6 +1248,10 @@
 </div>
 
 <footer>Vedic numerology calculator &middot; calculations shown in full &middot; for personal interest only</footer>
+
+</div>
+</div>
+</div>
 
 <div class="modal-overlay" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="modal-box">
@@ -2477,21 +2563,30 @@ videoModal.addEventListener('click', (e) => { if (e.target === videoModal) close
 
 // --- Dashboard (Tab 0) ---
 
-async function checkDashboardLogin() {
+async function checkDashboardLogin(isRetry = false) {
   try {
     const res = await fetch('/api/admin/me');
     const data = await res.json();
     if (data.loggedIn) {
-      document.getElementById('dashboardLoginGate').style.display = 'none';
-      document.getElementById('dashboardContent').style.display = 'block';
+      document.getElementById('appLoginScreen').style.display = 'none';
+      document.getElementById('appAuthenticatedRoot').style.display = 'block';
       loadDashboard();
     } else {
-      document.getElementById('dashboardLoginGate').style.display = 'block';
-      document.getElementById('dashboardContent').style.display = 'none';
+      document.getElementById('appLoginScreen').style.display = 'flex';
+      document.getElementById('appAuthenticatedRoot').style.display = 'none';
     }
   } catch (err) {
-    document.getElementById('dashboardLoginError').textContent = 'Could not check login status.';
-    document.getElementById('dashboardLoginError').classList.add('show');
+    // The live server (Render free tier) can take 30-60s to wake up after
+    // being idle -- that shows up here as a failed fetch, not a real error.
+    // Retry once quietly before showing anything alarming.
+    if (!isRetry) {
+      document.getElementById('dashboardLoginError').textContent = 'Waking up the server\u2026 this can take up to a minute on first load.';
+      document.getElementById('dashboardLoginError').classList.add('show');
+      setTimeout(() => checkDashboardLogin(true), 4000);
+    } else {
+      document.getElementById('dashboardLoginError').textContent = 'Could not reach the server. Please refresh and try again.';
+      document.getElementById('dashboardLoginError').classList.add('show');
+    }
   }
 }
 
@@ -2514,6 +2609,31 @@ document.getElementById('dashboardLoginBtn').addEventListener('click', async () 
 
 document.getElementById('dashboardLogoutBtn').addEventListener('click', async () => {
   await fetch('/api/admin/logout', { method: 'POST' });
+  checkDashboardLogin();
+});
+
+// --- Top bar account dropdown ---
+document.getElementById('topbarAccountBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const menu = document.getElementById('topbarAccountMenu');
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+});
+document.addEventListener('click', (e) => {
+  const account = document.getElementById('topbarAccount');
+  if (!account.contains(e.target)) document.getElementById('topbarAccountMenu').style.display = 'none';
+});
+document.getElementById('topbarSettingsBtn').addEventListener('click', () => {
+  document.getElementById('topbarAccountMenu').style.display = 'none';
+  document.querySelector('[data-tab="tab0"]').click();
+});
+document.getElementById('topbarThemeBtn').addEventListener('click', () => {
+  document.getElementById('topbarAccountMenu').style.display = 'none';
+  alert('Theme switching is coming soon.');
+});
+document.getElementById('topbarLogoutBtn').addEventListener('click', async () => {
+  document.getElementById('topbarAccountMenu').style.display = 'none';
+  await fetch('/api/admin/logout', { method: 'POST' });
+  document.querySelector('[data-tab="tab0"]').click();
   checkDashboardLogin();
 });
 
@@ -2540,14 +2660,35 @@ async function loadKPIs() {
     const res = await fetch('/api/dashboard/kpis');
     const data = await res.json();
     const cards = [
-      { num: data.totalCases, label: 'Total cases' },
-      ...Object.entries(data.bySource || {}).map(([source, count]) => ({ num: count, label: TAB_SOURCE_LABELS[source] || source })),
-      { num: data.crystalSuggestions, label: 'Crystal suggestions' },
+      { num: data.totalCases, label: 'Total Cases' },
+      { num: data.dobMatching, label: 'DOB Matching' },
+      { num: data.nameDobMatching, label: 'Name + DOB' },
+      { num: data.mobileDobMatching, label: 'Mobile + DOB' },
     ];
     el.innerHTML = cards.map((c) => `<div class="kpi-card"><div class="kpi-num">${c.num}</div><div class="kpi-label">${c.label}</div></div>`).join('');
+    renderCompatibilityOverview(data.compatibilityOverview || {});
   } catch (err) {
     el.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Could not load overview right now.</p>';
   }
+}
+
+function renderCompatibilityOverview(overview) {
+  const el = document.getElementById('compatibilityOverview');
+  if (!el) return;
+  const rows = [
+    { label: 'DOB \u2194 DOB', value: overview.dobDob },
+    { label: 'Name \u2194 DOB', value: overview.nameDob },
+    { label: 'Mobile \u2194 DOB', value: overview.mobileDob },
+    { label: 'Name \u2194 Mobile', value: overview.nameMobile },
+    { label: 'Overall Match', value: overview.overall },
+  ];
+  el.innerHTML = rows.map((r) => `
+    <div class="compat-row">
+      <span class="compat-label">${r.label}</span>
+      <div class="compat-bar-track"><div class="compat-bar-fill" style="width:${r.value ?? 0}%;"></div></div>
+      <span class="compat-value">${r.value !== null && r.value !== undefined ? r.value + '%' : 'No data'}</span>
+    </div>
+  `).join('');
 }
 
 async function loadNews() {
@@ -2592,24 +2733,27 @@ function renderSavedProfilesTable(profiles) {
     container.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">No profiles saved yet.</p>';
     return;
   }
+  window._savedProfilesById = {};
+  profiles.forEach((p) => { window._savedProfilesById[p._id] = p; });
+
   const statuses = ['Active', 'Review', 'Completed', 'Follow-up'];
   const rows = profiles.map((p) => {
     const dob = (p.day && p.month && p.year) ? `${String(p.day).padStart(2, '0')}/${String(p.month).padStart(2, '0')}/${p.year}` : '\u2014';
     const status = p.status || 'Active';
     const statusOptions = statuses.map((s) => `<option value="${s}" ${s === status ? 'selected' : ''}>${s}</option>`).join('');
     return `
-      <tr data-id="${p._id}">
+      <tr data-id="${p._id}" class="case-row">
         <td>${p.name || '\u2014'}</td>
         <td>${p.phone || '\u2014'}</td>
         <td>${dob}</td>
         <td>${p.crystalSuggestion || '\u2014'}</td>
         <td>
           <div style="font-size:12px;color:var(--text-dim);margin-bottom:6px;">${p.autoSummary || ''}</div>
-          <textarea class="notes-input" placeholder="Your notes...">${p.userNotes || ''}</textarea>
+          <textarea class="notes-input" placeholder="Your notes..." onclick="event.stopPropagation()">${p.userNotes || ''}</textarea>
         </td>
-        <td><select class="status-select">${statusOptions}</select></td>
+        <td><select class="status-select" onclick="event.stopPropagation()">${statusOptions}</select></td>
         <td>
-          <div class="row-actions">
+          <div class="row-actions" onclick="event.stopPropagation()">
             <button type="button" class="save-notes-btn">Save</button>
             <button type="button" class="delete-profile-btn">Delete</button>
           </div>
@@ -2624,6 +2768,10 @@ function renderSavedProfilesTable(profiles) {
       <tbody>${rows}</tbody>
     </table>
   `;
+
+  container.querySelectorAll('.case-row').forEach((row) => {
+    row.addEventListener('click', () => openCaseDrawer(row.dataset.id));
+  });
 
   container.querySelectorAll('.save-notes-btn').forEach((btn) => {
     btn.addEventListener('click', async (e) => {
@@ -2691,6 +2839,69 @@ async function loadCommonNumbers() {
   } catch (err) {
     panel.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Could not load this right now.</p>';
   }
+}
+
+function initials(name) {
+  if (!name) return '?';
+  return name.trim().split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+}
+
+function closeCaseDrawer() {
+  const existing = document.getElementById('caseDrawerRoot');
+  if (existing) existing.remove();
+}
+
+function openCaseDrawer(id) {
+  const p = window._savedProfilesById[id];
+  if (!p) return;
+  closeCaseDrawer();
+
+  const dob = (p.day && p.month && p.year) ? `${String(p.day).padStart(2, '0')}/${String(p.month).padStart(2, '0')}/${p.year}` : '\u2014';
+
+  const root = document.createElement('div');
+  root.id = 'caseDrawerRoot';
+  root.innerHTML = `
+    <div class="case-overlay"></div>
+    <div class="case-drawer">
+      <div class="case-drawer-header">
+        <div style="display:flex;gap:14px;align-items:center;">
+          <div class="case-avatar">${initials(p.name)}</div>
+          <div>
+            <h2 style="font-size:18px;margin:0;">${p.name || 'Unnamed case'}</h2>
+            <p style="font-size:12px;color:var(--text-dim);margin:2px 0 0;">${p.phone || 'No phone on file'} \u00b7 ${dob}</p>
+          </div>
+        </div>
+        <button type="button" class="case-drawer-close" id="caseDrawerCloseBtn">\u2715</button>
+      </div>
+
+      <div class="case-panel">
+        <h3>Numerology</h3>
+        <p>Driver Number: <b>${p.driverNumber ?? '\u2014'}</b></p>
+        <p>Conductor Number: <b>${p.conductorNumber ?? '\u2014'}</b></p>
+        <p>Name Number: <b>${p.nameNumber ?? '\u2014'}</b></p>
+      </div>
+
+      <div class="case-panel">
+        <h3>Compatibility</h3>
+        <p>Overall Match: <b>${p.matchScore !== undefined && p.matchScore !== null ? p.matchScore + '%' : '\u2014'}</b></p>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">From: ${TAB_SOURCE_LABELS[p.tabSource] || p.tabSource}</p>
+      </div>
+
+      <div class="case-panel">
+        <h3>Crystal suggestion</h3>
+        <p>${p.crystalSuggestion || 'No crystal suggestion recorded for this case.'}</p>
+      </div>
+
+      <div class="case-panel">
+        <h3>Notes &amp; status</h3>
+        <p style="white-space:pre-wrap;">${p.userNotes || 'No notes yet.'}</p>
+        <span class="status-pill ${p.status || 'Active'}" style="margin-top:8px;display:inline-block;">${p.status || 'Active'}</span>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(root);
+  document.getElementById('caseDrawerCloseBtn').addEventListener('click', closeCaseDrawer);
+  root.querySelector('.case-overlay').addEventListener('click', closeCaseDrawer);
 }
 
 async function saveToDashboard(payload, btn) {

@@ -104,21 +104,49 @@ router.get('/common-numbers', requireAdmin, async (req, res) => {
 // GET /api/dashboard/kpis — case counts by source tool and status, for the KPI cards
 router.get('/kpis', requireAdmin, async (req, res) => {
   try {
-    const profiles = await SavedProfile.find().select('tabSource status crystalSuggestion');
-    const bySource = {};
+    const profiles = await SavedProfile.find().select('tabSource status crystalSuggestion name day month year matchScore');
+
+    const totalCases = profiles.length;
+    // "DOB Matching": DOB-only cases, no name given
+    const dobMatching = profiles.filter((p) => p.day && p.month && p.year && !p.name).length;
+    // "Name + DOB": both a name and a DOB recorded together
+    const nameDobMatching = profiles.filter((p) => p.name && p.day && p.month && p.year).length;
+    // "Mobile + DOB": saved specifically from the Mobile Compatibility tool (inherently phone+DOB)
+    const mobileDobMatching = profiles.filter((p) => p.tabSource === 'mobile').length;
+
     let crystalSuggestions = 0;
-    profiles.forEach((p) => {
-      bySource[p.tabSource] = (bySource[p.tabSource] || 0) + 1;
-      if (p.crystalSuggestion) crystalSuggestions += 1;
-    });
     const byStatus = {};
-    profiles.forEach((p) => { byStatus[p.status] = (byStatus[p.status] || 0) + 1; });
+    profiles.forEach((p) => {
+      if (p.crystalSuggestion) crystalSuggestions += 1;
+      byStatus[p.status] = (byStatus[p.status] || 0) + 1;
+    });
+
+    // Compatibility Overview: average matchScore per category, only where
+    // that data genuinely exists -- null (not 0) when there's nothing to
+    // average yet, so the frontend can show "No data" honestly instead of
+    // a fabricated 0%.
+    const avgMatch = (filterFn) => {
+      const withScore = profiles.filter((p) => filterFn(p) && typeof p.matchScore === 'number');
+      if (withScore.length === 0) return null;
+      return Math.round(withScore.reduce((sum, p) => sum + p.matchScore, 0) / withScore.length);
+    };
+    const allWithScore = profiles.filter((p) => typeof p.matchScore === 'number');
+    const overallMatch = allWithScore.length === 0 ? null : Math.round(allWithScore.reduce((sum, p) => sum + p.matchScore, 0) / allWithScore.length);
 
     res.json({
-      totalCases: profiles.length,
-      bySource,
-      byStatus,
+      totalCases,
+      dobMatching,
+      nameDobMatching,
+      mobileDobMatching,
       crystalSuggestions,
+      byStatus,
+      compatibilityOverview: {
+        dobDob: avgMatch((p) => p.tabSource === 'relationship'),
+        nameDob: avgMatch((p) => p.tabSource === 'lo-shu' && p.name),
+        mobileDob: avgMatch((p) => p.tabSource === 'mobile'),
+        nameMobile: null, // no tool currently computes this specific comparison -- honestly null, not fabricated
+        overall: overallMatch,
+      },
     });
   } catch (err) {
     console.error('KPI calculation failed:', err.message);
