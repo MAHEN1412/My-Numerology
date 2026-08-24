@@ -115,6 +115,18 @@
   .case-drawer-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;}
   .case-drawer-close{background:var(--navy-2);border:none;border-radius:8px;width:32px;height:32px;font-size:16px;color:var(--text-dim);cursor:pointer;}
   .case-panel{background:var(--navy-2);border-radius:12px;padding:16px 18px;margin-bottom:14px;}
+  .wizard-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.4);z-index:70;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .wizard-shell{background:var(--surface);border-radius:16px;width:100%;max-width:640px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(15,23,42,0.2);}
+  .wizard-header{display:flex;justify-content:space-between;align-items:flex-start;padding:24px 24px 0;}
+  .wizard-step-label{font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin:0 0 4px;}
+  .wizard-progress{height:4px;background:var(--navy-2);margin:16px 24px 0;border-radius:4px;overflow:hidden;}
+  .wizard-progress-fill{height:100%;background:var(--indigo);border-radius:4px;transition:width .25s ease;}
+  .wizard-body{padding:20px 24px;overflow-y:auto;flex:1;}
+  .wizard-footer{display:flex;align-items:center;gap:10px;padding:16px 24px;border-top:1px solid var(--border);}
+  .wizard-footer button{padding:10px 18px;}
+  .wizard-result-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--navy-2);font-size:13px;}
+  .wizard-result-row:last-child{border-bottom:none;}
+  .wizard-skip-note{font-size:12px;color:var(--text-muted);margin-top:10px;}
   .case-panel h3{font-size:13px;margin:0 0 10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;}
   .case-panel p{margin:0 0 6px;font-size:13px;color:var(--text);}
   .case-avatar{width:48px;height:48px;border-radius:50%;background:var(--surface-2);color:var(--indigo);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}
@@ -502,12 +514,12 @@
   </div>
   <input class="topbar-search" placeholder="Search client, DOB, phone, personality...">
   <div class="topbar-spacer"></div>
-  <button type="button" class="topbar-newcase" onclick="document.querySelector('[data-tab=tab0]').click()">+ New Case</button>
+  <button type="button" class="topbar-newcase" onclick="openNewCaseWizard()">+ New Case</button>
   <div class="topbar-account" id="topbarAccount">
     <button type="button" class="topbar-account-btn" id="topbarAccountBtn">
       <div class="topbar-avatar" id="topbarAvatar">MP</div>
       <span class="topbar-account-name" id="topbarAccountName">Consultant</span>
-      <span class="topbar-account-arrow">\u25be</span>
+      <span class="topbar-account-arrow">&#9662;</span>
     </button>
     <div class="topbar-account-menu" id="topbarAccountMenu" style="display:none;">
       <button type="button" class="topbar-menu-item" id="topbarSettingsBtn">Settings</button>
@@ -568,7 +580,7 @@
           <div class="rp-divider"></div>
 
           <p class="rp-section-label">NUMEROLOGY NEWS</p>
-          <div class="rp-item" onclick="document.querySelector('[data-tab=tab9]').click()"><b>Latest headlines</b><span>Read insights \u2192</span></div>
+          <div class="rp-item" onclick="document.querySelector('[data-tab=tab9]').click()"><b>Latest headlines</b><span>Read insights &#8594;</span></div>
         </aside>
       </div>
     </div>
@@ -1191,6 +1203,12 @@
 
     <details class="block section-accordion" id="videoSection7"><summary class="section-accordion-summary">Explore more about your numbers</summary><div class="section-accordion-body">
       <div id="videoContainer7"></div>
+
+      <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
+        <p style="font-weight:500;font-size:14px;margin:0 0 4px;color:var(--text);">Videos about your exact combination</p>
+        <p style="font-size:12px;color:var(--text-dim);margin:0 0 14px;">Only videos mentioning BOTH your Driver and Conductor numbers together, not just one.</p>
+        <div id="combinationVideoTable7"></div>
+      </div>
     </div></details>
 
     <details class="block section-accordion" id="nameNumerologySection7" style="display:none;"><summary class="section-accordion-summary">Name numerology</summary><div class="section-accordion-body">
@@ -1330,6 +1348,26 @@
 
 </div>
 </div>
+</div>
+
+<div class="wizard-overlay" id="newCaseWizard" style="display:none;">
+  <div class="wizard-shell">
+    <div class="wizard-header">
+      <div>
+        <p class="wizard-step-label" id="wizardStepLabel">Step 1 of 6</p>
+        <h2 id="wizardStepTitle">Client details</h2>
+      </div>
+      <button type="button" class="case-drawer-close" id="wizardCloseBtn">&#10005;</button>
+    </div>
+    <div class="wizard-progress"><div class="wizard-progress-fill" id="wizardProgressFill"></div></div>
+    <div class="wizard-body" id="wizardBody"></div>
+    <div class="wizard-footer">
+      <button type="button" class="ghost" id="wizardBackBtn" style="display:none;">Back</button>
+      <div style="flex:1;"></div>
+      <button type="button" class="ghost" id="wizardSkipBtn">Skip this step</button>
+      <button type="button" id="wizardNextBtn">Next</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal-overlay" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -3108,6 +3146,368 @@ function renderKeyNumbersMeaning(result, ns = '') {
   });
 }
 
+
+// ===== New Case guided wizard =====
+const WIZARD_STEPS = [
+  { id: 'basics', title: 'Client details & name correction' },
+  { id: 'mobile', title: 'Mobile Compatibility' },
+  { id: 'business', title: 'Business Name' },
+  { id: 'crystal', title: 'Crystal Compatibility' },
+  { id: 'number', title: 'Number Compatibility' },
+  { id: 'relationship', title: 'Relationship Match' },
+];
+
+let wizardState = {};
+
+function resetWizardState() {
+  wizardState = {
+    currentStep: 0,
+    name: '', phone: '', day: null, month: null, year: null, system: 'chaldean',
+    driverNumber: null, conductorNumber: null,
+    correctedNameSuggestion: '',
+    mobileNumberChecked: '', mobileAnalysisLabel: '', matchScore: null,
+    businessNameChecked: '', businessNameScore: null,
+    crystalSuggestion: '',
+    genericNumberType: '', genericNumberValue: '',
+    relationshipPersonBName: '', relationshipScore: null,
+  };
+}
+
+function openNewCaseWizard() {
+  resetWizardState();
+  document.getElementById('newCaseWizard').style.display = 'flex';
+  renderWizardStep();
+}
+
+function closeNewCaseWizard() {
+  document.getElementById('newCaseWizard').style.display = 'none';
+}
+
+function renderWizardStep() {
+  const step = WIZARD_STEPS[wizardState.currentStep];
+  document.getElementById('wizardStepLabel').textContent = `Step ${wizardState.currentStep + 1} of ${WIZARD_STEPS.length}`;
+  document.getElementById('wizardStepTitle').textContent = step.title;
+  document.getElementById('wizardProgressFill').style.width = `${((wizardState.currentStep + 1) / WIZARD_STEPS.length) * 100}%`;
+  document.getElementById('wizardBackBtn').style.display = wizardState.currentStep === 0 ? 'none' : 'inline-block';
+  document.getElementById('wizardSkipBtn').style.display = step.id === 'basics' ? 'none' : 'inline-block';
+  document.getElementById('wizardNextBtn').textContent = wizardState.currentStep === WIZARD_STEPS.length - 1 ? 'Save Case' : 'Next';
+
+  const renderers = {
+    basics: renderWizardBasics,
+    mobile: renderWizardMobile,
+    business: renderWizardBusiness,
+    crystal: renderWizardCrystal,
+    number: renderWizardNumber,
+    relationship: renderWizardRelationship,
+  };
+  renderers[step.id]();
+}
+
+function wizardField(label, id, value = '', placeholder = '', type = 'text') {
+  return `
+    <div class="field">
+      <label for="${id}">${label}</label>
+      <input type="${type}" id="${id}" value="${value}" placeholder="${placeholder}">
+    </div>
+  `;
+}
+
+function renderWizardBasics() {
+  const body = document.getElementById('wizardBody');
+  body.innerHTML = `
+    ${wizardField('Full name', 'wizName', wizardState.name, 'e.g. Ravi Kumar')}
+    ${wizardField('Date of birth', 'wizDob', wizardState.day ? `${wizardState.year}-${String(wizardState.month).padStart(2, '0')}-${String(wizardState.day).padStart(2, '0')}` : '', '', 'date')}
+    ${wizardField('Phone', 'wizPhone', wizardState.phone, 'e.g. 9876543210')}
+    <button type="button" id="wizAnalyzeBasics" class="calc-btn" style="margin-top:8px;">Calculate</button>
+    <div id="wizBasicsResults" style="margin-top:20px;"></div>
+  `;
+  document.getElementById('wizAnalyzeBasics').addEventListener('click', async () => {
+    const name = document.getElementById('wizName').value.trim();
+    const dobVal = document.getElementById('wizDob').value;
+    const phone = document.getElementById('wizPhone').value.trim();
+    if (!dobVal) { alert('Enter a date of birth to continue.'); return; }
+    const [y, m, d] = dobVal.split('-').map(Number);
+    wizardState.name = name; wizardState.phone = phone;
+    wizardState.day = d; wizardState.month = m; wizardState.year = y;
+
+    const resultsEl = document.getElementById('wizBasicsResults');
+    resultsEl.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Calculating\u2026</p>';
+    try {
+      const res = await fetch('/api/readings', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ day: d, month: m, year: y, name: name || undefined, system: 'chaldean' }),
+      });
+      const data = await res.json();
+      if (!res.ok) { resultsEl.innerHTML = `<p class="wizard-skip-note">${data.error || 'Could not calculate.'}</p>`; return; }
+      const result = data.result;
+      wizardState.driverNumber = result.driverNumber.value;
+      wizardState.conductorNumber = result.conductorNumber.value;
+
+      let nameCorrectionHtml = '';
+      if (name) {
+        try {
+          const ncRes = await fetch('/api/name-correction/suggest', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ day: d, month: m, year: y, baseName: name, system: 'chaldean' }),
+          });
+          const ncData = await ncRes.json();
+          if (ncRes.ok && ncData.results && ncData.results.length > 0) {
+            const top = ncData.results[0];
+            wizardState.correctedNameSuggestion = top.name;
+            nameCorrectionHtml = `
+              <div class="case-panel" style="margin-top:14px;">
+                <h3 style="font-size:13px;margin:0 0 10px;color:var(--text-dim);">Suggested name correction</h3>
+                <p style="font-size:14px;font-weight:600;margin:0;">${top.name}</p>
+                <p style="font-size:12px;color:var(--text-muted);margin:4px 0 0;">Name Number ${top.nameNumber} \u2014 ranked as the best-compatibility spelling found</p>
+              </div>
+            `;
+          }
+        } catch (e) { /* name correction is a bonus, not critical -- fail quietly */ }
+      }
+
+      resultsEl.innerHTML = `
+        <div class="wizard-result-row"><span>Driver Number</span><b>${result.driverNumber.value}</b></div>
+        <div class="wizard-result-row"><span>Conductor Number</span><b>${result.conductorNumber.value}</b></div>
+        ${result.nameNumber ? `<div class="wizard-result-row"><span>Name Number</span><b>${result.nameNumber.value}</b></div>` : ''}
+        ${nameCorrectionHtml}
+      `;
+    } catch (err) {
+      resultsEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';
+    }
+  });
+}
+
+function renderWizardMobile() {
+  const body = document.getElementById('wizardBody');
+  body.innerHTML = `
+    <p class="wizard-skip-note" style="margin:0 0 14px;">Optional \u2014 skip if the client doesn't want their number checked.</p>
+    ${wizardField('Mobile number', 'wizMobile', wizardState.mobileNumberChecked, 'e.g. 9876543210')}
+    <button type="button" id="wizAnalyzeMobile" class="calc-btn">Check this number</button>
+    <div id="wizMobileResults" style="margin-top:16px;"></div>
+  `;
+  document.getElementById('wizAnalyzeMobile').addEventListener('click', async () => {
+    const mobileNumber = document.getElementById('wizMobile').value.trim();
+    const resultsEl = document.getElementById('wizMobileResults');
+    if (!mobileNumber) { resultsEl.innerHTML = '<p class="wizard-skip-note">Enter a number first.</p>'; return; }
+    resultsEl.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Checking\u2026</p>';
+    try {
+      const res = await fetch('/api/mobile/analyze', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ day: wizardState.day, month: wizardState.month, year: wizardState.year, name: wizardState.name || undefined, system: 'chaldean', mobileNumber }),
+      });
+      const data = await res.json();
+      if (!res.ok) { resultsEl.innerHTML = `<p class="wizard-skip-note">${data.error}</p>`; return; }
+      wizardState.mobileNumberChecked = mobileNumber;
+      wizardState.mobileAnalysisLabel = data.compatibilityLabel;
+      wizardState.matchScore = data.compatibilityScore;
+      resultsEl.innerHTML = `
+        <div class="wizard-result-row"><span>Verdict</span><b>${data.compatibilityLabel}</b></div>
+        <div class="wizard-result-row"><span>Score</span><b>${data.compatibilityScore}%</b></div>
+        <p style="font-size:13px;color:var(--text-dim);margin-top:10px;">${data.simpleVerdict}</p>
+      `;
+    } catch (err) {
+      resultsEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';
+    }
+  });
+}
+
+function renderWizardBusiness() {
+  const body = document.getElementById('wizardBody');
+  body.innerHTML = `
+    <p class="wizard-skip-note" style="margin:0 0 14px;">Optional \u2014 skip if there's no business name to check.</p>
+    ${wizardField('Business name', 'wizBusiness', wizardState.businessNameChecked, 'e.g. Sunrise Traders')}
+    <button type="button" id="wizAnalyzeBusiness" class="calc-btn">Check this name</button>
+    <div id="wizBusinessResults" style="margin-top:16px;"></div>
+  `;
+  document.getElementById('wizAnalyzeBusiness').addEventListener('click', async () => {
+    const businessName = document.getElementById('wizBusiness').value.trim();
+    const resultsEl = document.getElementById('wizBusinessResults');
+    if (!businessName) { resultsEl.innerHTML = '<p class="wizard-skip-note">Enter a business name first.</p>'; return; }
+    resultsEl.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Checking\u2026</p>';
+    try {
+      const res = await fetch('/api/business-name/compare', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ names: [businessName], system: 'chaldean', ownerDay: wizardState.day, ownerMonth: wizardState.month, ownerYear: wizardState.year }),
+      });
+      const data = await res.json();
+      if (!res.ok) { resultsEl.innerHTML = `<p class="wizard-skip-note">${data.error}</p>`; return; }
+      const top = data.results[0];
+      wizardState.businessNameChecked = businessName;
+      wizardState.businessNameScore = top.compatibilityScore ?? null;
+      resultsEl.innerHTML = `
+        <div class="wizard-result-row"><span>Business Name Number</span><b>${top.nameNumber}</b></div>
+        ${top.compatibilityScore !== undefined ? `<div class="wizard-result-row"><span>Compatibility with owner</span><b>${top.compatibilityScore}%</b></div>` : ''}
+      `;
+    } catch (err) {
+      resultsEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';
+    }
+  });
+}
+
+function renderWizardCrystal() {
+  const body = document.getElementById('wizardBody');
+  body.innerHTML = `
+    <p class="wizard-skip-note" style="margin:0 0 14px;">Optional \u2014 skip if not needed for this client.</p>
+    <button type="button" id="wizAnalyzeCrystal" class="calc-btn">Get crystal suggestion</button>
+    <div id="wizCrystalResults" style="margin-top:16px;"></div>
+  `;
+  document.getElementById('wizAnalyzeCrystal').addEventListener('click', async () => {
+    const resultsEl = document.getElementById('wizCrystalResults');
+    resultsEl.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Calculating\u2026</p>';
+    try {
+      const res = await fetch('/api/crystals/analyze', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ day: wizardState.day, month: wizardState.month, year: wizardState.year, name: wizardState.name || undefined, system: 'chaldean' }),
+      });
+      const data = await res.json();
+      if (!res.ok) { resultsEl.innerHTML = `<p class="wizard-skip-note">${data.error}</p>`; return; }
+      const top = data.compatibility[0];
+      wizardState.crystalSuggestion = top ? top.crystal : '';
+      resultsEl.innerHTML = top ? `
+        <div class="wizard-result-row"><span>Top recommendation</span><b>${top.crystal}</b></div>
+        <div class="wizard-result-row"><span>Rating</span><b>${'\u2605'.repeat(top.stars || 0)}${'\u2606'.repeat(5 - (top.stars || 0))}</b></div>
+      ` : '<p class="wizard-skip-note">No strong crystal match found.</p>';
+    } catch (err) {
+      resultsEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';
+    }
+  });
+}
+
+function renderWizardNumber() {
+  const body = document.getElementById('wizardBody');
+  body.innerHTML = `
+    <p class="wizard-skip-note" style="margin:0 0 14px;">Optional \u2014 check a bank account, house, or vehicle number.</p>
+    <div class="field">
+      <label for="wizNumberType">Number type</label>
+      <select id="wizNumberType">
+        <option value="bank">Bank account</option>
+        <option value="house">House / address</option>
+        <option value="vehicle">Vehicle</option>
+      </select>
+    </div>
+    ${wizardField('Number', 'wizNumberValue', wizardState.genericNumberValue, 'e.g. 123456789')}
+    <button type="button" id="wizAnalyzeNumber" class="calc-btn">Check this number</button>
+    <div id="wizNumberResults" style="margin-top:16px;"></div>
+  `;
+  document.getElementById('wizAnalyzeNumber').addEventListener('click', async () => {
+    const type = document.getElementById('wizNumberType').value;
+    const value = document.getElementById('wizNumberValue').value.trim();
+    const resultsEl = document.getElementById('wizNumberResults');
+    if (!value) { resultsEl.innerHTML = '<p class="wizard-skip-note">Enter a number first.</p>'; return; }
+    resultsEl.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Checking\u2026</p>';
+    try {
+      const res = await fetch('/api/numbers/analyze', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ day: wizardState.day, month: wizardState.month, year: wizardState.year, name: wizardState.name || undefined, system: 'chaldean', value, type }),
+      });
+      const data = await res.json();
+      if (!res.ok) { resultsEl.innerHTML = `<p class="wizard-skip-note">${data.error}</p>`; return; }
+      wizardState.genericNumberType = type;
+      wizardState.genericNumberValue = value;
+      resultsEl.innerHTML = `
+        <div class="wizard-result-row"><span>Verdict</span><b>${data.result.label || data.result.verdict || '\u2014'}</b></div>
+      `;
+    } catch (err) {
+      resultsEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';
+    }
+  });
+}
+
+function renderWizardRelationship() {
+  const body = document.getElementById('wizardBody');
+  body.innerHTML = `
+    <p class="wizard-skip-note" style="margin:0 0 14px;">Optional \u2014 compare against a second person.</p>
+    ${wizardField('Second person\u2019s name', 'wizRelName', wizardState.relationshipPersonBName, 'e.g. Anita Sharma')}
+    ${wizardField('Their date of birth', 'wizRelDob', '', '', 'date')}
+    <button type="button" id="wizAnalyzeRelationship" class="calc-btn">Compare</button>
+    <div id="wizRelationshipResults" style="margin-top:16px;"></div>
+  `;
+  document.getElementById('wizAnalyzeRelationship').addEventListener('click', async () => {
+    const relName = document.getElementById('wizRelName').value.trim();
+    const relDobVal = document.getElementById('wizRelDob').value;
+    const resultsEl = document.getElementById('wizRelationshipResults');
+    if (!relDobVal) { resultsEl.innerHTML = '<p class="wizard-skip-note">Enter their date of birth first.</p>'; return; }
+    const [ry, rm, rd] = relDobVal.split('-').map(Number);
+    resultsEl.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Comparing\u2026</p>';
+    try {
+      const res = await fetch('/api/relationship/compare', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          personA: { label: wizardState.name || 'Client', day: wizardState.day, month: wizardState.month, year: wizardState.year, system: 'chaldean' },
+          personB: { label: relName || 'Person B', day: rd, month: rm, year: ry, system: 'chaldean' },
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) { resultsEl.innerHTML = `<p class="wizard-skip-note">${data.error}</p>`; return; }
+      wizardState.relationshipPersonBName = relName;
+      wizardState.relationshipScore = data.compatibility.score ?? null;
+      resultsEl.innerHTML = `
+        <div class="wizard-result-row"><span>Compatibility score</span><b>${data.compatibility.score}%</b></div>
+        ${data.compatibility.label ? `<div class="wizard-result-row"><span>Verdict</span><b>${data.compatibility.label}</b></div>` : ''}
+      `;
+    } catch (err) {
+      resultsEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';
+    }
+  });
+}
+
+async function wizardSaveCase() {
+  const btn = document.getElementById('wizardNextBtn');
+  btn.disabled = true; btn.textContent = 'Saving\u2026';
+  try {
+    const summaryParts = [];
+    if (wizardState.correctedNameSuggestion) summaryParts.push(`Name correction: ${wizardState.correctedNameSuggestion}`);
+    if (wizardState.mobileNumberChecked) summaryParts.push(`Mobile ${wizardState.mobileNumberChecked}: ${wizardState.mobileAnalysisLabel}`);
+    if (wizardState.businessNameChecked) summaryParts.push(`Business name "${wizardState.businessNameChecked}" checked`);
+    if (wizardState.crystalSuggestion) summaryParts.push(`Crystal: ${wizardState.crystalSuggestion}`);
+    if (wizardState.genericNumberValue) summaryParts.push(`${wizardState.genericNumberType} number checked`);
+    if (wizardState.relationshipPersonBName) summaryParts.push(`Compared with ${wizardState.relationshipPersonBName}`);
+
+    const res = await fetch('/api/dashboard/save', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: wizardState.name, phone: wizardState.phone,
+        day: wizardState.day, month: wizardState.month, year: wizardState.year, system: 'chaldean',
+        tabSource: 'new-case-wizard',
+        driverNumber: wizardState.driverNumber, conductorNumber: wizardState.conductorNumber,
+        crystalSuggestion: wizardState.crystalSuggestion, matchScore: wizardState.matchScore,
+        correctedNameSuggestion: wizardState.correctedNameSuggestion,
+        mobileNumberChecked: wizardState.mobileNumberChecked, mobileAnalysisLabel: wizardState.mobileAnalysisLabel,
+        businessNameChecked: wizardState.businessNameChecked, businessNameScore: wizardState.businessNameScore,
+        genericNumberType: wizardState.genericNumberType, genericNumberValue: wizardState.genericNumberValue,
+        relationshipPersonBName: wizardState.relationshipPersonBName, relationshipScore: wizardState.relationshipScore,
+        autoSummary: summaryParts.join(' \u00b7 '),
+      }),
+    });
+    if (!res.ok) { const data = await res.json(); alert(data.error || 'Could not save this case.'); return; }
+    closeNewCaseWizard();
+    document.querySelector('[data-tab="tab0"]').click();
+    loadDashboard();
+  } catch (err) {
+    alert('Could not reach the server.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Case';
+  }
+}
+
+document.getElementById('wizardCloseBtn').addEventListener('click', () => {
+  if (confirm('Close this new case? Anything not saved will be lost.')) closeNewCaseWizard();
+});
+document.getElementById('wizardBackBtn').addEventListener('click', () => {
+  wizardState.currentStep = Math.max(0, wizardState.currentStep - 1);
+  renderWizardStep();
+});
+document.getElementById('wizardSkipBtn').addEventListener('click', () => {
+  if (wizardState.currentStep === WIZARD_STEPS.length - 1) { wizardSaveCase(); return; }
+  wizardState.currentStep += 1;
+  renderWizardStep();
+});
+document.getElementById('wizardNextBtn').addEventListener('click', () => {
+  if (wizardState.currentStep === 0 && !wizardState.day) { alert('Enter and calculate the client\u2019s date of birth first.'); return; }
+  if (wizardState.currentStep === WIZARD_STEPS.length - 1) { wizardSaveCase(); return; }
+  wizardState.currentStep += 1;
+  renderWizardStep();
+});
 
 async function saveToDashboard(payload, btn) {
   const originalText = btn.textContent;

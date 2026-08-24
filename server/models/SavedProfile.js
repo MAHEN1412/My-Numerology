@@ -24,6 +24,19 @@ const SavedProfileSchema = new mongoose.Schema({
   crystalSuggestion: { type: String, trim: true, maxlength: 200 }, // top recommended crystal, if applicable
   matchScore: { type: Number }, // compatibility score, when the source tool computed one (mobile, crystal, relationship)
 
+  // Consolidated case fields -- populated by the "New Case" guided wizard,
+  // which walks through several tools for one client in sequence. Each is
+  // optional since every step in the wizard can be skipped.
+  correctedNameSuggestion: { type: String, trim: true, maxlength: 120 },
+  mobileNumberChecked: { type: String, trim: true, maxlength: 20 },
+  mobileAnalysisLabel: { type: String, trim: true, maxlength: 40 },
+  businessNameChecked: { type: String, trim: true, maxlength: 120 },
+  businessNameScore: { type: Number },
+  genericNumberType: { type: String, trim: true, maxlength: 20 },
+  genericNumberValue: { type: String, trim: true, maxlength: 40 },
+  relationshipPersonBName: { type: String, trim: true, maxlength: 120 },
+  relationshipScore: { type: Number },
+
   autoSummary: { type: String, trim: true, maxlength: 500 }, // auto-generated, regenerated on save
   userNotes: { type: String, trim: true, maxlength: 2000, default: '' }, // person's own editable notes
 

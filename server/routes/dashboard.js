@@ -7,7 +7,13 @@ const router = express.Router();
 // POST /api/dashboard/save — save a profile snapshot (explicit action only)
 router.post('/save', requireAdmin, async (req, res) => {
   try {
-    const { name, phone, day, month, year, system, tabSource, driverNumber, conductorNumber, nameNumber, crystalSuggestion, matchScore, autoSummary, userNotes, status } = req.body;
+    const {
+      name, phone, day, month, year, system, tabSource, driverNumber, conductorNumber, nameNumber,
+      crystalSuggestion, matchScore, autoSummary, userNotes, status,
+      correctedNameSuggestion, mobileNumberChecked, mobileAnalysisLabel,
+      businessNameChecked, businessNameScore, genericNumberType, genericNumberValue,
+      relationshipPersonBName, relationshipScore,
+    } = req.body;
 
     if (!tabSource) return res.status(400).json({ error: 'Missing tab source.' });
 
@@ -25,6 +31,15 @@ router.post('/save', requireAdmin, async (req, res) => {
       nameNumber: nameNumber ?? undefined,
       crystalSuggestion: crystalSuggestion || '',
       matchScore: matchScore ?? undefined,
+      correctedNameSuggestion: correctedNameSuggestion || '',
+      mobileNumberChecked: mobileNumberChecked || '',
+      mobileAnalysisLabel: mobileAnalysisLabel || '',
+      businessNameChecked: businessNameChecked || '',
+      businessNameScore: businessNameScore ?? undefined,
+      genericNumberType: genericNumberType || '',
+      genericNumberValue: genericNumberValue || '',
+      relationshipPersonBName: relationshipPersonBName || '',
+      relationshipScore: relationshipScore ?? undefined,
       autoSummary: autoSummary || '',
       userNotes: userNotes || '',
     });

@@ -3,37 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Book Library Admin</title>
+<title>Book Library \u2014 Numerology Consultant Engine</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --navy:#0A0C18; --navy-2:#12142B; --surface:#181B38;
-    --border:rgba(255,255,255,0.08); --border-strong:rgba(255,255,255,0.16);
-    --indigo:#7C6FF0; --violet:#9D7BFF; --gold:#D4AF6A;
-    --text:#F3F1FA; --text-dim:#B7B2D6; --text-muted:#7B7699;
-    --danger:#F0836B;
+    --navy:#F8FAFC; --navy-2:#F1F5F9; --surface:#FFFFFF; --surface-2:#EEF2FF;
+    --border:#E2E8F0; --border-strong:#CBD5E1;
+    --indigo:#4F46E5; --violet:#4338CA; --gold:#CA8A04;
+    --text:#0F172A; --text-dim:#475569; --text-muted:#94A3B8;
+    --danger:#DC2626;
   }
   *{box-sizing:border-box;}
-  body{margin:0;background:var(--navy);color:var(--text);font-family:'Inter',sans-serif;line-height:1.6;min-height:100vh;}
-  h1,h2{font-family:'Cormorant Garamond',serif;font-weight:600;margin:0;}
-  .wrap{max-width:720px;margin:0 auto;padding:56px 24px;}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;}
+  body{margin:0;background:var(--navy);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;line-height:1.6;min-height:100vh;}
+  h1,h2{font-family:'Inter',system-ui,-apple-system,sans-serif;font-weight:800;margin:0;color:var(--text);}
+  .topbar{height:72px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:16px;}
+  .topbar-logo-title{font-size:19px;font-weight:800;color:var(--indigo);letter-spacing:.4px;}
+  .topbar-logo-sub{font-size:9px;color:var(--text-muted);font-weight:700;display:block;margin-top:2px;letter-spacing:.05em;}
+  .topbar-back{margin-left:auto;font-size:13px;font-weight:600;color:var(--text-dim);text-decoration:none;padding:8px 14px;border-radius:8px;}
+  .topbar-back:hover{background:var(--navy-2);}
+  .wrap{max-width:720px;margin:0 auto;padding:40px 24px 56px;}
+  .card{background:var(--surface);border:1px solid #EDF1F5;border-radius:14px;padding:20px;box-shadow:0 1px 2px rgba(15,23,42,0.03);}
   .field{margin-bottom:16px;}
-  .field label{display:block;font-size:13px;font-weight:500;margin-bottom:8px;}
+  .field label{display:block;font-size:13px;font-weight:500;margin-bottom:8px;color:var(--text);}
   .field input{
     width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;
     padding:12px 14px;color:var(--text);font-size:15px;font-family:'Inter',sans-serif;
   }
-  .field input:focus{outline:none;border-color:var(--violet);}
+  .field input:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(67,56,202,0.15);}
   button{
-    font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;
-    padding:12px 18px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--indigo),var(--violet));color:#fff;
+    font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;
+    padding:11px 17px;border-radius:9px;border:none;background:var(--indigo);color:#fff;
   }
+  button:hover:not(:disabled){background:var(--violet);}
   button:disabled{opacity:0.6;cursor:default;}
-  button.ghost{background:transparent;border:1px solid var(--border-strong);color:var(--text-dim);}
-  button.danger{background:transparent;border:1px solid var(--danger);color:var(--danger);padding:6px 12px;font-size:12px;}
+  button.ghost{background:var(--surface-2);color:var(--violet);}
+  button.ghost:hover:not(:disabled){background:var(--navy-2);}
+  button.danger{background:transparent;border:1px solid var(--danger);color:var(--danger);padding:6px 12px;font-size:12px;font-weight:600;}
+  button.danger:hover:not(:disabled){background:rgba(220,38,38,0.06);}
   .err{color:var(--danger);font-size:13px;margin-top:10px;display:none;}
   .err.show{display:block;}
   .top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;}
@@ -46,10 +54,17 @@
 </style>
 </head>
 <body>
+<header class="topbar">
+  <div>
+    <span class="topbar-logo-title">NUMEROLOGY</span>
+    <span class="topbar-logo-sub">CONSULTANT ENGINE</span>
+  </div>
+  <a href="/" class="topbar-back">&larr; Back to app</a>
+</header>
 <div class="wrap">
 
   <div id="loginView">
-    <h1 style="text-align:center;margin-bottom:24px;">Book Library Admin</h1>
+    <h1 style="text-align:center;margin-bottom:24px;font-size:22px;">Book Library</h1>
     <div class="card" style="max-width:360px;margin:0 auto;">
       <div class="field">
         <label for="passwordInput">Admin password</label>
@@ -58,12 +73,11 @@
       <div class="err" id="loginError"></div>
       <button id="loginBtn" style="width:100%;margin-top:8px;">Log in</button>
     </div>
-    <p style="text-align:center;margin-top:20px;"><a href="/">&larr; Back to the calculator</a></p>
   </div>
 
   <div id="panelView" style="display:none;">
     <div class="top-row">
-      <h1>Book Library</h1>
+      <h1 style="font-size:22px;">Book Library</h1>
       <button class="ghost" id="logoutBtn">Log out</button>
     </div>
 
