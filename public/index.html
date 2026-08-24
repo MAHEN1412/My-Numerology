@@ -35,6 +35,14 @@
     --danger:#DC2626; --danger-bg:rgba(220,38,38,0.08);
     --glow: radial-gradient(circle, rgba(79,70,229,0.10), transparent 70%);
   }
+  html[data-theme="dark"]{
+    --navy:#0F1117; --navy-2:#1A1D26; --surface:#181B24; --surface-2:rgba(124,111,240,0.14);
+    --border:rgba(255,255,255,0.08); --border-strong:rgba(255,255,255,0.16);
+    --indigo:#7C6FF0; --violet:#9D7BFF; --gold:#E8A33D;
+    --text:#F1F5F9; --text-dim:#B8BFCC; --text-muted:#7B8296;
+    --danger:#F87171; --danger-bg:rgba(248,113,113,0.15);
+    --glow: radial-gradient(circle, rgba(157,123,255,0.25), transparent 70%);
+  }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;} }
@@ -66,6 +74,9 @@
   .field input[type="date"], .field input[type="text"], .field input[type="password"]{
     width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;
     padding:13px 14px;color:var(--text);font-size:16px;font-family:'Inter',sans-serif;color-scheme:light;
+  }
+  html[data-theme="dark"] .field input[type="date"], html[data-theme="dark"] .field input[type="text"], html[data-theme="dark"] .field input[type="password"]{
+    color-scheme:dark;
   }
   .field input[type="text"]::placeholder, .field input[type="password"]::placeholder{color:var(--text-muted);}
   .field input:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(67,56,202,0.2);}
@@ -149,6 +160,9 @@
   .reference-panel .rp-item span{display:block;color:var(--text-muted);font-size:10px;margin-top:3px;}
   .reference-panel .rp-item:hover b{color:var(--indigo);}
   .reference-panel .rp-divider{height:1px;background:var(--border);margin:16px 0;}
+  .rp-birthday-tabs{display:flex;gap:6px;margin-bottom:12px;}
+  .rp-tab-btn{background:var(--navy-2);border:none;color:var(--text-dim);font-size:11px;font-weight:600;padding:6px 12px;border-radius:20px;cursor:pointer;}
+  .rp-tab-btn.active{background:var(--indigo);color:#fff;}
   .kpi-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;}
   .kpi-card{background:var(--surface);border:1px solid #EDF1F5;border-radius:14px;padding:18px;box-shadow:0 1px 2px rgba(15,23,42,0.03);}
   .kpi-card .kpi-num{font-family:'Inter',system-ui,-apple-system,sans-serif;font-size:28px;font-weight:800;color:var(--text);line-height:1;margin:8px 0;}
@@ -473,11 +487,6 @@
           <p class="eyebrow" style="margin:32px 0 12px;">Compatibility Overview</p>
           <div id="compatibilityOverview" class="card"></div>
 
-          <p class="eyebrow" style="margin:32px 0 12px;">Common numbers across your saved profiles</p>
-          <div id="commonNumbersPanel">
-            <p style="font-size:13px;color:var(--text-dim);">Save a few profiles to see patterns here.</p>
-          </div>
-
           <p class="eyebrow" style="margin:32px 0 12px;">My Client Cases</p>
           <div id="savedProfilesTable">
             <p style="font-size:13px;color:var(--text-dim);">No profiles saved yet.</p>
@@ -486,7 +495,11 @@
 
         <aside class="reference-panel">
           <p class="rp-section-label">TODAY'S BIRTHDAYS</p>
-          <p style="font-size:11px;color:var(--text-muted);margin:0 0 12px;">Real people, real numbers &mdash; sourced from Wikipedia, numerology computed from their actual birthdate.</p>
+          <p style="font-size:11px;color:var(--text-muted);margin:0 0 10px;">Real people, real numbers &mdash; sourced from Wikipedia, numerology computed from their actual birthdate.</p>
+          <div class="rp-birthday-tabs">
+            <button type="button" class="rp-tab-btn active" data-birthday-filter="world">World</button>
+            <button type="button" class="rp-tab-btn" data-birthday-filter="indian">Indian</button>
+          </div>
           <div id="todaysBirthdaysList"><p style="font-size:12px;color:var(--text-muted);">Loading&hellip;</p></div>
           <div class="rp-divider"></div>
           <p class="rp-section-label">NUMEROLOGY NEWS</p>
@@ -2648,9 +2661,20 @@ document.getElementById('topbarSettingsBtn').addEventListener('click', () => {
   document.getElementById('topbarAccountMenu').style.display = 'none';
   document.querySelector('[data-tab="tab0"]').click();
 });
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('numerologyTheme', theme);
+  const btn = document.getElementById('topbarThemeBtn');
+  if (btn) btn.textContent = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
+}
+
+const savedTheme = localStorage.getItem('numerologyTheme');
+applyTheme(savedTheme === 'dark' ? 'dark' : 'light');
+
 document.getElementById('topbarThemeBtn').addEventListener('click', () => {
   document.getElementById('topbarAccountMenu').style.display = 'none';
-  alert('Theme switching is coming soon.');
+  const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
 });
 document.getElementById('topbarLogoutBtn').addEventListener('click', async () => {
   document.getElementById('topbarAccountMenu').style.display = 'none';
@@ -2662,18 +2686,20 @@ document.getElementById('topbarLogoutBtn').addEventListener('click', async () =>
 async function loadDashboard() {
   loadKPIs();
   loadSavedProfiles();
-  loadCommonNumbers();
   loadTodaysBirthdays();
 }
 
-async function loadTodaysBirthdays() {
+async function loadTodaysBirthdays(filter = 'world') {
   const el = document.getElementById('todaysBirthdaysList');
   if (!el) return;
+  el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);">Loading\u2026</p>';
   try {
-    const res = await fetch('/api/reference/todays-birthdays');
+    const res = await fetch('/api/reference/todays-birthdays' + (filter === 'indian' ? '?filter=indian' : ''));
     const data = await res.json();
     if (!data.people || data.people.length === 0) {
-      el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);">Could not load today\u2019s birthdays right now.</p>';
+      el.innerHTML = filter === 'indian'
+        ? '<p style="font-size:12px;color:var(--text-muted);">No Indian personalities matched among today\u2019s birthdays in this feed.</p>'
+        : '<p style="font-size:12px;color:var(--text-muted);">Could not load today\u2019s birthdays right now.</p>';
       return;
     }
     el.innerHTML = data.people.map((p) => {
@@ -2690,6 +2716,14 @@ async function loadTodaysBirthdays() {
     el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);">Could not load today\u2019s birthdays right now.</p>';
   }
 }
+
+document.querySelectorAll('.rp-tab-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.rp-tab-btn').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    loadTodaysBirthdays(btn.dataset.birthdayFilter);
+  });
+});
 
 const TAB_SOURCE_LABELS = {
   'lo-shu': 'Lo Shu cases', 'crystal': 'Crystal cases', 'mobile': 'Mobile cases',
@@ -2784,20 +2818,17 @@ function renderSavedProfilesTable(profiles) {
     const dob = (p.day && p.month && p.year) ? `${String(p.day).padStart(2, '0')}/${String(p.month).padStart(2, '0')}/${p.year}` : '\u2014';
     const status = p.status || 'Active';
     const statusOptions = statuses.map((s) => `<option value="${s}" ${s === status ? 'selected' : ''}>${s}</option>`).join('');
+    const descriptionText = [p.autoSummary, p.userNotes].filter(Boolean).join(' \u2014 ') || '\u2014';
     return `
       <tr data-id="${p._id}" class="case-row">
         <td>${p.name || '\u2014'}</td>
         <td>${p.phone || '\u2014'}</td>
         <td>${dob}</td>
         <td>${p.crystalSuggestion || '\u2014'}</td>
-        <td>
-          <div style="font-size:12px;color:var(--text-dim);margin-bottom:6px;">${p.autoSummary || ''}</div>
-          <textarea class="notes-input" placeholder="Your notes..." onclick="event.stopPropagation()">${p.userNotes || ''}</textarea>
-        </td>
+        <td style="font-size:12px;color:var(--text-dim);">${descriptionText}</td>
         <td><select class="status-select" onclick="event.stopPropagation()">${statusOptions}</select></td>
         <td>
           <div class="row-actions" onclick="event.stopPropagation()">
-            <button type="button" class="save-notes-btn">Save</button>
             <button type="button" class="delete-profile-btn">Delete</button>
           </div>
         </td>
@@ -2812,26 +2843,26 @@ function renderSavedProfilesTable(profiles) {
     </table>
   `;
 
+  // Clicking anywhere on a row (except the status dropdown or delete
+  // button, which stop propagation above) opens the full 360-degree case
+  // view in the drawer.
   container.querySelectorAll('.case-row').forEach((row) => {
     row.addEventListener('click', () => openCaseDrawer(row.dataset.id));
   });
 
-  container.querySelectorAll('.save-notes-btn').forEach((btn) => {
-    btn.addEventListener('click', async (e) => {
+  container.querySelectorAll('.status-select').forEach((select) => {
+    select.addEventListener('change', async (e) => {
       const row = e.target.closest('tr');
       const id = row.dataset.id;
-      const notes = row.querySelector('.notes-input').value;
-      const status = row.querySelector('.status-select').value;
-      btn.disabled = true; btn.textContent = 'Saving\u2026';
+      const status = select.value;
       try {
         await fetch('/api/dashboard/' + id, {
-          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userNotes: notes, status }),
+          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }),
         });
-        btn.textContent = 'Saved!';
+        if (window._savedProfilesById[id]) window._savedProfilesById[id].status = status;
         loadKPIs();
-        setTimeout(() => { btn.textContent = 'Save'; btn.disabled = false; }, 1200);
       } catch (err) {
-        btn.textContent = 'Failed'; btn.disabled = false;
+        alert('Could not update status. Try again.');
       }
     });
   });
@@ -2844,7 +2875,6 @@ function renderSavedProfilesTable(profiles) {
       try {
         await fetch('/api/dashboard/' + id, { method: 'DELETE' });
         row.remove();
-        loadCommonNumbers();
         loadKPIs();
         if (container.querySelectorAll('tbody tr').length === 0) {
           container.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">No profiles saved yet.</p>';
@@ -2854,33 +2884,6 @@ function renderSavedProfilesTable(profiles) {
       }
     });
   });
-}
-
-async function loadCommonNumbers() {
-  const panel = document.getElementById('commonNumbersPanel');
-  try {
-    const res = await fetch('/api/dashboard/common-numbers');
-    const data = await res.json();
-    if (!data.totalProfiles || data.totalProfiles === 0) {
-      panel.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Save a few profiles to see patterns here.</p>';
-      return;
-    }
-    const buildCol = (title, entries) => {
-      if (entries.length === 0) return `<div class="common-numbers-col"><h4>${title}</h4><p style="font-size:12px;color:var(--text-dim);">No data yet.</p></div>`;
-      const bars = entries.slice(0, 5).map((e) => `<div class="cn-bar"><span class="cn-num">${e.number}</span> appears ${e.count}\u00d7</div>`).join('');
-      return `<div class="common-numbers-col"><h4>${title}</h4>${bars}</div>`;
-    };
-    panel.innerHTML = `
-      <p style="font-size:12px;color:var(--text-dim);margin-bottom:16px;">Based on ${data.totalProfiles} saved profile${data.totalProfiles === 1 ? '' : 's'}.</p>
-      <div class="common-numbers-grid">
-        ${buildCol('Driver numbers', data.driverNumbers)}
-        ${buildCol('Conductor numbers', data.conductorNumbers)}
-        ${buildCol('Name numbers', data.nameNumbers)}
-      </div>
-    `;
-  } catch (err) {
-    panel.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Could not load this right now.</p>';
-  }
 }
 
 function initials(name) {

@@ -109,10 +109,13 @@ async function fetchTodaysBirthdays() {
 
   // Only people with a full page + a real birth year -- filters out
   // ancient/uncertain dates where numerology on the DOB wouldn't be
-  // meaningful anyway, and keeps this to well-documented figures.
+  // meaningful anyway, and keeps this to well-documented figures. Keep a
+  // larger pool here (not just the top few) so the Indian filter below
+  // has enough to actually search through, rather than being starved by
+  // an early cutoff applied before filtering.
   const people = (data.births || [])
     .filter((b) => b.year && b.pages && b.pages[0])
-    .slice(0, 10)
+    .slice(0, 50)
     .map((b) => {
       const page = b.pages[0];
       const year = Number(b.year);
@@ -148,15 +151,25 @@ async function fetchTodaysBirthdays() {
   return people;
 }
 
-// GET /api/reference/todays-birthdays
+// GET /api/reference/todays-birthdays?filter=indian
 // Real people who share today's calendar date of birth, sourced from
 // Wikipedia's own "On This Day" feed (same CC BY-SA license as the rest
 // of the Reference Library) -- with their actual Driver/Conductor numbers
 // computed from their real birthdate, not invented.
+//
+// The optional "indian" filter is a best-effort heuristic: it keeps only
+// entries whose short Wikipedia description happens to mention "Indian"
+// (as in "Indian politician", "Indian actor", etc.) -- there's no
+// structured nationality field in this feed to filter on reliably, so
+// this can miss people whose description is phrased differently, and
+// isn't presented as a complete or curated Indian personalities database.
 router.get('/todays-birthdays', async (req, res) => {
   try {
     const people = await fetchTodaysBirthdays();
-    res.json({ people, license: 'CC BY-SA 4.0', source: 'Wikipedia "On this day"' });
+    const filtered = req.query.filter === 'indian'
+      ? people.filter((p) => /indian/i.test(p.description || ''))
+      : people;
+    res.json({ people: filtered.slice(0, 10), license: 'CC BY-SA 4.0', source: 'Wikipedia "On this day"' });
   } catch (err) {
     console.error('[reference] todays-birthdays failed:', err.message);
     res.json({ people: [], error: true });
