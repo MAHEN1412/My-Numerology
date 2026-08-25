@@ -145,57 +145,58 @@
 
   /* ===== Professional PDF Report ===== */
   #fullReportPrintArea{display:none;}
-  .report-page{background:#fff;color:#1a1a2e;font-family:'Inter',system-ui,sans-serif;padding:8mm 2mm;min-height:250mm;position:relative;}
+  .report-page{background:#FAF9F5;color:#1F2933;font-family:'Inter',system-ui,sans-serif;padding:8mm 2mm;min-height:250mm;position:relative;}
   .report-cover{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:250mm;text-align:center;}
-  .report-cover-kicker{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#4F46E5;font-weight:700;margin-bottom:18px;}
-  .report-cover-title{font-size:34px;font-weight:800;margin:0 0 40px;color:#0F172A;}
-  .report-cover-field{margin-bottom:14px;font-size:15px;color:#334155;}
-  .report-cover-field b{color:#0F172A;font-size:17px;display:block;margin-top:2px;}
-  .report-cover-footer{position:absolute;bottom:14mm;left:0;right:0;font-size:11px;color:#94A3B8;}
+  .report-cover-kicker{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#405C3D;font-weight:700;margin-bottom:18px;}
+  .report-cover-title{font-size:34px;font-weight:800;margin:0 0 40px;color:#1F2933;}
+  .report-cover-field{margin-bottom:14px;font-size:15px;color:#1F2933;}
+  .report-cover-field b{color:#1F2933;font-size:17px;display:block;margin-top:2px;}
+  .report-cover-footer{position:absolute;bottom:14mm;left:0;right:0;font-size:11px;color:#667085;}
 
-  .report-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #4F46E5;padding-bottom:10px;margin-bottom:22px;}
-  .report-header-brand{font-size:12px;font-weight:800;color:#4F46E5;letter-spacing:.05em;}
-  .report-header-client{font-size:11px;color:#64748B;}
-  .report-footer{position:absolute;bottom:8mm;left:8mm;right:8mm;display:flex;justify-content:space-between;font-size:10px;color:#94A3B8;border-top:1px solid #E2E8F0;padding-top:6px;}
+  .report-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #405C3D;padding-bottom:10px;margin-bottom:22px;}
+  .report-header-brand{font-size:12px;font-weight:800;color:#405C3D;letter-spacing:.05em;}
+  .report-header-client{font-size:11px;color:#667085;}
+  .report-footer{position:absolute;bottom:8mm;left:8mm;right:8mm;display:flex;justify-content:space-between;font-size:10px;color:#667085;border-top:1px solid #EAF0E8;padding-top:6px;}
 
-  .report-section-title{font-size:20px;font-weight:800;color:#0F172A;margin:0 0 18px;}
-  .report-subsection-title{font-size:14px;font-weight:700;color:#334155;margin:20px 0 10px;text-transform:uppercase;letter-spacing:.03em;}
+  .report-section-title{font-size:20px;font-weight:800;color:#1F2933;margin:0 0 18px;}
+  .report-subsection-title{font-size:14px;font-weight:700;color:#1F2933;margin:20px 0 10px;text-transform:uppercase;letter-spacing:.03em;}
 
   .report-number-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;margin-bottom:20px;}
-  .report-number-card{border:1px solid #E2E8F0;border-radius:10px;padding:14px;text-align:center;}
-  .report-number-card .rnc-label{font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
-  .report-number-card .rnc-value{font-size:30px;font-weight:800;color:#4F46E5;line-height:1;}
+  .report-number-card{border:1px solid #EAF0E8;border-radius:10px;padding:14px;text-align:center;}
+  .report-number-card .rnc-label{font-size:10px;color:#667085;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+  .report-number-card .rnc-value{font-size:32px;font-weight:800;color:#F4C542;line-height:1;}
 
-  .report-insight-list{margin:0;padding-left:18px;font-size:13px;line-height:1.7;color:#334155;}
+  .report-insight-list{margin:0;padding-left:18px;font-size:13px;line-height:1.7;color:#1F2933;}
 
-  .report-loshu-grid{display:grid;grid-template-columns:repeat(3,50px);grid-template-rows:repeat(3,50px);gap:2px;background:#E2E8F0;border:1px solid #CBD5E1;border-radius:8px;overflow:hidden;margin:0 auto 14px;}
+  .report-loshu-grid{display:grid;grid-template-columns:repeat(3,50px);grid-template-rows:repeat(3,50px);gap:2px;background:#EAF0E8;border:1px solid #EAF0E8;border-radius:8px;overflow:hidden;margin:0 auto 14px;}
   .report-loshu-cell{background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
-  .report-loshu-cell.rl-present{color:#CA8A04;}
+  .report-loshu-cell.rl-present{color:#F4C542;}
   .report-loshu-cell.rl-repeated{color:#DC2626;}
-  .report-loshu-cell.rl-missing{color:#CBD5E1;}
-  .report-loshu-legend{display:flex;gap:16px;justify-content:center;font-size:11px;color:#64748B;margin-bottom:20px;}
+  .report-loshu-cell.rl-missing{color:#EAF0E8;}
+  .report-loshu-legend{display:flex;gap:16px;justify-content:center;font-size:11px;color:#667085;margin-bottom:20px;}
   .report-loshu-legend span{display:flex;align-items:center;gap:5px;}
   .report-loshu-legend i{width:10px;height:10px;border-radius:3px;display:inline-block;}
 
   .report-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
-  .report-card{border:1px solid #E2E8F0;border-radius:10px;padding:14px;}
-  .report-card h4{font-size:13px;margin:0 0 6px;color:#0F172A;}
-  .report-card p{font-size:12px;color:#475569;margin:0;line-height:1.6;}
+  .report-card{background:#FFFFFF;border:1px solid #EAF0E8;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(31,41,51,0.04);}
+  .report-number-card{background:#FFFFFF;box-shadow:0 1px 3px rgba(31,41,51,0.04);}
+  .report-card h4{font-size:13px;margin:0 0 6px;color:#1F2933;}
+  .report-card p{font-size:12px;color:#667085;margin:0;line-height:1.6;}
 
   .report-before-after{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:20px;}
-  .report-before-after th{text-align:left;padding:8px 10px;background:#F1F5F9;color:#334155;font-weight:700;border-bottom:2px solid #E2E8F0;}
-  .report-before-after td{padding:8px 10px;border-bottom:1px solid #F1F5F9;}
-  .report-before-after td.rba-changed{color:#4F46E5;font-weight:700;}
+  .report-before-after th{text-align:left;padding:8px 10px;background:#EAF0E8;color:#1F2933;font-weight:700;border-bottom:2px solid #EAF0E8;}
+  .report-before-after td{padding:8px 10px;border-bottom:1px solid #EAF0E8;}
+  .report-before-after td.rba-changed{color:#405C3D;font-weight:700;}
 
   .report-chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
-  .report-chip{background:#EEF2FF;color:#4338CA;font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;}
+  .report-chip{background:#EAF0E8;color:#405C3D;font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;}
 
   .report-color-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:18px;}
-  .report-color-swatch{display:flex;align-items:center;gap:8px;font-size:12px;color:#334155;}
+  .report-color-swatch{display:flex;align-items:center;gap:8px;font-size:12px;color:#1F2933;}
   .report-color-swatch i{width:22px;height:22px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,0.1);}
 
-  .report-source-item{font-size:11px;color:#64748B;margin-bottom:10px;padding-left:12px;border-left:2px solid #E2E8F0;}
-  .report-source-item b{color:#334155;display:block;font-size:12px;}
+  .report-source-item{font-size:11px;color:#667085;margin-bottom:10px;padding-left:12px;border-left:2px solid #EAF0E8;}
+  .report-source-item b{color:#1F2933;display:block;font-size:12px;}
   .case-panel h3{font-size:13px;margin:0 0 10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;}
   .case-panel p{margin:0 0 6px;font-size:13px;color:var(--text);}
   .case-avatar{width:48px;height:48px;border-radius:50%;background:var(--surface-2);color:var(--indigo);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}
@@ -1446,6 +1447,41 @@
 </div>
 
 <div id="fullReportPrintArea"></div>
+
+<div class="wizard-overlay" id="reportFormOverlay" style="display:none;">
+  <div class="wizard-shell" style="max-width:600px;">
+    <div class="wizard-header">
+      <div>
+        <p class="wizard-step-label">Before generating</p>
+        <h2>Complete the report details</h2>
+      </div>
+      <button type="button" class="case-drawer-close" id="reportFormCloseBtn">&#10005;</button>
+    </div>
+    <div class="wizard-body">
+      <div id="reportFormCalculatedSummary" class="case-panel" style="margin-bottom:18px;"></div>
+
+      <p style="font-size:12px;color:var(--text-dim);margin:0 0 14px;">These fields aren't calculated by the app &mdash; fill in whatever you'd like included. Anything left blank is simply omitted from the report, never invented.</p>
+
+      <div class="field"><label for="reportPlaceOfBirth">Place of birth</label><input type="text" id="reportPlaceOfBirth" placeholder="e.g. Hyderabad"></div>
+      <div class="field"><label for="reportTimeOfBirth">Time of birth</label><input type="text" id="reportTimeOfBirth" placeholder="e.g. 1:00 AM"></div>
+      <div class="field">
+        <label for="reportRemedies">Remedies <span style="color:var(--text-muted);font-weight:400;">(one per line)</span></label>
+        <textarea id="reportRemedies" rows="4" style="width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;" placeholder="Each line becomes one numbered remedy"></textarea>
+      </div>
+      <div class="field">
+        <label for="reportKeyRecommendations">Key recommendations <span style="color:var(--text-muted);font-weight:400;">(one per line)</span></label>
+        <textarea id="reportKeyRecommendations" rows="3" style="width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;" placeholder="Your own consultation notes"></textarea>
+      </div>
+      <div class="field"><label for="reportConsultantName">Consultant / brand name</label><input type="text" id="reportConsultantName" placeholder="e.g. Numerology by ..."></div>
+      <div class="field"><label for="reportWebsite">Website</label><input type="text" id="reportWebsite" placeholder="e.g. www.example.com"></div>
+      <div class="field"><label for="reportPhone">Phone / WhatsApp</label><input type="text" id="reportPhone" placeholder="e.g. +91 90000 00000"></div>
+    </div>
+    <div class="wizard-footer">
+      <div style="flex:1;"></div>
+      <button type="button" id="reportFormGenerateBtn">Generate PDF</button>
+    </div>
+  </div>
+</div>
 
 <div class="wizard-overlay" id="newCaseWizard" style="display:none;">
   <div class="wizard-shell">
@@ -3227,34 +3263,50 @@ function reportCoreNumberSection(title, numberValue, planet, knowledgeBase) {
   `;
 }
 
-function buildFullReportHtml(data) {
+function buildFullReportHtml(data, extras = {}) {
   const { client, original, corrected, crystalCompatibility, bookInsights } = data;
   const dobStr = `${String(client.day).padStart(2, '0')}/${String(client.month).padStart(2, '0')}/${client.year}`;
   const reportDateStr = new Date(data.reportDate).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
   const kb = original.numberKnowledgeBase;
+  const brandName = extras.consultantName || 'Numerology Consultant Engine';
 
   // ----- Cover page -----
   let html = `
     <div class="report-page report-cover">
-      <p class="report-cover-kicker">Numerology Consultant Engine</p>
+      <p class="report-cover-kicker">${brandName}</p>
       <h1 class="report-cover-title">Numerology Consultation Report</h1>
       <div class="report-cover-field">Prepared for<b>${client.name}</b></div>
       <div class="report-cover-field">Date of Birth<b>${dobStr}</b></div>
-      ${client.phone ? `<div class="report-cover-field">Phone<b>${client.phone}</b></div>` : ''}
-      <div class="report-cover-field">Report Date<b>${reportDateStr}</b></div>
       <p class="report-cover-footer">This report reflects a traditional numerology belief system, for personal interest. It is not medical, legal, or financial advice.</p>
     </div>
   `;
 
-  const pageHeader = (subtitle) => `
+  const pageHeader = () => `
     <div class="report-header">
-      <span class="report-header-brand">NUMEROLOGY CONSULTATION REPORT</span>
+      <span class="report-header-brand">${brandName.toUpperCase()}</span>
       <span class="report-header-client">${client.name} \u00b7 ${dobStr}</span>
     </div>
   `;
-  const pageFooter = (pageNum) => `<div class="report-footer"><span>${subtitleForFooter}</span><span>Page ${pageNum}</span></div>`;
-  let subtitleForFooter = client.name;
+  const footerContact = [extras.website, extras.phone].filter(Boolean).join('  \u00b7  ');
+  const pageFooter = (pageNum) => `<div class="report-footer"><span>${brandName}${footerContact ? '  \u00b7  ' + footerContact : ''}</span><span>Page ${pageNum}</span></div>`;
   let pageNum = 2;
+
+  // ----- Client Details -----
+  html += `
+    <div class="report-page">
+      ${pageHeader()}
+      <h2 class="report-section-title">Client Details</h2>
+      <div class="report-card-grid">
+        <div class="report-card"><h4>Name</h4><p>${client.name}</p></div>
+        <div class="report-card"><h4>Date of Birth</h4><p>${dobStr}</p></div>
+        ${extras.placeOfBirth ? `<div class="report-card"><h4>Place of Birth</h4><p>${extras.placeOfBirth}</p></div>` : ''}
+        ${extras.timeOfBirth ? `<div class="report-card"><h4>Time of Birth</h4><p>${extras.timeOfBirth}</p></div>` : ''}
+        ${client.phone ? `<div class="report-card"><h4>Phone</h4><p>${client.phone}</p></div>` : ''}
+        <div class="report-card"><h4>Report Date</h4><p>${reportDateStr}</p></div>
+      </div>
+      ${pageFooter(pageNum++)}
+    </div>
+  `;
 
   // ----- Numerology Snapshot -----
   html += `
@@ -3357,23 +3409,60 @@ function buildFullReportHtml(data) {
     `;
   }
 
-  // ----- Supportive Numbers, Colors, Crystal -----
+  // ----- Lucky & Negative Numbers / Colours (per spec, as explicit sections) -----
+  const COLOR_HEX = { Red: '#DC2626', Orange: '#EA580C', Yellow: '#F4C542', Green: '#405C3D', Blue: '#2563EB', 'Dark Blue': '#1E3A8A', White: '#F8FAFC', Black: '#1F2933', Gold: '#F4C542', Brown: '#78350F', Grey: '#94A3B8', Gray: '#94A3B8', Cream: '#FEF3C7', Pink: '#EC4899', Purple: '#7C3AED', Silver: '#CBD5E1' };
+  const colorSwatch = (name) => `<span class="report-color-swatch"><i style="background:${COLOR_HEX[name] || '#CBD5E1'}"></i>${name}</span>`;
+
   const favorableNums = (original.numbersAnalysis?.favorableNumbers || []).map((n) => n.number ?? n);
+  const challengingNums = (original.numbersAnalysis?.challengingNumbers || []).map((n) => n.number ?? n);
+  const luckyColors = (original.colorProfile?.best || []).map((c) => c.color);
+  const negativeColorNames = [...new Set((original.colorProfile?.useModerately || []).map((c) => c.color))];
+
   html += `
     <div class="report-page">
       ${pageHeader()}
-      <h2 class="report-section-title">Supportive Numbers &amp; Colours</h2>
-      <p class="report-subsection-title">Supportive Numbers</p>
-      <div class="report-chip-row">${favorableNums.length ? favorableNums.map((n) => `<span class="report-chip">${n}</span>`).join('') : '<p style="font-size:12px;color:#64748B;">No configured source available.</p>'}</div>
-      <p class="report-subsection-title">Supportive Colours</p>
-      <div class="report-color-row">${(original.colorProfile?.bestColors || []).map((c) => `<span class="report-color-swatch"><i style="background:${c.hex || '#ccc'}"></i>${c.name || c}</span>`).join('') || '<p style="font-size:12px;color:#64748B;">No configured source available.</p>'}</div>
-      ${crystalCompatibility && crystalCompatibility[0] ? `
-        <p class="report-subsection-title">Crystal Recommendation</p>
-        <div class="report-card"><h4>${crystalCompatibility[0].crystal}</h4><p>${(crystalCompatibility[0].reasons || []).join(' ')}</p></div>
-      ` : ''}
+      <h2 class="report-section-title">Lucky &amp; Negative Numbers</h2>
+      <p class="report-subsection-title">Lucky Numbers</p>
+      <div class="report-chip-row">${favorableNums.length ? favorableNums.map((n) => `<span class="report-chip">${n}</span>`).join('') : '<p style="font-size:12px;color:#667085;">No configured source available.</p>'}</div>
+      <p class="report-subsection-title">Negative Numbers</p>
+      <div class="report-chip-row">${challengingNums.length ? challengingNums.map((n) => `<span class="report-chip" style="background:#FDEEEE;color:#B91C1C;">${n}</span>`).join('') : '<p style="font-size:12px;color:#667085;">No configured source available.</p>'}</div>
+      <h2 class="report-section-title" style="margin-top:32px;">Lucky &amp; Negative Colours</h2>
+      <p class="report-subsection-title">Lucky Colours</p>
+      <div class="report-color-row">${luckyColors.length ? luckyColors.map(colorSwatch).join('') : '<p style="font-size:12px;color:#667085;">No configured source available.</p>'}</div>
+      <p class="report-subsection-title">Negative Colours</p>
+      <div class="report-color-row">${negativeColorNames.length ? negativeColorNames.map(colorSwatch).join('') : '<p style="font-size:12px;color:#667085;">No configured source available.</p>'}</div>
       ${pageFooter(pageNum++)}
     </div>
   `;
+
+  // ----- Crystal Recommendation -----
+  if (crystalCompatibility && crystalCompatibility[0]) {
+    html += `
+      <div class="report-page">
+        ${pageHeader()}
+        <h2 class="report-section-title">Crystal Recommendation</h2>
+        <div class="report-card"><h4>${crystalCompatibility[0].crystal}</h4><p>${(crystalCompatibility[0].reasons || []).join(' ')}</p></div>
+        ${pageFooter(pageNum++)}
+      </div>
+    `;
+  }
+
+  // ----- Remedies (only the consultant's own entries -- never invented) -----
+  if (extras.remedies && extras.remedies.length > 0) {
+    html += `
+      <div class="report-page">
+        ${pageHeader()}
+        <h2 class="report-section-title">Remedies</h2>
+        ${extras.remedies.map((r, i) => `
+          <div class="report-card" style="display:flex;gap:14px;align-items:flex-start;margin-bottom:12px;">
+            <span style="background:#F4C542;color:#1F2933;font-weight:800;font-size:13px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${i + 1}</span>
+            <p style="margin:0;">${r}</p>
+          </div>
+        `).join('')}
+        ${pageFooter(pageNum++)}
+      </div>
+    `;
+  }
 
   // ----- Sources -----
   if (bookInsights && bookInsights.length > 0) {
@@ -3388,6 +3477,20 @@ function buildFullReportHtml(data) {
             ${t.books.map((b) => `${b.bookTitle}${b.bookAuthor ? ' \u2014 ' + b.bookAuthor : ''}, p.${b.excerpts[0] ? b.excerpts[0].page : '?'}`).join('<br>')}
           </div>
         `).join('')}
+        ${pageFooter(pageNum++)}
+      </div>
+    `;
+  }
+
+  // ----- Key Recommendations (consultant's own notes -- only if provided) -----
+  if (extras.keyRecommendations && extras.keyRecommendations.length > 0) {
+    html += `
+      <div class="report-page">
+        ${pageHeader()}
+        <h2 class="report-section-title">Key Recommendations</h2>
+        <ul class="report-insight-list">
+          ${extras.keyRecommendations.map((r) => `<li>${r}</li>`).join('')}
+        </ul>
         ${pageFooter(pageNum++)}
       </div>
     `;
@@ -3414,28 +3517,82 @@ function buildFullReportHtml(data) {
     </div>
   `;
 
+  // ----- Consultation / Services CTA (only if contact details were provided) -----
+  if (extras.consultantName || extras.website || extras.phone) {
+    html += `
+      <div class="report-page">
+        ${pageHeader()}
+        <div style="text-align:center;padding-top:60px;">
+          <h2 class="report-section-title" style="text-align:center;">Continue Your Consultation</h2>
+          <p style="font-size:13px;color:#667085;max-width:380px;margin:0 auto 24px;">For a deeper personal consultation, name correction guidance, or follow-up readings, get in touch.</p>
+          ${extras.consultantName ? `<p style="font-size:16px;font-weight:700;color:#405C3D;margin:0 0 8px;">${extras.consultantName}</p>` : ''}
+          ${extras.website ? `<p style="font-size:13px;color:#1F2933;margin:0 0 4px;">${extras.website}</p>` : ''}
+          ${extras.phone ? `<p style="font-size:13px;color:#1F2933;margin:0;">${extras.phone}</p>` : ''}
+        </div>
+        ${pageFooter(pageNum++)}
+      </div>
+    `;
+  }
+
   return html;
 }
+
+let _pendingReportData = null;
 
 async function generateFullReport(profileId) {
   const btn = document.getElementById('caseDrawerReportBtn');
   const originalText = btn.textContent;
-  btn.disabled = true; btn.textContent = 'Building report\u2026';
+  btn.disabled = true; btn.textContent = 'Loading\u2026';
   try {
     const res = await fetch('/api/dashboard/' + profileId + '/report-data');
     const data = await res.json();
     if (!res.ok) { alert(data.error || 'Could not generate the report.'); return; }
 
-    document.getElementById('fullReportPrintArea').innerHTML = buildFullReportHtml(data);
-    document.getElementById('fullReportPrintArea').style.display = 'block';
-    window.print();
-    document.getElementById('fullReportPrintArea').style.display = 'none';
+    _pendingReportData = data;
+    const summaryEl = document.getElementById('reportFormCalculatedSummary');
+    summaryEl.innerHTML = `
+      <h3>Already calculated (from the app, not editable here)</h3>
+      <p>Client: <b>${data.client.name}</b> \u00b7 DOB: <b>${String(data.client.day).padStart(2, '0')}/${String(data.client.month).padStart(2, '0')}/${data.client.year}</b></p>
+      <p>Driver ${data.original.driverNumber.value} \u00b7 Conductor ${data.original.conductorNumber.value}${data.original.nameNumber ? ' \u00b7 Name Number ' + data.original.nameNumber.value : ''}</p>
+      ${data.corrected ? `<p>Name correction on file: <b>${data.corrected.name}</b></p>` : ''}
+    `;
+    document.getElementById('reportFormOverlay').style.display = 'flex';
   } catch (err) {
     alert('Could not reach the server to build the report.');
   } finally {
     btn.disabled = false; btn.textContent = originalText;
   }
 }
+
+function closeReportForm() {
+  document.getElementById('reportFormOverlay').style.display = 'none';
+}
+
+async function finalizeAndPrintReport() {
+  if (!_pendingReportData) return;
+  const genBtn = document.getElementById('reportFormGenerateBtn');
+  genBtn.disabled = true; genBtn.textContent = 'Building\u2026';
+
+  const extras = {
+    placeOfBirth: document.getElementById('reportPlaceOfBirth').value.trim(),
+    timeOfBirth: document.getElementById('reportTimeOfBirth').value.trim(),
+    remedies: document.getElementById('reportRemedies').value.split('\n').map((s) => s.trim()).filter(Boolean),
+    keyRecommendations: document.getElementById('reportKeyRecommendations').value.split('\n').map((s) => s.trim()).filter(Boolean),
+    consultantName: document.getElementById('reportConsultantName').value.trim(),
+    website: document.getElementById('reportWebsite').value.trim(),
+    phone: document.getElementById('reportPhone').value.trim(),
+  };
+
+  document.getElementById('fullReportPrintArea').innerHTML = buildFullReportHtml(_pendingReportData, extras);
+  document.getElementById('fullReportPrintArea').style.display = 'block';
+  closeReportForm();
+  window.print();
+  document.getElementById('fullReportPrintArea').style.display = 'none';
+  genBtn.disabled = false; genBtn.textContent = 'Generate PDF';
+}
+
+document.getElementById('reportFormCloseBtn').addEventListener('click', closeReportForm);
+document.getElementById('reportFormGenerateBtn').addEventListener('click', finalizeAndPrintReport);
 
 function initials(name) {
   if (!name) return '?';
