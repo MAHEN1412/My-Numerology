@@ -3313,6 +3313,25 @@ async function loadCaseDrawerFullAnalysis(p) {
     loadVideos(result.driverNumber.value, result.conductorNumber.value, result.day, result.month, result.year, result.loShuGrid.missing, result.loShuGrid.repeated, arrowParam, 'Drawer');
     loadBookInsights(result.driverNumber.value, result.conductorNumber.value, result.loShuGrid.missing, result.loShuGrid.repeated, result.nameNumber ? result.nameNumber.value : null, 'Drawer');
     loadCombinationVideoTable(result.driverNumber.value, result.conductorNumber.value, 'Drawer');
+
+    // If this case already has a saved correction from a previous visit,
+    // restore its grid too -- otherwise the "corrected" side stays empty
+    // until a fresh comparison is run, even though a correction was
+    // already chosen and saved.
+    if (p.correctedNameSuggestion) {
+      try {
+        const correctedRes = await fetch('/api/readings', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ day: p.day, month: p.month, year: p.year, name: p.correctedNameSuggestion, system: p.system || 'chaldean' }),
+        });
+        const correctedData = await correctedRes.json();
+        if (correctedRes.ok) {
+          renderCompactLoShuGrid(correctedData.result.loShuGrid, 'DrawerCorrected');
+          const label = document.getElementById('ncCorrectedLabel');
+          if (label) label.textContent = `With correction (${p.correctedNameSuggestion})`;
+        }
+      } catch (e) { /* non-critical -- the saved text label still shows even if this fails */ }
+    }
   } catch (err) {
     container.innerHTML = '<p style="font-size:13px;color:var(--text-dim);padding:12px 0;">Could not reach the server for the full analysis.</p>';
   }
