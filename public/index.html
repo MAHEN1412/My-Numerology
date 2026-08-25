@@ -675,9 +675,9 @@
           <div id="todaysBirthdaysList"><p style="font-size:12px;color:var(--text-muted);">Loading&hellip;</p></div>
           <div class="rp-divider"></div>
 
-          <p class="rp-section-label">INDIAN CELEBRITIES</p>
-          <p style="font-size:11px;color:var(--text-muted);margin:0 0 10px;">Name &amp; occupation only &mdash; this source doesn't provide birth dates, so numerology can't be computed here.</p>
-          <div id="indianCelebritiesList"><p style="font-size:12px;color:var(--text-muted);">Loading&hellip;</p></div>
+          <p class="rp-section-label">TODAY'S READING</p>
+          <p style="font-size:11px;color:var(--text-muted);margin:0 0 10px;">One topic a day, pulled from your uploaded book library.</p>
+          <div id="dailyReadingContent"><p style="font-size:12px;color:var(--text-muted);">Loading&hellip;</p></div>
           <div class="rp-divider"></div>
 
           <p class="rp-section-label">NUMEROLOGY NEWS</p>
@@ -3060,28 +3060,56 @@ async function loadDashboard() {
   loadKPIs();
   loadSavedProfiles();
   loadTodaysBirthdays();
-  loadIndianCelebrities();
+  loadDailyReading();
 }
 
-async function loadIndianCelebrities() {
-  const el = document.getElementById('indianCelebritiesList');
+async function loadDailyReading() {
+  const el = document.getElementById('dailyReadingContent');
   if (!el) return;
   try {
-    const res = await fetch('/api/reference/indian-celebrities');
+    const res = await fetch('/api/reference/daily-book-summary');
     const data = await res.json();
-    if (!data.people || data.people.length === 0) {
-      el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);">Could not load this list right now.</p>';
+
+    if (!data.topic || data.sourceCount === 0) {
+      el.innerHTML = `<p style="font-size:12px;color:var(--text-muted);">Today's topic is <b>${data.topic || 'not available'}</b>, but no uploaded books cover it yet.</p>`;
       return;
     }
-    el.innerHTML = data.people.map((p) => `
-      <div class="rp-item">
-        <b>${p.name}</b>
-        <span>${[p.occupation, p.birthplace].filter(Boolean).join(' \u00b7 ') || 'No further details available'}</span>
-      </div>
-    `).join('');
+
+    const excerptTexts = [];
+    const excerptsHtml = data.books.map((b) => {
+      b.excerpts.forEach((e) => excerptTexts.push(e.excerpt));
+      const bookExcerpts = b.excerpts.map((e) => `<p style="font-size:12px;color:var(--text-dim);margin:4px 0;">${e.excerpt}</p>`).join('');
+      return `<div style="margin-bottom:10px;"><p style="font-size:11px;font-weight:600;color:var(--text);margin:0;">${b.bookTitle}${b.bookAuthor ? ' \u2014 ' + b.bookAuthor : ''}</p>${bookExcerpts}</div>`;
+    }).join('');
+
+    el.innerHTML = `
+      <p style="font-size:13px;font-weight:700;color:var(--text);margin:0 0 8px;">${data.topic}</p>
+      ${excerptsHtml}
+      <button type="button" id="dailyReadingAudioBtn" class="ghost" style="padding:6px 12px;font-size:12px;margin-top:6px;">\u{1F50A} Play audio</button>
+    `;
+
+    const audioBtn = document.getElementById('dailyReadingAudioBtn');
+    audioBtn.addEventListener('click', () => toggleDailyReadingAudio(data.topic, excerptTexts, audioBtn));
   } catch (err) {
-    el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);">Could not load this list right now.</p>';
+    el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);">Could not load today\'s reading right now.</p>';
   }
+}
+
+function toggleDailyReadingAudio(topic, excerptTexts, btn) {
+  if (!('speechSynthesis' in window)) {
+    btn.textContent = 'Audio not supported in this browser';
+    return;
+  }
+  if (window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    btn.textContent = '\u{1F50A} Play audio';
+    return;
+  }
+  const utterance = new SpeechSynthesisUtterance(`${topic}. ${excerptTexts.join('. ')}`);
+  utterance.onend = () => { btn.textContent = '\u{1F50A} Play audio'; };
+  utterance.onerror = () => { btn.textContent = '\u{1F50A} Play audio'; };
+  window.speechSynthesis.speak(utterance);
+  btn.textContent = '\u23F9 Stop audio';
 }
 
 async function loadTodaysBirthdays(filter = 'world') {

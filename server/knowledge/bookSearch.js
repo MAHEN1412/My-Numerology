@@ -230,7 +230,42 @@ async function searchByExactTerm(termEntry, bookIds) {
   };
 }
 
-module.exports = { buildTopicList, buildCombinationTopicList, buildMobileTopicList, buildCrystalTopicList, searchTopic, searchByExactTerm, buildBookInsights, buildMobileBookInsights, buildCrystalBookInsights, truncateExcerpt };
+/**
+ * General-purpose topics for the "daily reading" feature -- NOT tied to
+ * any specific person's Driver/Conductor, since this runs on the
+ * Dashboard before any client is selected. Covers each number 1-9
+ * generally, plus the same person-independent themes already used
+ * elsewhere (Lo Shu, name correction, health, relationships, etc.)
+ */
+const DAILY_TOPICS = [
+  { key: 'daily:num1', label: 'Number 1', terms: ['number 1', 'number one', 'digit 1 meaning'], requiredNumber: 1, requiredKeywords: ['number', 'meaning', 'personality', 'trait'] },
+  { key: 'daily:num2', label: 'Number 2', terms: ['number 2', 'number two', 'digit 2 meaning'], requiredNumber: 2, requiredKeywords: ['number', 'meaning', 'personality', 'trait'] },
+  { key: 'daily:num3', label: 'Number 3', terms: ['number 3', 'number three', 'digit 3 meaning'], requiredNumber: 3, requiredKeywords: ['number', 'meaning', 'personality', 'trait'] },
+  { key: 'daily:num4', label: 'Number 4', terms: ['number 4', 'number four', 'digit 4 meaning'], requiredNumber: 4, requiredKeywords: ['number', 'meaning', 'personality', 'trait'] },
+  { key: 'daily:num5', label: 'Number 5', terms: ['number 5', 'number five', 'digit 5 meaning'], requiredNumber: 5, requiredKeywords: ['number', 'meaning', 'personality', 'trait'] },
+  { key: 'daily:num6', label: 'Number 6', terms: ['number 6', 'number six', 'digit 6 meaning'], requiredNumber: 6, requiredKeywords: ['number', 'meaning', 'personality', 'trait'] },
+  { key: 'daily:num7', label: 'Number 7', terms: ['number 7', 'number seven', 'digit 7 meaning'], requiredNumber: 7, requiredKeywords: ['number', 'meaning', 'personality', 'trait'] },
+  { key: 'daily:num8', label: 'Number 8', terms: ['number 8', 'number eight', 'digit 8 meaning'], requiredNumber: 8, requiredKeywords: ['number', 'meaning', 'personality', 'trait'] },
+  { key: 'daily:num9', label: 'Number 9', terms: ['number 9', 'number nine', 'digit 9 meaning'], requiredNumber: 9, requiredKeywords: ['number', 'meaning', 'personality', 'trait'] },
+  { key: 'daily:loshu', label: 'Lo Shu Grid / Magic Square', terms: ['lo shu grid', 'lo shu', 'magic square'], requiredNumber: null, requiredKeywords: ['lo shu', 'magic square'] },
+  { key: 'daily:nameCorrection', label: 'Name Correction', terms: ['name correction', 'name change', 'lucky name'], requiredNumber: null, requiredKeywords: ['name correction', 'name change', 'lucky name'] },
+  { key: 'daily:health', label: 'Health & Numerology', terms: ['health numerology', 'ayurveda numerology', 'gemstone remedy'], requiredNumber: null, requiredKeywords: ['health', 'ayurveda', 'gemstone'] },
+  { key: 'daily:relationships', label: 'Relationships & Compatibility', terms: ['compatibility numerology', 'marriage', 'love compatibility'], requiredNumber: null, requiredKeywords: ['relationship', 'marriage', 'compatibility', 'love'] },
+  { key: 'daily:career', label: 'Career & Business', terms: ['career numerology', 'business numerology', 'profession'], requiredNumber: null, requiredKeywords: ['career', 'profession', 'business'] },
+  { key: 'daily:remedies', label: 'Remedies & Lucky Elements', terms: ['numerology remedy', 'lucky gemstone', 'lucky color'], requiredNumber: null, requiredKeywords: ['remedy', 'remedies', 'gem', 'lucky color', 'lucky colour'] },
+];
+
+/**
+ * Picks one topic deterministically based on the calendar date, so every
+ * visitor sees the SAME topic on a given day, and it rotates daily. Pure
+ * date-based selection -- no randomness, no per-request variation.
+ */
+function getTodaysTopic(date = new Date()) {
+  const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
+  return DAILY_TOPICS[dayOfYear % DAILY_TOPICS.length];
+}
+
+module.exports = { buildTopicList, buildCombinationTopicList, buildMobileTopicList, buildCrystalTopicList, searchTopic, searchByExactTerm, buildBookInsights, buildMobileBookInsights, buildCrystalBookInsights, truncateExcerpt, getTodaysTopic };
 
 
 function isRelevant(text, topic) {

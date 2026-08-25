@@ -242,4 +242,36 @@ router.get('/indian-celebrities', async (req, res) => {
   }
 });
 
+// GET /api/reference/daily-book-summary
+// One topic per day, rotating deterministically by date, searched across
+// the user's own uploaded books. Real excerpts only -- never a fabricated
+// AI summary standing in for the actual book content.
+router.get('/daily-book-summary', async (req, res) => {
+  try {
+    const { getTodaysTopic, searchTopic } = require('../knowledge/bookSearch');
+    const now = new Date();
+    const topic = getTodaysTopic(now);
+    const cacheKey = `daily-book-summary:${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+
+    const cached = await ReferenceCache.findOne({ key: cacheKey });
+    if (cached && cached.extract) {
+      try { return res.json(JSON.parse(cached.extract)); } catch (e) { /* fall through and rebuild */ }
+    }
+
+    const result = await searchTopic(topic, null);
+    const payload = { topic: topic.label, sourceCount: result.sourceCount, books: result.books };
+
+    await ReferenceCache.findOneAndUpdate(
+      { key: cacheKey },
+      { key: cacheKey, title: 'daily-book-summary-cache', extract: JSON.stringify(payload), sourceUrl: '', thumbnail: '', fetchedAt: new Date() },
+      { upsert: true }
+    );
+
+    res.json(payload);
+  } catch (err) {
+    console.error('[reference] daily-book-summary failed:', err.message);
+    res.json({ topic: null, sourceCount: 0, books: [], error: true });
+  }
+});
+
 module.exports = router;
