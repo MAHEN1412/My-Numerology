@@ -65,10 +65,11 @@ router.get('/list', requireAdmin, async (req, res) => {
 // PUT /api/dashboard/:id — edit user notes and/or status (everything else is a historical record)
 router.put('/:id', requireAdmin, async (req, res) => {
   try {
-    const { userNotes, status } = req.body;
+    const { userNotes, status, correctedNameSuggestion } = req.body;
     const update = { updatedAt: new Date() };
     if (userNotes !== undefined) update.userNotes = userNotes || '';
     if (status !== undefined && ['Active', 'Review', 'Completed', 'Follow-up'].includes(status)) update.status = status;
+    if (correctedNameSuggestion !== undefined) update.correctedNameSuggestion = correctedNameSuggestion || '';
 
     const profile = await SavedProfile.findByIdAndUpdate(req.params.id, update, { new: true });
     if (!profile) return res.status(404).json({ error: 'Profile not found.' });

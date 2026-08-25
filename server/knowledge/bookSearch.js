@@ -171,7 +171,66 @@ async function buildCrystalBookInsights({ driver, conductor, nameNumber, missing
   return results;
 }
 
-module.exports = { buildTopicList, buildCombinationTopicList, buildMobileTopicList, buildCrystalTopicList, searchTopic, buildBookInsights, buildMobileBookInsights, buildCrystalBookInsights, truncateExcerpt };
+/**
+ * Phase 1/2 terminology-preservation search: looks for ONE exact term
+ * literally, without grouping in any alternative terms. This is
+ * deliberately separate from searchTopic() above, which groups related
+ * terms together as an assumed synonym set -- exactly what the
+ * terminology-preservation approach avoids. A hit here means a book
+ * genuinely contains this specific phrase, nothing broader.
+ */
+async function searchByExactTerm(termEntry, bookIds) {
+  const searchPhrases = [termEntry.original_term];
+  if (termEntry.transliteration && termEntry.transliteration !== termEntry.original_term) {
+    searchPhrases.push(termEntry.transliteration);
+  }
+  if (termEntry.language_term) searchPhrases.push(termEntry.language_term);
+
+  const filter = { $text: { $search: searchPhrases.join(' ') } };
+  if (bookIds && bookIds.length) filter.bookId = { $in: bookIds };
+
+  const hits = await BookChunk.find(filter, { score: { $meta: 'textScore' } })
+    .sort({ score: { $meta: 'textScore' } })
+    .limit(30);
+
+  // Require the EXACT phrase (not just a text-search token match) to
+  // actually appear in the passage -- MongoDB's $text search can match on
+  // individual words, which isn't precise enough for a literal-term check.
+  const exactHits = hits.filter((h) => {
+    const lower = h.text.toLowerCase();
+    return searchPhrases.some((p) => lower.includes(p.toLowerCase()));
+  });
+
+  const byBook = new Map();
+  for (const hit of exactHits) {
+    const key = String(hit.bookId);
+    if (!byBook.has(key)) byBook.set(key, []);
+    const bucket = byBook.get(key);
+    if (bucket.length < MAX_EXCERPTS_PER_BOOK) {
+      bucket.push({ page: hit.page, excerpt: truncateExcerpt(hit.text) });
+    }
+  }
+
+  const books = Array.from(byBook.entries())
+    .slice(0, MAX_BOOKS_PER_TOPIC)
+    .map(([bookId, excerpts]) => {
+      const anyHit = exactHits.find((h) => String(h.bookId) === bookId);
+      return { bookId, bookTitle: anyHit.bookTitle, bookAuthor: anyHit.bookAuthor, excerpts };
+    });
+
+  return {
+    termId: termEntry.id,
+    originalTerm: termEntry.original_term,
+    language: termEntry.original_language,
+    system: termEntry.system,
+    alternativeTerms: termEntry.alternative_terms || [],
+    equivalenceStatus: termEntry.equivalence_status,
+    sourceCount: books.length,
+    books,
+  };
+}
+
+module.exports = { buildTopicList, buildCombinationTopicList, buildMobileTopicList, buildCrystalTopicList, searchTopic, searchByExactTerm, buildBookInsights, buildMobileBookInsights, buildCrystalBookInsights, truncateExcerpt };
 
 
 function isRelevant(text, topic) {

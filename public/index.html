@@ -127,6 +127,8 @@
   .wizard-result-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--navy-2);font-size:13px;}
   .wizard-result-row:last-child{border-bottom:none;}
   .wizard-skip-note{font-size:12px;color:var(--text-muted);margin-top:10px;}
+  .nc-name-compare-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+  .nc-name-compare-label{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;}
 
   @media print{
     body *{visibility:hidden;}
@@ -2527,10 +2529,12 @@ document.getElementById('relationshipBtn').addEventListener('click', async () =>
 
 function renderBookInsightsInto(container, insights) {
   container.innerHTML = '';
-  const withSources = insights.filter(t => t.sourceCount > 0);
-  const withoutSources = insights.filter(t => t.sourceCount === 0);
+  const singleTopics = insights.filter(t => !t.isCombination);
+  const comboTopics = insights.filter(t => t.isCombination);
+  const withSources = singleTopics.filter(t => t.sourceCount > 0);
+  const withoutSources = singleTopics.filter(t => t.sourceCount === 0);
 
-  if (withSources.length === 0) {
+  if (withSources.length === 0 && comboTopics.length === 0) {
     container.innerHTML = '<p class="insight-none">No book coverage found for this yet &mdash; upload numerology books via the admin panel to see citations here.</p>';
     return;
   }
@@ -2539,6 +2543,7 @@ function renderBookInsightsInto(container, insights) {
   // genuine deduplicated count across every topic, not an estimate).
   const allBookIds = new Set();
   withSources.forEach(t => t.books.forEach(b => allBookIds.add(b.bookId)));
+  comboTopics.forEach(t => t.books.forEach(b => allBookIds.add(b.bookId)));
   const statsBar = document.createElement('div');
   statsBar.className = 'book-stats-bar';
   statsBar.innerHTML = `
@@ -2548,16 +2553,14 @@ function renderBookInsightsInto(container, insights) {
   `;
   container.appendChild(statsBar);
 
-  withSources.forEach((topic) => {
+  const buildTopicSection = (topic) => {
     const section = document.createElement('div');
     section.className = 'insight-topic';
     const bookWord = topic.sourceCount > 1 ? 'books address' : 'book addresses';
-
     const excerptsHtml = topic.books.map(b => {
       const excerpts = b.excerpts.map(e => `<div class="insight-excerpt"><div class="ie-page">Page ${e.page}</div>${e.excerpt}</div>`).join('');
       return `<div class="insight-book"><div class="ib-title">${b.bookTitle}</div><div class="ib-author">${b.bookAuthor || 'Unknown author'}</div>${excerpts}</div>`;
     }).join('');
-
     section.innerHTML = `
       <div class="insight-topic-header">
         <div>
@@ -2568,7 +2571,44 @@ function renderBookInsightsInto(container, insights) {
       </div>
       <div class="insight-evidence-body">${excerptsHtml}</div>
     `;
-    container.appendChild(section);
+    return section;
+  };
+
+  // Combination topics get their own clearly-labeled section, and unlike
+  // single-number topics, a combination with zero genuine matches is
+  // shown explicitly (not silently hidden) -- an honest "insufficient
+  // evidence for this specific pairing" is itself useful information,
+  // not something to bury.
+  if (comboTopics.length > 0) {
+    const header = document.createElement('p');
+    header.className = 'eyebrow';
+    header.style.margin = '4px 0 12px';
+    header.textContent = 'Number combination analysis';
+    container.appendChild(header);
+
+    const note = document.createElement('p');
+    note.style.cssText = 'font-size:12px;color:var(--text-muted);margin:0 0 16px;';
+    note.textContent = 'Only passages that genuinely discuss these numbers together, not separate single-number facts combined.';
+    container.appendChild(note);
+
+    comboTopics.forEach((topic) => {
+      if (topic.sourceCount > 0) {
+        container.appendChild(buildTopicSection(topic));
+      } else {
+        const empty = document.createElement('div');
+        empty.className = 'insight-topic';
+        empty.innerHTML = `<h3 style="margin:0 0 4px;">${topic.label}</h3><p class="insight-none">Insufficient book evidence available for this specific combination.</p>`;
+        container.appendChild(empty);
+      }
+    });
+
+    const divider = document.createElement('div');
+    divider.style.cssText = 'height:1px;background:var(--border);margin:20px 0;';
+    container.appendChild(divider);
+  }
+
+  withSources.forEach((topic) => {
+    container.appendChild(buildTopicSection(topic));
   });
 
   // DOM traversal (relative to each clicked header) instead of global
@@ -3118,6 +3158,10 @@ function openCaseDrawer(id) {
         <p>Driver Number: <b>${p.driverNumber ?? '\u2014'}</b></p>
         <p>Conductor Number: <b>${p.conductorNumber ?? '\u2014'}</b></p>
         <p>Name Number: <b>${p.nameNumber ?? '\u2014'}</b></p>
+        <div class="nc-name-compare-row" id="caseDrawerNameCompareRow" style="${p.correctedNameSuggestion ? '' : 'display:none;'}">
+          <div><span class="nc-name-compare-label">Original</span><br><b>${p.name || '\u2014'}</b></div>
+          <div><span class="nc-name-compare-label">Saved correction</span><br><b id="caseDrawerSavedCorrectionName">${p.correctedNameSuggestion || ''}</b></div>
+        </div>
       </div>
 
       <div class="case-panel no-print">
@@ -3203,9 +3247,36 @@ async function runCaseDrawerNameCorrection(p) {
     resultsEl.innerHTML = `
       <div class="wizard-result-row"><span>${candidateName}</span><b>Name Number ${result.nameNumber ? result.nameNumber.value : '\u2014'}</b></div>
       <p class="wizard-skip-note" style="margin-top:8px;">Compare the two grids below \u2014 original on the left, this name on the right.</p>
+      <button type="button" id="caseDrawerSaveCorrectionBtn" class="ghost" style="margin-top:10px;padding:8px 14px;font-size:13px;">Save this correction (keeps original too)</button>
     `;
+    document.getElementById('caseDrawerSaveCorrectionBtn').addEventListener('click', () => saveCaseDrawerNameCorrection(p, candidateName));
   } catch (err) {
     resultsEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';
+  }
+}
+
+async function saveCaseDrawerNameCorrection(p, candidateName) {
+  const btn = document.getElementById('caseDrawerSaveCorrectionBtn');
+  btn.disabled = true; btn.textContent = 'Saving\u2026';
+  try {
+    const res = await fetch('/api/dashboard/' + p._id, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ correctedNameSuggestion: candidateName }),
+    });
+    if (!res.ok) { btn.textContent = 'Could not save'; btn.disabled = false; return; }
+    // Keep the in-memory copy in sync so re-opening the drawer (without a
+    // full page reload) shows the saved correction immediately.
+    p.correctedNameSuggestion = candidateName;
+    if (window._savedProfilesById && window._savedProfilesById[p._id]) {
+      window._savedProfilesById[p._id].correctedNameSuggestion = candidateName;
+    }
+    const compareRow = document.getElementById('caseDrawerNameCompareRow');
+    document.getElementById('caseDrawerSavedCorrectionName').textContent = candidateName;
+    compareRow.style.display = '';
+    btn.textContent = 'Saved \u2713';
+    setTimeout(() => { btn.disabled = false; btn.textContent = 'Save this correction (keeps original too)'; }, 1500);
+  } catch (err) {
+    btn.textContent = 'Could not save'; btn.disabled = false;
   }
 }
 
