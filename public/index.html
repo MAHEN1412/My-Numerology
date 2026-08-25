@@ -1513,6 +1513,7 @@
     </div>
     <div class="wizard-footer">
       <div style="flex:1;"></div>
+      <button type="button" class="ghost" id="reportFormWhatsAppBtn">Share via WhatsApp</button>
       <button type="button" id="reportFormGenerateBtn">Generate PDF</button>
     </div>
   </div>
@@ -3519,13 +3520,9 @@ function closeReportForm() {
   document.getElementById('reportFormOverlay').style.display = 'none';
 }
 
-async function finalizeAndPrintReport() {
-  if (!_pendingReportData) return;
-  const genBtn = document.getElementById('reportFormGenerateBtn');
-  genBtn.disabled = true; genBtn.textContent = 'Building\u2026';
-
+function collectReportFormFields() {
   const v = (id) => document.getElementById(id).value.trim();
-  const fields = {
+  return {
     name: v('rfName'), dob: v('rfDob'), placeOfBirth: v('rfPlaceOfBirth'), timeOfBirth: v('rfTimeOfBirth'),
     mainPlanet: v('rfMainPlanet'), lifePath: v('rfLifePath'), compoundDestiny: v('rfCompoundDestiny'),
     destinyNumber: v('rfDestinyNumber'), soulNumber: v('rfSoulNumber'), personalityNumber: v('rfPersonalityNumber'),
@@ -3537,6 +3534,89 @@ async function finalizeAndPrintReport() {
     remedies: document.getElementById('reportRemedies').value.split('\n').map((s) => s.trim()).filter(Boolean),
     consultantName: v('reportConsultantName'), website: v('reportWebsite'), phone: v('reportPhone'),
   };
+}
+
+function buildWhatsAppMessage(data, f) {
+  const brandName = f.consultantName || 'Numerology Consultant Engine';
+  const lines = [];
+
+  lines.push(`*NUMEROLOGY CONSULTATION REPORT*`);
+  lines.push(`_${brandName}_`);
+  lines.push('');
+
+  lines.push(`*Your Details*`);
+  lines.push(`Name: ${f.name || '\u2014'}`);
+  lines.push(`Date of Birth: ${f.dob || '\u2014'}`);
+  if (f.placeOfBirth) lines.push(`Place of Birth: ${f.placeOfBirth}`);
+  if (f.timeOfBirth) lines.push(`Time of Birth: ${f.timeOfBirth}`);
+  lines.push('');
+
+  lines.push(`*Numerology Analysis*`);
+  if (f.mainPlanet) lines.push(`Main Planet Number: ${f.mainPlanet}`);
+  if (f.lifePath) lines.push(`Life Path Number: ${f.lifePath}`);
+  if (f.compoundDestiny) lines.push(`Compound Destiny: ${f.compoundDestiny}`);
+  if (f.destinyNumber) lines.push(`Destiny Number: ${f.destinyNumber}`);
+  if (f.soulNumber) lines.push(`Soul Number: ${f.soulNumber}`);
+  if (f.personalityNumber) lines.push(`Personality Number: ${f.personalityNumber}`);
+  if (f.completePlanes) lines.push(`Complete Planes: ${f.completePlanes}`);
+  if (f.combinationInfo) lines.push(`_${f.combinationInfo}_`);
+  lines.push('');
+
+  if (data.corrected && (f.sugName || f.sugDestinyNumber)) {
+    lines.push(`*Numerology Suggestions*`);
+    if (f.sugName) lines.push(`Suggested Name: ${f.sugName}`);
+    if (f.sugCompoundDestiny) lines.push(`Compound Destiny: ${f.sugCompoundDestiny}`);
+    if (f.sugDestinyNumber) lines.push(`Destiny Number: ${f.sugDestinyNumber}`);
+    if (f.sugSoulNumber) lines.push(`Soul Number: ${f.sugSoulNumber}`);
+    if (f.sugPersonalityNumber) lines.push(`Personality Number: ${f.sugPersonalityNumber}`);
+    if (f.sugPlanes) lines.push(`Complete Planes: ${f.sugPlanes}`);
+    if (f.nameInterpretation) { lines.push(''); lines.push(f.nameInterpretation); }
+    lines.push('');
+  }
+
+  if (f.luckyNumbers || f.negativeNumbers) {
+    lines.push(`*Lucky & Negative Numbers*`);
+    if (f.luckyNumbers) lines.push(`\u2705 Lucky: ${f.luckyNumbers}`);
+    if (f.negativeNumbers) lines.push(`\u26a0\ufe0f Negative: ${f.negativeNumbers}`);
+    lines.push('');
+  }
+
+  if (f.luckyColours || f.negativeColours) {
+    lines.push(`*Lucky & Negative Colours*`);
+    if (f.luckyColours) lines.push(`\u2705 Lucky: ${f.luckyColours}`);
+    if (f.negativeColours) lines.push(`\u26a0\ufe0f Negative: ${f.negativeColours}`);
+    lines.push('');
+  }
+
+  if (f.remedies && f.remedies.length > 0) {
+    lines.push(`*Remedies*`);
+    f.remedies.forEach((r, i) => lines.push(`${i + 1}. ${r}`));
+    lines.push('');
+  }
+
+  if (f.consultantName || f.website || f.phone) {
+    lines.push(`\u2728 *${f.consultantName || brandName}*`);
+    if (f.website) lines.push(f.website);
+    if (f.phone) lines.push(f.phone);
+  }
+
+  return lines.join('\n');
+}
+
+function shareReportViaWhatsApp() {
+  if (!_pendingReportData) return;
+  const fields = collectReportFormFields();
+  const message = buildWhatsAppMessage(_pendingReportData, fields);
+  const url = 'https://wa.me/?text=' + encodeURIComponent(message);
+  window.open(url, '_blank');
+}
+
+async function finalizeAndPrintReport() {
+  if (!_pendingReportData) return;
+  const genBtn = document.getElementById('reportFormGenerateBtn');
+  genBtn.disabled = true; genBtn.textContent = 'Building\u2026';
+
+  const fields = collectReportFormFields();
 
   document.getElementById('fullReportPrintArea').innerHTML = buildFullReportHtml(_pendingReportData, fields);
   document.getElementById('fullReportPrintArea').style.display = 'block';
@@ -3548,6 +3628,7 @@ async function finalizeAndPrintReport() {
 
 document.getElementById('reportFormCloseBtn').addEventListener('click', closeReportForm);
 document.getElementById('reportFormGenerateBtn').addEventListener('click', finalizeAndPrintReport);
+document.getElementById('reportFormWhatsAppBtn').addEventListener('click', shareReportViaWhatsApp);
 
 function initials(name) {
   if (!name) return '?';
