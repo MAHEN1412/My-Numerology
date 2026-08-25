@@ -70,6 +70,14 @@ router.get('/:id/loshu', async (req, res) => {
 // POST /api/actors/bulk-import
 // body: { actors: [{ name, day, month, year, category, gender, trending? }, ...] }
 // Skips duplicates (same name + DOB already on file) rather than erroring the whole batch.
+//
+// Batched deliberately: the original version did one findOne + one create
+// PER actor (2 sequential DB round-trips each), which for a 300-person
+// list meant 600 sequential round-trips -- easily enough to exceed a
+// platform request timeout and fail with a generic network error before
+// ever reaching a clean response. This version does the existence check
+// as ONE query for the whole batch, and the actual writes as ONE bulk
+// insert, regardless of how many actors are submitted.
 router.post('/bulk-import', requireAdmin, async (req, res) => {
   try {
     const { actors } = req.body;
@@ -77,9 +85,8 @@ router.post('/bulk-import', requireAdmin, async (req, res) => {
       return res.status(400).json({ error: 'Provide a non-empty actors array.' });
     }
 
-    let inserted = 0;
-    let skipped = 0;
     const errors = [];
+    const validated = [];
 
     for (const a of actors) {
       if (!a.name || !a.day || !a.month || !a.year || !a.category || !a.gender) {
@@ -95,14 +102,41 @@ router.post('/bulk-import', requireAdmin, async (req, res) => {
         errors.push(`Skipped "${a.name}" -- invalid gender "${a.gender}".`);
         continue;
       }
-      const existing = await ActorProfile.findOne({ name: a.name, day: a.day, month: a.month, year: a.year });
-      if (existing) { skipped++; continue; }
-
-      await ActorProfile.create({
+      validated.push({
         name: a.name, day: a.day, month: a.month, year: a.year,
         category, gender: a.gender, trending: !!a.trending,
       });
-      inserted++;
+    }
+
+    let inserted = 0;
+    let skipped = 0;
+
+    if (validated.length > 0) {
+      // One query for the whole batch's existing entries, instead of one
+      // findOne per actor.
+      const existing = await ActorProfile.find({
+        $or: validated.map((a) => ({ name: a.name, day: a.day, month: a.month, year: a.year })),
+      }).select('name day month year');
+      const seenKeys = new Set(existing.map((e) => `${e.name}|${e.day}|${e.month}|${e.year}`));
+
+      // Also dedupe WITHIN the incoming batch itself -- checking only
+      // against pre-existing DB records isn't enough, since two identical
+      // entries submitted in the same batch would both pass that check
+      // (neither is in the database yet) and both get inserted.
+      const toInsert = [];
+      for (const a of validated) {
+        const key = `${a.name}|${a.day}|${a.month}|${a.year}`;
+        if (seenKeys.has(key)) { skipped++; continue; }
+        seenKeys.add(key);
+        toInsert.push(a);
+      }
+
+      if (toInsert.length > 0) {
+        // One bulk insert instead of one create() per actor. ordered:false
+        // so one bad document doesn't abort the whole batch.
+        const result = await ActorProfile.insertMany(toInsert, { ordered: false });
+        inserted = result.length;
+      }
     }
 
     res.json({ inserted, skipped, errors });
