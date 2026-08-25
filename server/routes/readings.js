@@ -139,6 +139,44 @@ router.post('/', async (req, res) => {
   }
 });
 
+// POST /api/readings/lo-shu-projection
+// Keeps the person's day+month fixed (from their real birth date) but
+// varies the YEAR across a run of consecutive years, showing how the Lo
+// Shu grid itself shifts year to year -- a personal-year-style timeline,
+// not a re-calculation of their actual birth numbers (Driver/Conductor
+// stay tied to their real birth year; this is a separate exploratory view).
+router.post('/lo-shu-projection', (req, res) => {
+  try {
+    const { day, month, startYear, yearsCount, nameNumberValue } = req.body;
+    const d = Number(day);
+    const m = Number(month);
+    const start = Number(startYear);
+    const count = Math.min(Math.max(Number(yearsCount) || 20, 1), 30); // sane cap, default 20
+
+    if (!Number.isInteger(d) || d < 1 || d > 31 || !Number.isInteger(m) || m < 1 || m > 12 || !Number.isInteger(start)) {
+      return res.status(400).json({ error: 'Valid day, month, and startYear are required.' });
+    }
+
+    const years = [];
+    for (let i = 0; i < count; i++) {
+      const y = start + i;
+      const counts = calc.generateLoShuGrid(d, m, y, { nameNumberValue: nameNumberValue || null });
+      years.push({
+        year: y,
+        counts,
+        present: calc.getPresentNumbers(counts),
+        missing: calc.getMissingNumbers(counts),
+        repeated: calc.getRepeatedNumbers(counts),
+      });
+    }
+
+    res.json({ day: d, month: m, years });
+  } catch (err) {
+    console.error('Lo Shu projection failed:', err.message);
+    res.status(500).json({ error: 'Could not calculate the projection right now.' });
+  }
+});
+
 // GET /api/readings/:id
 router.get('/:id', async (req, res) => {
   try {

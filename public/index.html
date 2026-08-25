@@ -230,6 +230,11 @@
   .loshu-wrap{display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start;}
   .loshu-grid{display:grid;grid-template-columns:repeat(3,88px);grid-template-rows:repeat(3,88px);gap:2px;background:var(--border);border:1px solid var(--border-strong);border-radius:12px;overflow:hidden;}
   .nc-compare-grids .loshu-grid{grid-template-columns:repeat(3,56px);grid-template-rows:repeat(3,56px);}
+  .loshu-proj-row{display:flex;gap:16px;overflow-x:auto;padding-bottom:10px;-webkit-overflow-scrolling:touch;}
+  .loshu-proj-card{flex:0 0 auto;text-align:center;}
+  .loshu-proj-year{font-size:12px;font-weight:700;color:var(--text);margin:0 0 8px;}
+  .loshu-proj-grid{grid-template-columns:repeat(3,44px);grid-template-rows:repeat(3,44px);}
+  .loshu-proj-grid .loshu-cell{font-size:11px;}
   .nc-compare-grids .loshu-cell{font-size:12px;}
   .loshu-cell{background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;color:inherit;padding:0;transition:background .15s ease;}
   .loshu-cell:hover{background:var(--surface-2);}
@@ -352,6 +357,7 @@
   .topbar-newcase{background:var(--indigo);color:#fff;border:none;padding:11px 17px;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer;}
   .topbar-newcase:hover{background:var(--violet);}
   .topbar-avatar{width:38px;height:38px;border-radius:50%;background:var(--text);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+  .hamburger-btn{display:none;}
   .topbar-account{position:relative;}
   .topbar-account-btn{display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;padding:4px;border-radius:8px;}
   .topbar-account-btn:hover{background:var(--navy-2);}
@@ -442,28 +448,30 @@
 
     /* ===== Native app experience on mobile only -- desktop is untouched ===== */
 
-    /* Top bar: drop the search field and shrink to essentials, like a native app header */
+    /* Top bar: drop the search field and shrink to essentials, add the
+       hamburger menu button for navigation */
     .topbar{padding:0 14px;gap:10px;height:60px;}
     .topbar-logo-sub{display:none;}
     .topbar-search{display:none;}
     .topbar-newcase{padding:8px 12px;font-size:12px;}
     .topbar-account-name{display:none;}
+    .hamburger-btn{display:flex;background:none;border:none;padding:8px;cursor:pointer;order:-1;}
+    .hamburger-btn span{display:block;width:20px;height:2px;background:var(--text);margin:4px 0;border-radius:2px;}
 
-    /* Sidebar becomes a fixed bottom tab bar -- the single biggest native-app signal.
-       Horizontally scrollable since there are more tabs than comfortably fit at once,
-       same swipeable pattern used in many real apps with deep navigation. */
-    .app-shell{grid-template-columns:1fr;padding-bottom:64px;}
+    /* Sidebar becomes a slide-out panel behind a hamburger toggle, not a
+       fixed bottom bar -- hidden by default on mobile, opened via the
+       hamburger button, closes when a link is tapped or the backdrop is
+       tapped. */
+    .app-shell{grid-template-columns:1fr;}
     .sidebar-nav{
-      position:fixed;bottom:0;left:0;right:0;top:auto;height:auto;
-      flex-direction:row;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;
-      padding:8px 6px calc(8px + env(safe-area-inset-bottom));gap:2px;
-      background:var(--surface);border-right:none;border-top:1px solid var(--border);
-      z-index:40;box-shadow:0 -2px 12px rgba(15,23,42,0.06);
-      -webkit-overflow-scrolling:touch;
+      position:fixed;top:60px;left:0;bottom:0;width:260px;height:auto;
+      transform:translateX(-100%);transition:transform .2s ease;
+      z-index:45;box-shadow:2px 0 16px rgba(15,23,42,0.12);
     }
-    .sidebar-navtitle{display:none;}
-    .tab-btn{flex:0 0 auto;text-align:center;font-size:10px;padding:8px 12px;border-radius:10px;white-space:nowrap;}
-    .tab-btn.active{border-left:none;}
+    .sidebar-nav.open{transform:translateX(0);}
+    .sidebar-nav-backdrop{display:none;position:fixed;inset:60px 0 0 0;background:rgba(15,23,42,0.3);z-index:44;}
+    .sidebar-nav-backdrop.open{display:block;}
+    .sidebar-navtitle{display:block;}
 
     /* Dashboard: reference panel becomes its own full-width block below the
        main content instead of just vanishing, so nothing is actually lost */
@@ -529,6 +537,7 @@
 <div id="appAuthenticatedRoot" style="display:none;">
 
 <header class="topbar">
+  <button type="button" class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
   <div class="topbar-logo">
     <span class="topbar-logo-title">NUMEROLOGY</span>
     <span class="topbar-logo-sub">CONSULTANT ENGINE</span>
@@ -552,6 +561,7 @@
 </header>
 
 <div class="app-shell">
+  <div class="sidebar-nav-backdrop" id="sidebarBackdrop"></div>
   <aside class="sidebar-nav" id="tabNav">
     <div class="sidebar-navtitle">WORKSPACE</div>
     <button type="button" class="tab-btn active" data-tab="tab0">Dashboard</button>
@@ -2856,6 +2866,23 @@ if (savedDisplayName) {
 }
 
 // --- Top bar account dropdown ---
+// --- Mobile hamburger menu ---
+function closeSidebarMenu() {
+  document.getElementById('tabNav').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('open');
+}
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+if (hamburgerBtn) {
+  hamburgerBtn.addEventListener('click', () => {
+    document.getElementById('tabNav').classList.toggle('open');
+    document.getElementById('sidebarBackdrop').classList.toggle('open');
+  });
+}
+document.getElementById('sidebarBackdrop').addEventListener('click', closeSidebarMenu);
+document.getElementById('tabNav').querySelectorAll('.tab-btn, a').forEach((link) => {
+  link.addEventListener('click', closeSidebarMenu);
+});
+
 document.getElementById('topbarAccountBtn').addEventListener('click', (e) => {
   e.stopPropagation();
   const menu = document.getElementById('topbarAccountMenu');
@@ -3043,11 +3070,8 @@ function renderSavedProfilesTable(profiles) {
   window._savedProfilesById = {};
   profiles.forEach((p) => { window._savedProfilesById[p._id] = p; });
 
-  const statuses = ['Active', 'Review', 'Completed', 'Follow-up'];
   const rows = profiles.map((p) => {
     const dob = (p.day && p.month && p.year) ? `${String(p.day).padStart(2, '0')}/${String(p.month).padStart(2, '0')}/${p.year}` : '\u2014';
-    const status = p.status || 'Active';
-    const statusOptions = statuses.map((s) => `<option value="${s}" ${s === status ? 'selected' : ''}>${s}</option>`).join('');
     const descriptionText = [p.autoSummary, p.userNotes].filter(Boolean).join(' \u2014 ') || '\u2014';
     return `
       <tr data-id="${p._id}" class="case-row">
@@ -3056,7 +3080,6 @@ function renderSavedProfilesTable(profiles) {
         <td data-label="DOB">${dob}</td>
         <td data-label="Crystal suggestion">${p.crystalSuggestion || '\u2014'}</td>
         <td data-label="Description" style="font-size:12px;color:var(--text-dim);">${descriptionText}</td>
-        <td data-label="Status"><select class="status-select" onclick="event.stopPropagation()">${statusOptions}</select></td>
         <td data-label="Actions">
           <div class="row-actions" onclick="event.stopPropagation()">
             <button type="button" class="delete-profile-btn">Delete</button>
@@ -3068,33 +3091,15 @@ function renderSavedProfilesTable(profiles) {
 
   container.innerHTML = `
     <table class="saved-table">
-      <thead><tr><th>Name</th><th>Phone</th><th>DOB</th><th>Crystal suggestion</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Name</th><th>Phone</th><th>DOB</th><th>Crystal suggestion</th><th>Description</th><th>Actions</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
   `;
 
-  // Clicking anywhere on a row (except the status dropdown or delete
-  // button, which stop propagation above) opens the full 360-degree case
-  // view in the drawer.
+  // Clicking anywhere on a row (except the delete button, which stops
+  // propagation above) opens the full 360-degree case view in the drawer.
   container.querySelectorAll('.case-row').forEach((row) => {
     row.addEventListener('click', () => openCaseDrawer(row.dataset.id));
-  });
-
-  container.querySelectorAll('.status-select').forEach((select) => {
-    select.addEventListener('change', async (e) => {
-      const row = e.target.closest('tr');
-      const id = row.dataset.id;
-      const status = select.value;
-      try {
-        await fetch('/api/dashboard/' + id, {
-          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }),
-        });
-        if (window._savedProfilesById[id]) window._savedProfilesById[id].status = status;
-        loadKPIs();
-      } catch (err) {
-        alert('Could not update status. Try again.');
-      }
-    });
   });
 
   container.querySelectorAll('.delete-profile-btn').forEach((btn) => {
@@ -3280,6 +3285,39 @@ async function saveCaseDrawerNameCorrection(p, candidateName) {
   }
 }
 
+async function loadLoShuProjection(day, month, nameNumberValue) {
+  const container = document.getElementById('loshuProjectionDrawer');
+  if (!container) return;
+  const startYear = new Date().getFullYear();
+  try {
+    const res = await fetch('/api/readings/lo-shu-projection', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ day, month, startYear, yearsCount: 20, nameNumberValue }),
+    });
+    const data = await res.json();
+    if (!res.ok) { container.innerHTML = `<p class="wizard-skip-note">${data.error}</p>`; return; }
+
+    const yearCards = data.years.map((y) => {
+      const cells = [4, 9, 2, 3, 5, 7, 8, 1, 6].map((digit) => {
+        const count = y.counts[digit];
+        const cls = count === 0 ? ' missing' : count > 1 ? ' repeated' : '';
+        const content = count === 0 ? '\u2013' : `<div class="digits">${Array(count).fill(`<span class="d">${digit}</span>`).join('')}</div>`;
+        return `<div class="loshu-cell${cls}">${content}</div>`;
+      }).join('');
+      return `
+        <div class="loshu-proj-card">
+          <p class="loshu-proj-year">${y.year}</p>
+          <div class="loshu-grid loshu-proj-grid">${cells}</div>
+        </div>
+      `;
+    }).join('');
+
+    container.innerHTML = `<div class="loshu-proj-row">${yearCards}</div>`;
+  } catch (err) {
+    container.innerHTML = '<p class="wizard-skip-note">Could not load the projection right now.</p>';
+  }
+}
+
 async function loadCaseDrawerFullAnalysis(p) {
   const container = document.getElementById('caseDrawerFullAnalysis');
   if (!container) return;
@@ -3299,7 +3337,7 @@ async function loadCaseDrawerFullAnalysis(p) {
     }
     const result = data.result;
 
-    container.innerHTML = "    <section class=\"block\" id=\"loshuSectionDrawer\">\n      <p class=\"eyebrow\">Lo Shu grid analysis</p>\n      <div class=\"loshu-wrap\">\n        <div>\n          <div class=\"loshu-grid\" id=\"loshuGridDrawer\" role=\"group\" aria-label=\"Lo Shu grid, click a number to learn more\"></div>\n          <div class=\"loshu-legend\">\n            <span><i class=\"swatch\" style=\"background:var(--gold)\"></i>Present</span>\n            <span><i class=\"swatch\" style=\"background:var(--danger)\"></i>Repeated</span>\n            <span><i class=\"swatch\" style=\"background:var(--text-muted)\"></i>Missing</span>\n          </div>\n          <div id=\"loshuInfoDrawer\" role=\"status\"></div>\n        </div>\n        <div class=\"loshu-summary\">\n          <div class=\"sumline\"><div class=\"k\">Numbers present</div><div class=\"taglist\" id=\"presentTagsDrawer\"></div></div>\n          <div class=\"sumline\"><div class=\"k\">Numbers missing</div><div class=\"taglist\" id=\"missingTagsDrawer\"></div></div>\n          <div class=\"sumline\"><div class=\"k\">Repeated numbers</div><div class=\"taglist\" id=\"repeatTagsDrawer\"></div></div>\n        </div>\n      </div>\n      <div style=\"margin-top:28px;\">\n        <div class=\"sumline\"><div class=\"k\">What your missing and repeated numbers suggest</div></div>\n        <div id=\"interpListDrawer\" style=\"margin-top:10px;font-size:14px;color:var(--text-dim);\"></div>\n      </div>\n    </section>\n\n    <details class=\"block section-accordion\" id=\"videoSectionDrawer\"><summary class=\"section-accordion-summary\">Explore more about your numbers</summary><div class=\"section-accordion-body\">\n      <div id=\"videoContainerDrawer\"></div>\n\n      <div style=\"margin-top:28px;padding-top:20px;border-top:1px solid var(--border);\">\n        <p style=\"font-weight:500;font-size:14px;margin:0 0 4px;color:var(--text);\">Videos about your exact combination</p>\n        <p style=\"font-size:12px;color:var(--text-dim);margin:0 0 14px;\">Only videos mentioning BOTH your Driver and Conductor numbers together, not just one.</p>\n        <div id=\"combinationVideoTableDrawer\"></div>\n      </div>\n    </div></details>\n\n\n\n    <details class=\"block section-accordion\" id=\"missingNumbersSectionDrawer\"><summary class=\"section-accordion-summary\">Missing numbers</summary><div class=\"section-accordion-body\">\n      <div id=\"missingNumbersContainerDrawer\" class=\"interp-grid\"></div>\n    </div></details>\n\n    <details class=\"block section-accordion\" id=\"repeatedNumbersSectionDrawer\"><summary class=\"section-accordion-summary\">Repeated numbers</summary><div class=\"section-accordion-body\">\n      <div id=\"repeatedNumbersContainerDrawer\" class=\"interp-grid\"></div>\n    </div></details>\n\n\n    <details class=\"block section-accordion\" id=\"combinedInterpretationSectionDrawer\"><summary class=\"section-accordion-summary\">Combined interpretation</summary><div class=\"section-accordion-body\">\n      <div class=\"combo-card\">\n        <h3>Overall profile</h3>\n        <p id=\"ciOverallProfileDrawer\"></p>\n        <h3 style=\"margin-top:16px;\">Strengths</h3>\n        <div class=\"taglist\" id=\"ciStrengthsDrawer\"></div>\n        <h3 style=\"margin-top:16px;\">Traditional guidance</h3>\n        <p id=\"ciGuidanceDrawer\"></p>\n      </div>\n    </div></details>\n\n    <details class=\"block section-accordion\" id=\"numbersColorsSectionDrawer\"><summary class=\"section-accordion-summary\">Numbers &amp; colors</summary><div class=\"section-accordion-body\">\n\n      <h3 style=\"font-size:16px;margin-bottom:8px;\">Favorable numbers</h3>\n      <div id=\"favorableNumbersContainerDrawer\" style=\"margin-bottom:20px;\"></div>\n\n      <h3 style=\"font-size:16px;margin-bottom:8px;\">Challenging numbers</h3>\n      <div id=\"challengingNumbersContainerDrawer\" style=\"margin-bottom:20px;\"></div>\n\n      <h3 style=\"font-size:16px;margin-bottom:8px;\">Supportive combinations</h3>\n      <div class=\"taglist\" id=\"supportiveCombosContainerDrawer\" style=\"margin-bottom:24px;\"></div>\n\n      <h3 style=\"font-size:16px;margin-bottom:12px;\">Colors by number</h3>\n      <div id=\"colorsByNumberContainerDrawer\" style=\"margin-bottom:24px;\"></div>\n\n      <div class=\"combo-card\">\n        <h3>My colors</h3>\n        <p style=\"font-size:12px;color:var(--text-dim);margin:4px 0 16px;\">Numerology is a traditional belief system; color associations here are for personal interest, not medical, financial, or guaranteed-outcome claims.</p>\n        <div class=\"sumline\"><div class=\"k\">Best colors</div></div>\n        <div id=\"myColorsBestDrawer\" style=\"margin:10px 0 16px;\"></div>\n        <div class=\"sumline\"><div class=\"k\">Use moderately</div></div>\n        <div id=\"myColorsModerateDrawer\" style=\"margin:10px 0 16px;\"></div>\n        <div class=\"sumline\"><div class=\"k\">Personal palette</div></div>\n        <div id=\"myColorsPaletteDrawer\" style=\"margin-top:10px;\"></div>\n      </div>\n    </div></details>\n\n    <details class=\"block section-accordion\" id=\"numberLibrarySectionDrawer\"><summary class=\"section-accordion-summary\">Meaning of this person's numbers</summary><div class=\"section-accordion-body\">\n      <div class=\"interp-grid\" id=\"interpGridDrawer\"></div>\n    </div></details>\n\n\n    \n\n\n    <details class=\"block section-accordion\" id=\"bookInsightsSectionDrawer\"><summary class=\"section-accordion-summary\">Book insights &mdash; 360&deg; case analysis</summary><div class=\"section-accordion-body\">\n      <p style=\"font-size:13px;color:var(--text-dim);margin:0 0 16px;\">What your uploaded books actually say about your numbers, with page citations. Each book's perspective is shown separately &mdash; nothing here is invented or merged into a single &ldquo;answer.&rdquo;</p>\n      <div id=\"bookInsightsContainerDrawer\"></div>\n    </div></details>\n\n\n";
+    container.innerHTML = "    <section class=\"block\" id=\"loshuSectionDrawer\">\n      <p class=\"eyebrow\">Lo Shu grid analysis</p>\n      <div class=\"loshu-wrap\">\n        <div>\n          <div class=\"loshu-grid\" id=\"loshuGridDrawer\" role=\"group\" aria-label=\"Lo Shu grid, click a number to learn more\"></div>\n          <div class=\"loshu-legend\">\n            <span><i class=\"swatch\" style=\"background:var(--gold)\"></i>Present</span>\n            <span><i class=\"swatch\" style=\"background:var(--danger)\"></i>Repeated</span>\n            <span><i class=\"swatch\" style=\"background:var(--text-muted)\"></i>Missing</span>\n          </div>\n          <div id=\"loshuInfoDrawer\" role=\"status\"></div>\n        </div>\n        <div class=\"loshu-summary\">\n          <div class=\"sumline\"><div class=\"k\">Numbers present</div><div class=\"taglist\" id=\"presentTagsDrawer\"></div></div>\n          <div class=\"sumline\"><div class=\"k\">Numbers missing</div><div class=\"taglist\" id=\"missingTagsDrawer\"></div></div>\n          <div class=\"sumline\"><div class=\"k\">Repeated numbers</div><div class=\"taglist\" id=\"repeatTagsDrawer\"></div></div>\n        </div>\n      </div>\n      <div style=\"margin-top:28px;\">\n        <div class=\"sumline\"><div class=\"k\">What your missing and repeated numbers suggest</div></div>\n        <div id=\"interpListDrawer\" style=\"margin-top:10px;font-size:14px;color:var(--text-dim);\"></div>\n      </div>\n    </section>\n\n    <details class=\"block section-accordion\" id=\"loshuProjectionSectionDrawer\"><summary class=\"section-accordion-summary\">20-year Lo Shu projection</summary><div class=\"section-accordion-body\">\n      <p style=\"font-size:12px;color:var(--text-dim);margin:0 0 14px;\">Same day and month, year changed across the next 20 years \u2014 shows how the grid pattern shifts year to year. This is a separate exploratory view; it does not change this person's actual Driver, Conductor, or saved numbers.</p>\n      <div id=\"loshuProjectionDrawer\"><p style=\"font-size:13px;color:var(--text-dim);\">Loading projection\u2026</p></div>\n    </div></details>\n\n    <details class=\"block section-accordion\" id=\"videoSectionDrawer\"><summary class=\"section-accordion-summary\">Explore more about your numbers</summary><div class=\"section-accordion-body\">\n      <div id=\"videoContainerDrawer\"></div>\n\n      <div style=\"margin-top:28px;padding-top:20px;border-top:1px solid var(--border);\">\n        <p style=\"font-weight:500;font-size:14px;margin:0 0 4px;color:var(--text);\">Videos about your exact combination</p>\n        <p style=\"font-size:12px;color:var(--text-dim);margin:0 0 14px;\">Only videos mentioning BOTH your Driver and Conductor numbers together, not just one.</p>\n        <div id=\"combinationVideoTableDrawer\"></div>\n      </div>\n    </div></details>\n\n\n\n    <details class=\"block section-accordion\" id=\"missingNumbersSectionDrawer\"><summary class=\"section-accordion-summary\">Missing numbers</summary><div class=\"section-accordion-body\">\n      <div id=\"missingNumbersContainerDrawer\" class=\"interp-grid\"></div>\n    </div></details>\n\n    <details class=\"block section-accordion\" id=\"repeatedNumbersSectionDrawer\"><summary class=\"section-accordion-summary\">Repeated numbers</summary><div class=\"section-accordion-body\">\n      <div id=\"repeatedNumbersContainerDrawer\" class=\"interp-grid\"></div>\n    </div></details>\n\n\n    <details class=\"block section-accordion\" id=\"combinedInterpretationSectionDrawer\"><summary class=\"section-accordion-summary\">Combined interpretation</summary><div class=\"section-accordion-body\">\n      <div class=\"combo-card\">\n        <h3>Overall profile</h3>\n        <p id=\"ciOverallProfileDrawer\"></p>\n        <h3 style=\"margin-top:16px;\">Strengths</h3>\n        <div class=\"taglist\" id=\"ciStrengthsDrawer\"></div>\n        <h3 style=\"margin-top:16px;\">Traditional guidance</h3>\n        <p id=\"ciGuidanceDrawer\"></p>\n      </div>\n    </div></details>\n\n    <details class=\"block section-accordion\" id=\"numbersColorsSectionDrawer\"><summary class=\"section-accordion-summary\">Numbers &amp; colors</summary><div class=\"section-accordion-body\">\n\n      <h3 style=\"font-size:16px;margin-bottom:8px;\">Favorable numbers</h3>\n      <div id=\"favorableNumbersContainerDrawer\" style=\"margin-bottom:20px;\"></div>\n\n      <h3 style=\"font-size:16px;margin-bottom:8px;\">Challenging numbers</h3>\n      <div id=\"challengingNumbersContainerDrawer\" style=\"margin-bottom:20px;\"></div>\n\n      <h3 style=\"font-size:16px;margin-bottom:8px;\">Supportive combinations</h3>\n      <div class=\"taglist\" id=\"supportiveCombosContainerDrawer\" style=\"margin-bottom:24px;\"></div>\n\n      <h3 style=\"font-size:16px;margin-bottom:12px;\">Colors by number</h3>\n      <div id=\"colorsByNumberContainerDrawer\" style=\"margin-bottom:24px;\"></div>\n\n      <div class=\"combo-card\">\n        <h3>My colors</h3>\n        <p style=\"font-size:12px;color:var(--text-dim);margin:4px 0 16px;\">Numerology is a traditional belief system; color associations here are for personal interest, not medical, financial, or guaranteed-outcome claims.</p>\n        <div class=\"sumline\"><div class=\"k\">Best colors</div></div>\n        <div id=\"myColorsBestDrawer\" style=\"margin:10px 0 16px;\"></div>\n        <div class=\"sumline\"><div class=\"k\">Use moderately</div></div>\n        <div id=\"myColorsModerateDrawer\" style=\"margin:10px 0 16px;\"></div>\n        <div class=\"sumline\"><div class=\"k\">Personal palette</div></div>\n        <div id=\"myColorsPaletteDrawer\" style=\"margin-top:10px;\"></div>\n      </div>\n    </div></details>\n\n    <details class=\"block section-accordion\" id=\"numberLibrarySectionDrawer\"><summary class=\"section-accordion-summary\">Meaning of this person's numbers</summary><div class=\"section-accordion-body\">\n      <div class=\"interp-grid\" id=\"interpGridDrawer\"></div>\n    </div></details>\n\n\n    \n\n\n    <details class=\"block section-accordion\" id=\"bookInsightsSectionDrawer\"><summary class=\"section-accordion-summary\">Book insights &mdash; 360&deg; case analysis</summary><div class=\"section-accordion-body\">\n      <p style=\"font-size:13px;color:var(--text-dim);margin:0 0 16px;\">What your uploaded books actually say about your numbers, with page citations. Each book's perspective is shown separately &mdash; nothing here is invented or merged into a single &ldquo;answer.&rdquo;</p>\n      <div id=\"bookInsightsContainerDrawer\"></div>\n    </div></details>\n\n\n";
 
     renderLoShu(result.loShuGrid, result.numberKnowledgeBase, 'Drawer');
     renderCompactLoShuGrid(result.loShuGrid, 'DrawerOriginal');
@@ -3313,6 +3351,7 @@ async function loadCaseDrawerFullAnalysis(p) {
     loadVideos(result.driverNumber.value, result.conductorNumber.value, result.day, result.month, result.year, result.loShuGrid.missing, result.loShuGrid.repeated, arrowParam, 'Drawer');
     loadBookInsights(result.driverNumber.value, result.conductorNumber.value, result.loShuGrid.missing, result.loShuGrid.repeated, result.nameNumber ? result.nameNumber.value : null, 'Drawer');
     loadCombinationVideoTable(result.driverNumber.value, result.conductorNumber.value, 'Drawer');
+    loadLoShuProjection(p.day, p.month, result.nameNumber ? result.nameNumber.value : null);
 
     // If this case already has a saved correction from a previous visit,
     // restore its grid too -- otherwise the "corrected" side stays empty
