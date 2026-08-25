@@ -105,6 +105,20 @@
   .section-accordion-summary:hover{color:var(--gold);}
   .section-accordion-body{margin-top:20px;}
   .news-panel{display:grid;gap:10px;}
+  .actors-filter-bar{margin-bottom:24px;}
+  .actors-search-input{width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 16px;color:var(--text);font-size:14px;margin-bottom:14px;}
+  .actors-chip-group{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+  .actors-chip{background:var(--surface);border:1px solid var(--border-strong);border-radius:20px;padding:7px 16px;font-size:13px;font-weight:600;color:var(--text-dim);cursor:pointer;}
+  .actors-chip.active{background:var(--indigo);color:#fff;border-color:var(--indigo);}
+  .actors-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+  .actor-card{background:var(--surface);border:1px solid #EDF1F5;border-radius:14px;padding:18px;cursor:pointer;box-shadow:0 1px 2px rgba(15,23,42,0.03);}
+  .actor-card:hover{border-color:var(--violet);}
+  .actor-card .ac-name{font-size:14px;font-weight:700;color:var(--text);margin:0 0 4px;}
+  .actor-card .ac-meta{font-size:11px;color:var(--text-muted);margin:0 0 12px;}
+  .actor-card .ac-numbers{display:flex;gap:10px;}
+  .actor-card .ac-num{text-align:center;}
+  .actor-card .ac-num-value{font-size:18px;font-weight:800;color:var(--indigo);}
+  .actor-card .ac-num-label{font-size:9px;color:var(--text-muted);text-transform:uppercase;}
   .news-item{display:block;padding:12px 16px;background:var(--surface);border:1px solid var(--border-strong);border-radius:8px;color:var(--text);text-decoration:none;font-size:14px;transition:border-color .15s;}
   .news-item:hover{border-color:var(--gold);}
   .news-item .news-meta{display:block;font-size:11px;color:var(--text-muted);margin-top:4px;}
@@ -643,6 +657,7 @@
     <button type="button" class="tab-btn" data-tab="tab6">Relationship Match</button>
     <button type="button" class="tab-btn" data-tab="tab7">Name correction Lo shu</button>
     <button type="button" class="tab-btn" data-tab="tab9">Numerology News</button>
+    <button type="button" class="tab-btn" data-tab="tab10">Actors Profile</button>
     <a href="/admin.html" target="_blank" rel="noopener" class="tab-btn">Manage Books</a>
   </aside>
 
@@ -701,6 +716,44 @@
   <div class="wrap" style="padding-bottom:56px;">
     <div id="newsPanel" class="news-panel">
       <p class="loading-note">Loading news&hellip;</p>
+    </div>
+  </div>
+</div>
+
+<div id="tab10Content" style="display:none;">
+  <header class="hero" style="padding-top:56px;padding-bottom:32px;">
+    <div class="sacred-lines" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <p class="kicker">Public Figures</p>
+      <h1>Actors Profile</h1>
+      <p class="lead">Numerology profiles for film actors and actresses, computed from their real date of birth.</p>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-bottom:56px;">
+    <div class="actors-filter-bar">
+      <input type="text" id="actorsSearchInput" placeholder="Search by name\u2026" class="actors-search-input">
+      <div class="actors-chip-group" id="actorsCategoryChips">
+        <button type="button" class="actors-chip active" data-category="">All</button>
+        <button type="button" class="actors-chip" data-category="Bollywood">Bollywood</button>
+        <button type="button" class="actors-chip" data-category="Tollywood">Tollywood</button>
+        <button type="button" class="actors-chip" data-category="Tamil">Tamil</button>
+        <button type="button" class="actors-chip" data-category="Malayalam">Malayalam</button>
+        <button type="button" class="actors-chip" data-category="Kannada">Kannada</button>
+      </div>
+      <div class="actors-chip-group" id="actorsGenderChips">
+        <button type="button" class="actors-chip active" data-gender="">All</button>
+        <button type="button" class="actors-chip" data-gender="Actor">Actors</button>
+        <button type="button" class="actors-chip" data-gender="Actress">Actresses</button>
+      </div>
+    </div>
+
+    <div id="actorsResultsGrid" class="actors-grid">
+      <p class="loading-note">Loading\u2026</p>
+    </div>
+
+    <div style="text-align:center;margin-top:24px;">
+      <button type="button" class="ghost" id="actorsShowAllBtn">Show All</button>
     </div>
   </div>
 </div>
@@ -2072,6 +2125,7 @@ document.getElementById('tabNav').addEventListener('click', (e) => {
   document.getElementById('tab6Content').style.display = btn.dataset.tab === 'tab6' ? 'block' : 'none';
   document.getElementById('tab7Content').style.display = btn.dataset.tab === 'tab7' ? 'block' : 'none';
   document.getElementById('tab9Content').style.display = btn.dataset.tab === 'tab9' ? 'block' : 'none';
+  document.getElementById('tab10Content').style.display = btn.dataset.tab === 'tab10' ? 'block' : 'none';
   syncSystemToggles(currentSystem);
   // Carry the DOB/name already entered on Tab 1 over to whichever tab is
   // opened, so the person doesn't have to retype it.
@@ -2109,6 +2163,9 @@ document.getElementById('tabNav').addEventListener('click', (e) => {
   }
   if (btn.dataset.tab === 'tab9') {
     loadNews();
+  }
+  if (btn.dataset.tab === 'tab10') {
+    loadActorsList();
   }
   window.scrollTo(0, 0);
 });
@@ -3063,36 +3120,80 @@ async function loadDashboard() {
   loadDailyReading();
 }
 
+let _dailyReadingData = null;
+
 async function loadDailyReading() {
   const el = document.getElementById('dailyReadingContent');
   if (!el) return;
   try {
     const res = await fetch('/api/reference/daily-book-summary');
     const data = await res.json();
+    _dailyReadingData = data;
 
     if (!data.topic || data.sourceCount === 0) {
       el.innerHTML = `<p style="font-size:12px;color:var(--text-muted);">Today's topic is <b>${data.topic || 'not available'}</b>, but no uploaded books cover it yet.</p>`;
       return;
     }
 
-    const excerptTexts = [];
-    const excerptsHtml = data.books.map((b) => {
-      b.excerpts.forEach((e) => excerptTexts.push(e.excerpt));
-      const bookExcerpts = b.excerpts.map((e) => `<p style="font-size:12px;color:var(--text-dim);margin:4px 0;">${e.excerpt}</p>`).join('');
-      return `<div style="margin-bottom:10px;"><p style="font-size:11px;font-weight:600;color:var(--text);margin:0;">${b.bookTitle}${b.bookAuthor ? ' \u2014 ' + b.bookAuthor : ''}</p>${bookExcerpts}</div>`;
-    }).join('');
+    const firstExcerpt = data.books[0] && data.books[0].excerpts[0] ? data.books[0].excerpts[0].excerpt : '';
+    const teaser = firstExcerpt.length > 90 ? firstExcerpt.slice(0, 90) + '\u2026' : firstExcerpt;
 
     el.innerHTML = `
-      <p style="font-size:13px;font-weight:700;color:var(--text);margin:0 0 8px;">${data.topic}</p>
-      ${excerptsHtml}
-      <button type="button" id="dailyReadingAudioBtn" class="ghost" style="padding:6px 12px;font-size:12px;margin-top:6px;">\u{1F50A} Play audio</button>
+      <div class="rp-item" id="dailyReadingOpenBtn" style="cursor:pointer;">
+        <b>${data.topic}</b>
+        <span>${teaser}</span>
+      </div>
     `;
-
-    const audioBtn = document.getElementById('dailyReadingAudioBtn');
-    audioBtn.addEventListener('click', () => toggleDailyReadingAudio(data.topic, excerptTexts, audioBtn));
+    document.getElementById('dailyReadingOpenBtn').addEventListener('click', openDailyReadingModal);
   } catch (err) {
     el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);">Could not load today\'s reading right now.</p>';
   }
+}
+
+function openDailyReadingModal() {
+  const data = _dailyReadingData;
+  if (!data || !data.topic) return;
+
+  const excerptTexts = [];
+  const excerptsHtml = data.books.map((b) => {
+    b.excerpts.forEach((e) => excerptTexts.push(e.excerpt));
+    const bookExcerpts = b.excerpts.map((e) => `<p style="font-size:13px;color:var(--text-dim);margin:6px 0;line-height:1.6;">${e.excerpt}</p>`).join('');
+    return `<div style="margin-bottom:16px;"><p style="font-size:12px;font-weight:600;color:var(--text);margin:0;">${b.bookTitle}${b.bookAuthor ? ' \u2014 ' + b.bookAuthor : ''}</p>${bookExcerpts}</div>`;
+  }).join('');
+
+  const root = document.createElement('div');
+  root.id = 'dailyReadingModalRoot';
+  root.innerHTML = `
+    <div class="case-overlay"></div>
+    <div class="case-drawer" style="max-width:520px;">
+      <div class="case-drawer-header">
+        <h2 style="font-size:18px;margin:0;">${data.topic}</h2>
+        <button type="button" class="case-drawer-close" id="dailyReadingModalCloseBtn">\u2715</button>
+      </div>
+      <div style="margin-top:16px;">
+        ${excerptsHtml}
+        <button type="button" id="dailyReadingAudioBtn" class="ghost" style="padding:8px 14px;font-size:13px;">\u{1F50A} Play audio</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(root);
+  document.getElementById('dailyReadingModalCloseBtn').addEventListener('click', () => root.remove());
+  root.querySelector('.case-overlay').addEventListener('click', () => root.remove());
+  document.getElementById('dailyReadingAudioBtn').addEventListener('click', (e) => toggleDailyReadingAudio(data.topic, excerptTexts, e.target));
+}
+
+function pickIndianFemaleVoice() {
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null;
+  // Best-effort: prefer an explicitly Indian-locale voice: many browsers
+  // expose "en-IN" or "hi-IN" voices, and some label gender in the name.
+  const indianVoices = voices.filter((v) => /en-in|hi-in/i.test(v.lang));
+  const femaleIndian = indianVoices.find((v) => /female|women|f\b/i.test(v.name));
+  if (femaleIndian) return femaleIndian;
+  if (indianVoices.length) return indianVoices[0];
+  // Fall back to any voice with "India" in its name (some platforms label this way)
+  const namedIndia = voices.find((v) => /india/i.test(v.name));
+  return namedIndia || null;
 }
 
 function toggleDailyReadingAudio(topic, excerptTexts, btn) {
@@ -3105,12 +3206,129 @@ function toggleDailyReadingAudio(topic, excerptTexts, btn) {
     btn.textContent = '\u{1F50A} Play audio';
     return;
   }
-  const utterance = new SpeechSynthesisUtterance(`${topic}. ${excerptTexts.join('. ')}`);
-  utterance.onend = () => { btn.textContent = '\u{1F50A} Play audio'; };
-  utterance.onerror = () => { btn.textContent = '\u{1F50A} Play audio'; };
-  window.speechSynthesis.speak(utterance);
-  btn.textContent = '\u23F9 Stop audio';
+
+  const speakNow = () => {
+    const utterance = new SpeechSynthesisUtterance(`${topic}. ${excerptTexts.join('. ')}`);
+    const voice = pickIndianFemaleVoice();
+    if (voice) utterance.voice = voice;
+    utterance.onend = () => { btn.textContent = '\u{1F50A} Play audio'; };
+    utterance.onerror = () => { btn.textContent = '\u{1F50A} Play audio'; };
+    window.speechSynthesis.speak(utterance);
+    btn.textContent = '\u23F9 Stop audio';
+  };
+
+  // Voices often load asynchronously -- if the list is empty on the first
+  // call, wait once for voiceschanged before picking, so the Indian voice
+  // (if available on this device) actually gets a chance to be found.
+  if (window.speechSynthesis.getVoices().length === 0) {
+    window.speechSynthesis.addEventListener('voiceschanged', speakNow, { once: true });
+  } else {
+    speakNow();
+  }
 }
+
+// ===== Actors Profile =====
+let _actorsState = { category: '', gender: '', search: '', showAll: false };
+let _actorsSearchDebounce = null;
+
+async function loadActorsList() {
+  const grid = document.getElementById('actorsResultsGrid');
+  if (!grid) return;
+  grid.innerHTML = '<p class="loading-note">Loading\u2026</p>';
+  try {
+    const params = new URLSearchParams();
+    if (_actorsState.category) params.set('category', _actorsState.category);
+    if (_actorsState.gender) params.set('gender', _actorsState.gender);
+    if (_actorsState.search) params.set('search', _actorsState.search);
+    if (!_actorsState.showAll && !_actorsState.search) params.set('trendingOnly', 'true');
+    params.set('limit', _actorsState.showAll ? '200' : '24');
+
+    const res = await fetch('/api/actors?' + params.toString());
+    const data = await res.json();
+
+    if (!data.actors || data.actors.length === 0) {
+      grid.innerHTML = '<p class="loading-note">No actors found for this filter yet.</p>';
+      return;
+    }
+
+    grid.innerHTML = data.actors.map((a) => `
+      <div class="actor-card" data-id="${a._id}">
+        <p class="ac-name">${a.name}</p>
+        <p class="ac-meta">${a.category} \u00b7 ${a.gender} \u00b7 ${String(a.day).padStart(2, '0')}/${String(a.month).padStart(2, '0')}/${a.year}</p>
+        <div class="ac-numbers">
+          <div class="ac-num"><div class="ac-num-value">${a.driverNumber}</div><div class="ac-num-label">Driver</div></div>
+          <div class="ac-num"><div class="ac-num-value">${a.conductorNumber}</div><div class="ac-num-label">Conductor</div></div>
+        </div>
+      </div>
+    `).join('');
+
+    grid.querySelectorAll('.actor-card').forEach((card) => {
+      card.addEventListener('click', () => openActorLoShuModal(card.dataset.id));
+    });
+  } catch (err) {
+    grid.innerHTML = '<p class="loading-note">Could not load actors right now.</p>';
+  }
+}
+
+async function openActorLoShuModal(actorId) {
+  try {
+    const res = await fetch('/api/actors/' + actorId + '/loshu');
+    const data = await res.json();
+    if (!res.ok) { alert(data.error || 'Could not load this profile.'); return; }
+
+    const root = document.createElement('div');
+    root.id = 'actorLoShuModalRoot';
+    root.innerHTML = `
+      <div class="case-overlay"></div>
+      <div class="case-drawer" style="max-width:420px;">
+        <div class="case-drawer-header">
+          <h2 style="font-size:18px;margin:0;">${data.name}</h2>
+          <button type="button" class="case-drawer-close" id="actorLoShuModalCloseBtn">\u2715</button>
+        </div>
+        <p style="font-size:12px;color:var(--text-dim);margin:12px 0 16px;">${String(data.day).padStart(2, '0')}/${String(data.month).padStart(2, '0')}/${data.year}</p>
+        <div id="loshuGridActorLoShu" class="loshu-grid" style="margin:0 auto;"></div>
+      </div>
+    `;
+    document.body.appendChild(root);
+    document.getElementById('actorLoShuModalCloseBtn').addEventListener('click', () => root.remove());
+    root.querySelector('.case-overlay').addEventListener('click', () => root.remove());
+    renderCompactLoShuGrid(data.loShuGrid, 'ActorLoShu');
+  } catch (err) {
+    alert('Could not reach the server.');
+  }
+}
+
+document.getElementById('actorsCategoryChips').addEventListener('click', (e) => {
+  const btn = e.target.closest('.actors-chip');
+  if (!btn) return;
+  document.querySelectorAll('#actorsCategoryChips .actors-chip').forEach((c) => c.classList.remove('active'));
+  btn.classList.add('active');
+  _actorsState.category = btn.dataset.category;
+  loadActorsList();
+});
+
+document.getElementById('actorsGenderChips').addEventListener('click', (e) => {
+  const btn = e.target.closest('.actors-chip');
+  if (!btn) return;
+  document.querySelectorAll('#actorsGenderChips .actors-chip').forEach((c) => c.classList.remove('active'));
+  btn.classList.add('active');
+  _actorsState.gender = btn.dataset.gender;
+  loadActorsList();
+});
+
+document.getElementById('actorsSearchInput').addEventListener('input', (e) => {
+  clearTimeout(_actorsSearchDebounce);
+  _actorsSearchDebounce = setTimeout(() => {
+    _actorsState.search = e.target.value.trim();
+    loadActorsList();
+  }, 300);
+});
+
+document.getElementById('actorsShowAllBtn').addEventListener('click', () => {
+  _actorsState.showAll = !_actorsState.showAll;
+  document.getElementById('actorsShowAllBtn').textContent = _actorsState.showAll ? 'Show Trending Only' : 'Show All';
+  loadActorsList();
+});
 
 async function loadTodaysBirthdays(filter = 'world') {
   const el = document.getElementById('todaysBirthdaysList');
