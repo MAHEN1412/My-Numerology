@@ -133,10 +133,69 @@
   @media print{
     body *{visibility:hidden;}
     #casePrintArea, #casePrintArea *{visibility:visible;}
+    #fullReportPrintArea, #fullReportPrintArea *{visibility:visible;}
     #casePrintArea{position:absolute;left:0;top:0;width:100%;}
+    #fullReportPrintArea{position:absolute;left:0;top:0;width:100%;}
     .no-print, #videoSectionDrawer, #bookInsightsSectionDrawer, .case-drawer-close, .case-overlay{display:none !important;}
     .case-drawer{position:static;box-shadow:none;width:100%;max-width:100%;height:auto;padding:0;}
+    .report-page{page-break-after:always;}
+    .report-page:last-child{page-break-after:auto;}
+    @page{margin:16mm;}
   }
+
+  /* ===== Professional PDF Report ===== */
+  #fullReportPrintArea{display:none;}
+  .report-page{background:#fff;color:#1a1a2e;font-family:'Inter',system-ui,sans-serif;padding:8mm 2mm;min-height:250mm;position:relative;}
+  .report-cover{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:250mm;text-align:center;}
+  .report-cover-kicker{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#4F46E5;font-weight:700;margin-bottom:18px;}
+  .report-cover-title{font-size:34px;font-weight:800;margin:0 0 40px;color:#0F172A;}
+  .report-cover-field{margin-bottom:14px;font-size:15px;color:#334155;}
+  .report-cover-field b{color:#0F172A;font-size:17px;display:block;margin-top:2px;}
+  .report-cover-footer{position:absolute;bottom:14mm;left:0;right:0;font-size:11px;color:#94A3B8;}
+
+  .report-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #4F46E5;padding-bottom:10px;margin-bottom:22px;}
+  .report-header-brand{font-size:12px;font-weight:800;color:#4F46E5;letter-spacing:.05em;}
+  .report-header-client{font-size:11px;color:#64748B;}
+  .report-footer{position:absolute;bottom:8mm;left:8mm;right:8mm;display:flex;justify-content:space-between;font-size:10px;color:#94A3B8;border-top:1px solid #E2E8F0;padding-top:6px;}
+
+  .report-section-title{font-size:20px;font-weight:800;color:#0F172A;margin:0 0 18px;}
+  .report-subsection-title{font-size:14px;font-weight:700;color:#334155;margin:20px 0 10px;text-transform:uppercase;letter-spacing:.03em;}
+
+  .report-number-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;margin-bottom:20px;}
+  .report-number-card{border:1px solid #E2E8F0;border-radius:10px;padding:14px;text-align:center;}
+  .report-number-card .rnc-label{font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+  .report-number-card .rnc-value{font-size:30px;font-weight:800;color:#4F46E5;line-height:1;}
+
+  .report-insight-list{margin:0;padding-left:18px;font-size:13px;line-height:1.7;color:#334155;}
+
+  .report-loshu-grid{display:grid;grid-template-columns:repeat(3,50px);grid-template-rows:repeat(3,50px);gap:2px;background:#E2E8F0;border:1px solid #CBD5E1;border-radius:8px;overflow:hidden;margin:0 auto 14px;}
+  .report-loshu-cell{background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+  .report-loshu-cell.rl-present{color:#CA8A04;}
+  .report-loshu-cell.rl-repeated{color:#DC2626;}
+  .report-loshu-cell.rl-missing{color:#CBD5E1;}
+  .report-loshu-legend{display:flex;gap:16px;justify-content:center;font-size:11px;color:#64748B;margin-bottom:20px;}
+  .report-loshu-legend span{display:flex;align-items:center;gap:5px;}
+  .report-loshu-legend i{width:10px;height:10px;border-radius:3px;display:inline-block;}
+
+  .report-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+  .report-card{border:1px solid #E2E8F0;border-radius:10px;padding:14px;}
+  .report-card h4{font-size:13px;margin:0 0 6px;color:#0F172A;}
+  .report-card p{font-size:12px;color:#475569;margin:0;line-height:1.6;}
+
+  .report-before-after{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:20px;}
+  .report-before-after th{text-align:left;padding:8px 10px;background:#F1F5F9;color:#334155;font-weight:700;border-bottom:2px solid #E2E8F0;}
+  .report-before-after td{padding:8px 10px;border-bottom:1px solid #F1F5F9;}
+  .report-before-after td.rba-changed{color:#4F46E5;font-weight:700;}
+
+  .report-chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+  .report-chip{background:#EEF2FF;color:#4338CA;font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;}
+
+  .report-color-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:18px;}
+  .report-color-swatch{display:flex;align-items:center;gap:8px;font-size:12px;color:#334155;}
+  .report-color-swatch i{width:22px;height:22px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,0.1);}
+
+  .report-source-item{font-size:11px;color:#64748B;margin-bottom:10px;padding-left:12px;border-left:2px solid #E2E8F0;}
+  .report-source-item b{color:#334155;display:block;font-size:12px;}
   .case-panel h3{font-size:13px;margin:0 0 10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;}
   .case-panel p{margin:0 0 6px;font-size:13px;color:var(--text);}
   .case-avatar{width:48px;height:48px;border-radius:50%;background:var(--surface-2);color:var(--indigo);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}
@@ -460,7 +519,7 @@
     .topbar-search{display:none;}
     .topbar-newcase{padding:8px 12px;font-size:12px;}
     .topbar-account-name{display:none;}
-    .hamburger-btn{display:flex;background:none;border:none;padding:8px;cursor:pointer;order:-1;}
+    .hamburger-btn{display:flex;flex-direction:column;justify-content:center;background:none;border:none;padding:8px;cursor:pointer;order:-1;}
     .hamburger-btn span{display:block;width:20px;height:2px;background:var(--text);margin:4px 0;border-radius:2px;}
 
     /* Sidebar becomes a slide-out panel behind a hamburger toggle, not a
@@ -1385,6 +1444,8 @@
 </div>
 </div>
 </div>
+
+<div id="fullReportPrintArea"></div>
 
 <div class="wizard-overlay" id="newCaseWizard" style="display:none;">
   <div class="wizard-shell">
@@ -3126,6 +3187,256 @@ function renderSavedProfilesTable(profiles) {
   });
 }
 
+// ===== Professional PDF Report =====
+// Centralized color config, used consistently for every Lo Shu grid drawn
+// in this report -- present/missing/repeated always mean the same colors.
+const LOSHU_REPORT_COLORS = { present: '#CA8A04', repeated: '#DC2626', missing: '#CBD5E1' };
+
+function buildReportLoShuGridHtml(loShu) {
+  const layout = loShu.layout.flat();
+  const cells = layout.map((digit) => {
+    const count = loShu.counts[digit];
+    const cls = count === 0 ? 'rl-missing' : count > 1 ? 'rl-repeated' : 'rl-present';
+    const content = count === 0 ? '\u2013' : Array(count).fill(digit).join(' ');
+    return `<div class="report-loshu-cell ${cls}">${content}</div>`;
+  }).join('');
+  return `
+    <div class="report-loshu-grid">${cells}</div>
+    <div class="report-loshu-legend">
+      <span><i style="background:${LOSHU_REPORT_COLORS.present}"></i>Present</span>
+      <span><i style="background:${LOSHU_REPORT_COLORS.repeated}"></i>Repeated</span>
+      <span><i style="background:${LOSHU_REPORT_COLORS.missing}"></i>Missing</span>
+    </div>
+  `;
+}
+
+function reportNumberCardHtml(label, value) {
+  return `<div class="report-number-card"><div class="rnc-label">${label}</div><div class="rnc-value">${value ?? '\u2014'}</div></div>`;
+}
+
+function reportCoreNumberSection(title, numberValue, planet, knowledgeBase) {
+  const rec = numberValue != null ? knowledgeBase[numberValue] : null;
+  if (!rec) return `<div class="report-card"><h4>${title}</h4><p>Not calculated for this case.</p></div>`;
+  return `
+    <div class="report-card">
+      <h4>${title} \u2014 ${numberValue}${planet ? ` (${rec.chaldeanPlanet || planet})` : ''}</h4>
+      <p><b>Meaning:</b> ${rec.personalityThemes || rec.keywords.join(', ')}</p>
+      <p style="margin-top:6px;"><b>Strengths:</b> ${(rec.positiveQualities || rec.strengths || []).slice(0, 3).join(', ')}</p>
+      <p style="margin-top:6px;"><b>Challenges:</b> ${(rec.challenges || rec.potentialChallenges || []).slice(0, 3).join(', ')}</p>
+    </div>
+  `;
+}
+
+function buildFullReportHtml(data) {
+  const { client, original, corrected, crystalCompatibility, bookInsights } = data;
+  const dobStr = `${String(client.day).padStart(2, '0')}/${String(client.month).padStart(2, '0')}/${client.year}`;
+  const reportDateStr = new Date(data.reportDate).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+  const kb = original.numberKnowledgeBase;
+
+  // ----- Cover page -----
+  let html = `
+    <div class="report-page report-cover">
+      <p class="report-cover-kicker">Numerology Consultant Engine</p>
+      <h1 class="report-cover-title">Numerology Consultation Report</h1>
+      <div class="report-cover-field">Prepared for<b>${client.name}</b></div>
+      <div class="report-cover-field">Date of Birth<b>${dobStr}</b></div>
+      ${client.phone ? `<div class="report-cover-field">Phone<b>${client.phone}</b></div>` : ''}
+      <div class="report-cover-field">Report Date<b>${reportDateStr}</b></div>
+      <p class="report-cover-footer">This report reflects a traditional numerology belief system, for personal interest. It is not medical, legal, or financial advice.</p>
+    </div>
+  `;
+
+  const pageHeader = (subtitle) => `
+    <div class="report-header">
+      <span class="report-header-brand">NUMEROLOGY CONSULTATION REPORT</span>
+      <span class="report-header-client">${client.name} \u00b7 ${dobStr}</span>
+    </div>
+  `;
+  const pageFooter = (pageNum) => `<div class="report-footer"><span>${subtitleForFooter}</span><span>Page ${pageNum}</span></div>`;
+  let subtitleForFooter = client.name;
+  let pageNum = 2;
+
+  // ----- Numerology Snapshot -----
+  html += `
+    <div class="report-page">
+      ${pageHeader()}
+      <h2 class="report-section-title">Numerology Snapshot</h2>
+      <div class="report-number-cards">
+        ${reportNumberCardHtml('Driver Number', original.driverNumber.value)}
+        ${reportNumberCardHtml('Conductor Number', original.conductorNumber.value)}
+        ${original.nameNumber ? reportNumberCardHtml('Name Number', original.nameNumber.value) : ''}
+        ${original.soulUrgeNumber ? reportNumberCardHtml('Soul Urge', original.soulUrgeNumber.value) : ''}
+        ${original.personalityNumber ? reportNumberCardHtml('Personality', original.personalityNumber.value) : ''}
+      </div>
+      <p class="report-subsection-title">Key Numerology Insight</p>
+      <ul class="report-insight-list">
+        <li>${original.interpretations.overallProfile}</li>
+        ${original.interpretations.strengths.slice(0, 2).map((s) => `<li>${s}</li>`).join('')}
+      </ul>
+      ${pageFooter(pageNum++)}
+    </div>
+  `;
+
+  // ----- Lo Shu Grid -----
+  html += `
+    <div class="report-page">
+      ${pageHeader()}
+      <h2 class="report-section-title">Lo Shu Grid Analysis</h2>
+      ${buildReportLoShuGridHtml(original.loShuGrid)}
+      <p class="report-subsection-title">Missing Numbers</p>
+      <div class="report-card-grid">
+        ${original.loShuGrid.missing.length === 0 ? '<p style="font-size:12px;color:#64748B;">None \u2014 every number 1\u20139 is present.</p>' :
+          original.loShuGrid.missing.map((n) => `<div class="report-card"><h4>Missing ${n}</h4><p>${(kb[n].keywords || []).join(', ')}</p></div>`).join('')}
+      </div>
+      <p class="report-subsection-title">Repeated Numbers</p>
+      <div class="report-card-grid">
+        ${original.loShuGrid.repeated.length === 0 ? '<p style="font-size:12px;color:#64748B;">None repeated more than once.</p>' :
+          original.loShuGrid.repeated.map((n) => `<div class="report-card"><h4>Repeated ${n} (\u00d7${original.loShuGrid.counts[n]})</h4><p>${(kb[n].keywords || []).join(', ')}</p></div>`).join('')}
+      </div>
+      ${pageFooter(pageNum++)}
+    </div>
+  `;
+
+  // ----- Planes & Arrows (only if genuinely detected) -----
+  const activePlanes = (original.planes || []).filter((p) => p.active);
+  const activeArrows = (original.arrows || []).filter((a) => a.active);
+  if (activePlanes.length > 0 || activeArrows.length > 0) {
+    html += `
+      <div class="report-page">
+        ${pageHeader()}
+        <h2 class="report-section-title">Planes &amp; Arrows</h2>
+        ${activePlanes.length > 0 ? `<p class="report-subsection-title">Planes detected</p><div class="report-card-grid">${activePlanes.map((p) => `<div class="report-card"><h4>${p.name}</h4><p>${p.meaning || ''}</p></div>`).join('')}</div>` : ''}
+        ${activeArrows.length > 0 ? `<p class="report-subsection-title">Arrows detected</p><div class="report-card-grid">${activeArrows.map((a) => `<div class="report-card"><h4>${a.name}</h4><p>${a.meaning || ''}</p></div>`).join('')}</div>` : ''}
+        ${pageFooter(pageNum++)}
+      </div>
+    `;
+  }
+
+  // ----- Core Number Analysis -----
+  html += `
+    <div class="report-page">
+      ${pageHeader()}
+      <h2 class="report-section-title">Core Number Analysis</h2>
+      <div class="report-card-grid">
+        ${reportCoreNumberSection('Driver Number', original.driverNumber.value, null, kb)}
+        ${reportCoreNumberSection('Conductor Number', original.conductorNumber.value, null, kb)}
+        ${original.nameNumber ? reportCoreNumberSection('Name / Destiny Number', original.nameNumber.value, null, kb) : ''}
+      </div>
+      ${pageFooter(pageNum++)}
+    </div>
+  `;
+
+  // ----- Before vs After Name Correction (only if a correction exists) -----
+  if (corrected) {
+    const rows = [
+      ['Name Number', original.nameNumber?.value, corrected.nameNumber?.value],
+      ['Soul Urge', original.soulUrgeNumber?.value, corrected.soulUrgeNumber?.value],
+      ['Personality', original.personalityNumber?.value, corrected.personalityNumber?.value],
+      ['Missing Numbers', original.loShuGrid.missing.join(', ') || 'None', corrected.loShuGrid.missing.join(', ') || 'None'],
+      ['Repeated Numbers', original.loShuGrid.repeated.join(', ') || 'None', corrected.loShuGrid.repeated.join(', ') || 'None'],
+    ];
+    html += `
+      <div class="report-page">
+        ${pageHeader()}
+        <h2 class="report-section-title">Name Correction: Before vs After</h2>
+        <p style="font-size:12px;color:#64748B;margin:0 0 16px;">Original name: <b>${client.name}</b> &nbsp;\u2192&nbsp; Suggested name: <b>${data.corrected ? original.name === corrected.name ? '' : (corrected.name || '') : ''}</b></p>
+        <table class="report-before-after">
+          <thead><tr><th>Analysis</th><th>Original (${client.name})</th><th>Corrected</th></tr></thead>
+          <tbody>
+            ${rows.map(([label, a, b]) => `<tr><td>${label}</td><td>${a ?? '\u2014'}</td><td class="${a !== b ? 'rba-changed' : ''}">${b ?? '\u2014'}</td></tr>`).join('')}
+          </tbody>
+        </table>
+        <p class="report-subsection-title">What Changed</p>
+        <p style="font-size:12px;color:#334155;">${original.nameNumber && corrected.nameNumber && original.nameNumber.value !== corrected.nameNumber.value
+          ? `The corrected name shifts the Name Number from ${original.nameNumber.value} to ${corrected.nameNumber.value}, changing which Lo Shu positions the name's digits reinforce.`
+          : 'The corrected name produces the same Name Number as the original in this case \u2014 the underlying letters differ, but they reduce to the same digit.'}</p>
+        <p class="report-subsection-title" style="margin-top:20px;">Corrected Name \u2014 Lo Shu Grid</p>
+        ${buildReportLoShuGridHtml(corrected.loShuGrid)}
+        ${pageFooter(pageNum++)}
+      </div>
+    `;
+  }
+
+  // ----- Supportive Numbers, Colors, Crystal -----
+  const favorableNums = (original.numbersAnalysis?.favorableNumbers || []).map((n) => n.number ?? n);
+  html += `
+    <div class="report-page">
+      ${pageHeader()}
+      <h2 class="report-section-title">Supportive Numbers &amp; Colours</h2>
+      <p class="report-subsection-title">Supportive Numbers</p>
+      <div class="report-chip-row">${favorableNums.length ? favorableNums.map((n) => `<span class="report-chip">${n}</span>`).join('') : '<p style="font-size:12px;color:#64748B;">No configured source available.</p>'}</div>
+      <p class="report-subsection-title">Supportive Colours</p>
+      <div class="report-color-row">${(original.colorProfile?.bestColors || []).map((c) => `<span class="report-color-swatch"><i style="background:${c.hex || '#ccc'}"></i>${c.name || c}</span>`).join('') || '<p style="font-size:12px;color:#64748B;">No configured source available.</p>'}</div>
+      ${crystalCompatibility && crystalCompatibility[0] ? `
+        <p class="report-subsection-title">Crystal Recommendation</p>
+        <div class="report-card"><h4>${crystalCompatibility[0].crystal}</h4><p>${(crystalCompatibility[0].reasons || []).join(' ')}</p></div>
+      ` : ''}
+      ${pageFooter(pageNum++)}
+    </div>
+  `;
+
+  // ----- Sources -----
+  if (bookInsights && bookInsights.length > 0) {
+    html += `
+      <div class="report-page">
+        ${pageHeader()}
+        <h2 class="report-section-title">Sources &amp; Methodology</h2>
+        <p style="font-size:12px;color:#64748B;margin:0 0 16px;">This report's calculations follow the Chaldean/Lo Shu methodology used throughout this application. Where your book library contains directly relevant passages, they're cited below.</p>
+        ${bookInsights.map((t) => `
+          <div class="report-source-item">
+            <b>${t.label}</b>
+            ${t.books.map((b) => `${b.bookTitle}${b.bookAuthor ? ' \u2014 ' + b.bookAuthor : ''}, p.${b.excerpts[0] ? b.excerpts[0].page : '?'}`).join('<br>')}
+          </div>
+        `).join('')}
+        ${pageFooter(pageNum++)}
+      </div>
+    `;
+  }
+
+  // ----- Executive Summary -----
+  const summaryPoints = [
+    `Core pattern: ${original.interpretations.overallProfile}`,
+    original.interpretations.strengths[0] ? `Major strength: ${original.interpretations.strengths[0]}` : null,
+    original.loShuGrid.missing.length ? `Development area: number ${original.loShuGrid.missing[0]} is missing from the Lo Shu grid.` : null,
+    corrected ? `Name correction: ${client.name} \u2192 ${corrected.name || 'suggested spelling'} was evaluated as a possible adjustment.` : null,
+    favorableNums.length ? `Supportive numbers: ${favorableNums.slice(0, 3).join(', ')}.` : null,
+    crystalCompatibility && crystalCompatibility[0] ? `Recommended crystal: ${crystalCompatibility[0].crystal}.` : null,
+  ].filter(Boolean);
+
+  html += `
+    <div class="report-page">
+      ${pageHeader()}
+      <h2 class="report-section-title">Your Numerology Summary</h2>
+      <ol class="report-insight-list">
+        ${summaryPoints.map((p) => `<li>${p}</li>`).join('')}
+      </ol>
+      ${pageFooter(pageNum++)}
+    </div>
+  `;
+
+  return html;
+}
+
+async function generateFullReport(profileId) {
+  const btn = document.getElementById('caseDrawerReportBtn');
+  const originalText = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Building report\u2026';
+  try {
+    const res = await fetch('/api/dashboard/' + profileId + '/report-data');
+    const data = await res.json();
+    if (!res.ok) { alert(data.error || 'Could not generate the report.'); return; }
+
+    document.getElementById('fullReportPrintArea').innerHTML = buildFullReportHtml(data);
+    document.getElementById('fullReportPrintArea').style.display = 'block';
+    window.print();
+    document.getElementById('fullReportPrintArea').style.display = 'none';
+  } catch (err) {
+    alert('Could not reach the server to build the report.');
+  } finally {
+    btn.disabled = false; btn.textContent = originalText;
+  }
+}
+
 function initials(name) {
   if (!name) return '?';
   return name.trim().split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
@@ -3156,8 +3467,9 @@ function openCaseDrawer(id) {
             <p style="font-size:12px;color:var(--text-dim);margin:2px 0 0;">${p.phone || 'No phone on file'} \u00b7 ${dob}</p>
           </div>
         </div>
-        <div style="display:flex;gap:8px;align-items:flex-start;">
-          <button type="button" class="ghost" id="caseDrawerPrintBtn" style="padding:8px 14px;font-size:13px;">Print / Save as PDF</button>
+        <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;">
+          <button type="button" class="ghost" id="caseDrawerReportBtn" style="padding:8px 14px;font-size:13px;">Generate Full Report</button>
+          <button type="button" class="ghost" id="caseDrawerPrintBtn" style="padding:8px 14px;font-size:13px;">Quick Print</button>
           <button type="button" class="case-drawer-close" id="caseDrawerCloseBtn">\u2715</button>
         </div>
       </div>
@@ -3221,6 +3533,7 @@ function openCaseDrawer(id) {
   document.getElementById('caseDrawerCloseBtn').addEventListener('click', closeCaseDrawer);
   root.querySelector('.case-overlay').addEventListener('click', closeCaseDrawer);
   document.getElementById('caseDrawerPrintBtn').addEventListener('click', () => window.print());
+  document.getElementById('caseDrawerReportBtn').addEventListener('click', () => generateFullReport(p._id));
   document.getElementById('caseDrawerNameCorrectionBtn').addEventListener('click', () => runCaseDrawerNameCorrection(p));
   document.getElementById('caseDrawerNameCorrectionInput').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') runCaseDrawerNameCorrection(p);

@@ -1,6 +1,12 @@
 const express = require('express');
 const SavedProfile = require('../models/SavedProfile');
 const { requireAdmin } = require('../utils/adminAuth');
+const calc = require('../utils/calculationEngine');
+const { buildInterpretationReport } = require('../knowledge/interpretationEngine');
+const { buildNumbersAnalysis, buildColorProfile } = require('../knowledge/colorEngine');
+const { buildCrystalCompatibility } = require('../knowledge/crystalEngine');
+const { buildBookInsights } = require('../knowledge/bookSearch');
+const { buildResultObject } = require('./readings');
 
 const router = express.Router();
 
@@ -167,6 +173,60 @@ router.get('/kpis', requireAdmin, async (req, res) => {
   } catch (err) {
     console.error('KPI calculation failed:', err.message);
     res.status(500).json({ error: 'Could not calculate KPIs right now.' });
+  }
+});
+
+// GET /api/dashboard/:id/report-data
+// Assembles the full structured report object for the professional PDF --
+// reuses buildResultObject (the same function powering the live calculator)
+// for both the original name and, if one was saved, the corrected name --
+// so the "before vs after" comparison is two REAL independent calculations,
+// never a copy or an invented diff.
+router.get('/:id/report-data', requireAdmin, async (req, res) => {
+  try {
+    const profile = await SavedProfile.findById(req.params.id);
+    if (!profile) return res.status(404).json({ error: 'Case not found.' });
+    if (!profile.day || !profile.month || !profile.year) {
+      return res.status(400).json({ error: 'This case has no date of birth on file, so a report cannot be generated.' });
+    }
+
+    const system = profile.system || 'chaldean';
+    const original = buildResultObject({ name: profile.name || null, day: profile.day, month: profile.month, year: profile.year, system });
+
+    let corrected = null;
+    if (profile.correctedNameSuggestion) {
+      corrected = buildResultObject({ name: profile.correctedNameSuggestion, day: profile.day, month: profile.month, year: profile.year, system });
+    }
+
+    const crystalCompatibility = buildCrystalCompatibility({
+      driver: original.driverNumber.value,
+      conductor: original.conductorNumber.value,
+      nameNumber: original.nameNumber ? original.nameNumber.value : null,
+      loshuMissing: original.loShuGrid.missing,
+    });
+
+    let bookInsights = [];
+    try {
+      bookInsights = await buildBookInsights({
+        driver: original.driverNumber.value, conductor: original.conductorNumber.value,
+        missing: original.loShuGrid.missing, repeated: original.loShuGrid.repeated,
+        nameNumber: original.nameNumber ? original.nameNumber.value : null,
+      }, null);
+    } catch (e) { /* book insights are a bonus section, not critical to the report */ }
+
+    res.json({
+      client: { name: profile.name || 'Unnamed client', phone: profile.phone || null, day: profile.day, month: profile.month, year: profile.year, system },
+      reportDate: new Date().toISOString(),
+      original,
+      corrected,
+      crystalCompatibility,
+      bookInsights: bookInsights.filter((t) => t.sourceCount > 0 && !t.isCombination),
+      caseStatus: profile.status,
+      caseNotes: profile.userNotes || '',
+    });
+  } catch (err) {
+    console.error('Report data generation failed:', err.message);
+    res.status(500).json({ error: 'Could not generate the report right now.' });
   }
 });
 
