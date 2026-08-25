@@ -141,25 +141,27 @@
     #fullReportPrintArea{position:absolute;left:0;top:0;width:100%;}
     .no-print, #videoSectionDrawer, #bookInsightsSectionDrawer, .case-drawer-close, .case-overlay{display:none !important;}
     .case-drawer{position:static;box-shadow:none;width:100%;max-width:100%;height:auto;padding:0;}
-    .report-page{page-break-after:always;}
-    .report-page:last-child{page-break-after:auto;}
+    .report-cover{page-break-after:always;}
+    .report-section-title{page-break-after:avoid;page-break-before:auto;}
+    .report-card, .report-number-cards, .report-loshu-grid{page-break-inside:avoid;}
     @page{margin:16mm;}
   }
 
-  /* ===== Professional PDF Report ===== */
+  /* ===== Professional PDF Report -- simple, natural document flow ===== */
   #fullReportPrintArea{display:none;}
-  .report-page{background:#FAF9F5;color:#1F2933;font-family:'Inter',system-ui,sans-serif;padding:8mm 2mm;min-height:250mm;position:relative;}
-  .report-cover{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:250mm;text-align:center;}
+  .report-page{background:#FAF9F5;color:#1F2933;font-family:'Inter',system-ui,sans-serif;padding:4mm 2mm 10mm;}
+  .report-section{margin-bottom:36px;}
+  .report-cover{min-height:250mm;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
   .report-cover-kicker{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#405C3D;font-weight:700;margin-bottom:18px;}
   .report-cover-title{font-size:34px;font-weight:800;margin:0 0 40px;color:#1F2933;}
   .report-cover-field{margin-bottom:14px;font-size:15px;color:#1F2933;}
   .report-cover-field b{color:#1F2933;font-size:17px;display:block;margin-top:2px;}
-  .report-cover-footer{position:absolute;bottom:14mm;left:0;right:0;font-size:11px;color:#667085;}
+  .report-cover-footer{margin-top:50px;font-size:11px;color:#667085;max-width:340px;}
 
   .report-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #405C3D;padding-bottom:10px;margin-bottom:22px;}
   .report-header-brand{font-size:12px;font-weight:800;color:#405C3D;letter-spacing:.05em;}
   .report-header-client{font-size:11px;color:#667085;}
-  .report-footer{position:absolute;bottom:8mm;left:8mm;right:8mm;display:flex;justify-content:space-between;font-size:10px;color:#667085;border-top:1px solid #EAF0E8;padding-top:6px;}
+  .report-footer{margin-top:24px;padding-top:8px;border-top:1px solid #EAF0E8;font-size:10px;color:#667085;text-align:center;}
 
   .report-section-title{font-size:20px;font-weight:800;color:#1F2933;margin:0 0 18px;}
   .report-subsection-title{font-size:14px;font-weight:700;color:#1F2933;margin:20px 0 10px;text-transform:uppercase;letter-spacing:.03em;}
@@ -3310,36 +3312,31 @@ function buildFullReportHtml(data, f) {
     </div>
   `;
 
-  const pageHeader = () => `
+  html += `
     <div class="report-header">
       <span class="report-header-brand">${brandName.toUpperCase()}</span>
       <span class="report-header-client">${f.name || client.name} \u00b7 ${f.dob}</span>
     </div>
   `;
   const footerContact = [f.website, f.phone].filter(Boolean).join('  \u00b7  ');
-  const pageFooter = (pageNum) => `<div class="report-footer"><span>${brandName}${footerContact ? '  \u00b7  ' + footerContact : ''}</span><span>Page ${pageNum}</span></div>`;
-  let pageNum = 2;
 
   // ----- Your Details -----
   html += `
-    <div class="report-page">
-      ${pageHeader()}
-      <h2 class="report-section-title">Your Details</h2>
+    <div class="report-section">
+            <h2 class="report-section-title">Your Details</h2>
       <div class="report-card-grid">
         <div class="report-card"><h4>Name</h4><p>${f.name || '\u2014'}</p></div>
         <div class="report-card"><h4>Date of Birth</h4><p>${f.dob || '\u2014'}</p></div>
         <div class="report-card"><h4>Place of Birth</h4><p>${f.placeOfBirth || '\u2014'}</p></div>
         <div class="report-card"><h4>Time of Birth</h4><p>${f.timeOfBirth || '\u2014'}</p></div>
       </div>
-      ${pageFooter(pageNum++)}
-    </div>
+          </div>
   `;
 
   // ----- Numerology Analysis -----
   html += `
-    <div class="report-page">
-      ${pageHeader()}
-      <h2 class="report-section-title">Numerology Analysis</h2>
+    <div class="report-section">
+            <h2 class="report-section-title">Numerology Analysis</h2>
       <div class="report-number-cards">
         <div class="report-number-card"><div class="rnc-label">Main Planet Number</div><div class="rnc-value" style="font-size:20px;">${f.mainPlanet || '\u2014'}</div></div>
         <div class="report-number-card"><div class="rnc-label">Life Path Number</div><div class="rnc-value" style="font-size:20px;">${f.lifePath || '\u2014'}</div></div>
@@ -3352,16 +3349,14 @@ function buildFullReportHtml(data, f) {
       <p class="report-subsection-title">Lo Shu Grid \u2014 Original</p>
       ${buildReportLoShuGridHtml(data.original.loShuGrid)}
       ${f.combinationInfo ? `<p style="font-size:12px;color:#667085;text-align:center;margin-top:10px;">${f.combinationInfo}</p>` : ''}
-      ${pageFooter(pageNum++)}
-    </div>
+          </div>
   `;
 
   // ----- Numerology Suggestions (only if a corrected name was saved) -----
   if (corrected && (f.sugName || f.sugDestinyNumber)) {
     html += `
-      <div class="report-page">
-        ${pageHeader()}
-        <h2 class="report-section-title">Numerology Suggestions</h2>
+      <div class="report-section">
+                <h2 class="report-section-title">Numerology Suggestions</h2>
         <p class="report-subsection-title">1. Name &amp; Numbers</p>
         <div class="report-card-grid">
           <div class="report-card"><h4>Name</h4><p>${f.sugName || '\u2014'}</p></div>
@@ -3374,8 +3369,7 @@ function buildFullReportHtml(data, f) {
         ${buildReportLoShuGridHtml(corrected.loShuGrid)}
         ${f.sugPlanes ? `<p class="report-subsection-title">3. Complete Planes</p><p style="font-size:13px;color:#1F2933;">${f.sugPlanes}</p>` : ''}
         ${f.nameInterpretation ? `<p class="report-subsection-title">4. Name Interpretation</p><p style="font-size:13px;color:#1F2933;line-height:1.7;">${f.nameInterpretation}</p>` : ''}
-        ${pageFooter(pageNum++)}
-      </div>
+              </div>
     `;
   }
 
@@ -3385,9 +3379,8 @@ function buildFullReportHtml(data, f) {
   const colorChips = (str) => str ? str.split(',').map((s) => s.trim()).filter(Boolean).map((name) => `<span class="report-color-swatch"><i style="background:${COLOR_HEX[name] || '#CBD5E1'}"></i>${name}</span>`).join('') : '<p style="font-size:12px;color:#667085;">No configured source available.</p>';
 
   html += `
-    <div class="report-page">
-      ${pageHeader()}
-      <h2 class="report-section-title">Lucky &amp; Negative Numbers</h2>
+    <div class="report-section">
+            <h2 class="report-section-title">Lucky &amp; Negative Numbers</h2>
       <p class="report-subsection-title">Lucky Numbers</p>
       <div class="report-chip-row">${chipList(f.luckyNumbers, false)}</div>
       <p class="report-subsection-title">Negative Numbers</p>
@@ -3397,55 +3390,50 @@ function buildFullReportHtml(data, f) {
       <div class="report-color-row">${colorChips(f.luckyColours)}</div>
       <p class="report-subsection-title">Negative Colours</p>
       <div class="report-color-row">${colorChips(f.negativeColours)}</div>
-      ${pageFooter(pageNum++)}
-    </div>
+          </div>
   `;
 
   // ----- Crystal (real data, shown quietly if present) -----
   if (crystalCompatibility && crystalCompatibility[0]) {
     html += `
-      <div class="report-page">
-        ${pageHeader()}
-        <h2 class="report-section-title">Crystal Recommendation</h2>
+      <div class="report-section">
+                <h2 class="report-section-title">Crystal Recommendation</h2>
         <div class="report-card"><h4>${crystalCompatibility[0].crystal}</h4><p>${(crystalCompatibility[0].reasons || []).join(' ')}</p></div>
-        ${pageFooter(pageNum++)}
-      </div>
+              </div>
     `;
   }
 
   // ----- Remedies (only the consultant's own entries -- never invented) -----
   if (f.remedies && f.remedies.length > 0) {
     html += `
-      <div class="report-page">
-        ${pageHeader()}
-        <h2 class="report-section-title">Remedies</h2>
+      <div class="report-section">
+                <h2 class="report-section-title">Remedies</h2>
         ${f.remedies.map((r, i) => `
           <div class="report-card" style="display:flex;gap:14px;align-items:flex-start;margin-bottom:12px;">
             <span style="background:#F4C542;color:#1F2933;font-weight:800;font-size:13px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${i + 1}</span>
             <p style="margin:0;white-space:pre-wrap;">${r}</p>
           </div>
         `).join('')}
-        ${pageFooter(pageNum++)}
-      </div>
+              </div>
     `;
   }
 
   // ----- Consultation / Services CTA (only if contact details were provided) -----
   if (f.consultantName || f.website || f.phone) {
     html += `
-      <div class="report-page">
-        ${pageHeader()}
-        <div style="text-align:center;padding-top:60px;">
+      <div class="report-section">
+                <div style="text-align:center;padding-top:20px;">
           <h2 class="report-section-title" style="text-align:center;">Continue Your Consultation</h2>
           <p style="font-size:13px;color:#667085;max-width:380px;margin:0 auto 24px;">For a deeper personal consultation, name correction guidance, or follow-up readings, get in touch.</p>
           ${f.consultantName ? `<p style="font-size:16px;font-weight:700;color:#405C3D;margin:0 0 8px;">${f.consultantName}</p>` : ''}
           ${f.website ? `<p style="font-size:13px;color:#1F2933;margin:0 0 4px;">${f.website}</p>` : ''}
           ${f.phone ? `<p style="font-size:13px;color:#1F2933;margin:0;">${f.phone}</p>` : ''}
         </div>
-        ${pageFooter(pageNum++)}
-      </div>
+              </div>
     `;
   }
+
+  html += `<div class="report-footer">${brandName}${footerContact ? '  \u00b7  ' + footerContact : ''}</div>`;
 
   return html;
 }
