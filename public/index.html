@@ -127,6 +127,9 @@
   .wizard-result-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--navy-2);font-size:13px;}
   .wizard-result-row:last-child{border-bottom:none;}
   .wizard-skip-note{font-size:12px;color:var(--text-muted);margin-top:10px;}
+  .report-form-section-label{font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin:22px 0 12px;padding-top:14px;border-top:1px solid var(--border);}
+  .report-form-section-label:first-of-type{margin-top:0;padding-top:0;border-top:none;}
+  .report-form-textarea{width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;}
   .nc-name-compare-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
   .nc-name-compare-label{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;}
 
@@ -1449,32 +1452,62 @@
 <div id="fullReportPrintArea"></div>
 
 <div class="wizard-overlay" id="reportFormOverlay" style="display:none;">
-  <div class="wizard-shell" style="max-width:600px;">
+  <div class="wizard-shell" style="max-width:640px;max-height:90vh;">
     <div class="wizard-header">
       <div>
         <p class="wizard-step-label">Before generating</p>
-        <h2>Complete the report details</h2>
+        <h2>Review &amp; edit the report</h2>
       </div>
       <button type="button" class="case-drawer-close" id="reportFormCloseBtn">&#10005;</button>
     </div>
     <div class="wizard-body">
-      <div id="reportFormCalculatedSummary" class="case-panel" style="margin-bottom:18px;"></div>
+      <p style="font-size:12px;color:var(--text-dim);margin:0 0 18px;">Every field below is pre-filled from the actual calculation where available, and fully editable &mdash; edit anything before generating. Fields with no computed source are left blank for you to fill in.</p>
 
-      <p style="font-size:12px;color:var(--text-dim);margin:0 0 14px;">These fields aren't calculated by the app &mdash; fill in whatever you'd like included. Anything left blank is simply omitted from the report, never invented.</p>
+      <p class="report-form-section-label">Your Details</p>
+      <div class="field"><label for="rfName">Name</label><input type="text" id="rfName"></div>
+      <div class="field"><label for="rfDob">Date of birth</label><input type="text" id="rfDob"></div>
+      <div class="field"><label for="rfPlaceOfBirth">Place of birth</label><input type="text" id="rfPlaceOfBirth" placeholder="e.g. Hyderabad"></div>
+      <div class="field"><label for="rfTimeOfBirth">Time of birth</label><input type="text" id="rfTimeOfBirth" placeholder="e.g. 1:00 AM"></div>
 
-      <div class="field"><label for="reportPlaceOfBirth">Place of birth</label><input type="text" id="reportPlaceOfBirth" placeholder="e.g. Hyderabad"></div>
-      <div class="field"><label for="reportTimeOfBirth">Time of birth</label><input type="text" id="reportTimeOfBirth" placeholder="e.g. 1:00 AM"></div>
-      <div class="field">
-        <label for="reportRemedies">Remedies <span style="color:var(--text-muted);font-weight:400;">(one per line)</span></label>
-        <textarea id="reportRemedies" rows="4" style="width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;" placeholder="Each line becomes one numbered remedy"></textarea>
+      <p class="report-form-section-label">Numerology Analysis</p>
+      <div class="field"><label for="rfMainPlanet">Main Planet Number</label><input type="text" id="rfMainPlanet"></div>
+      <div class="field"><label for="rfLifePath">Life Path Number</label><input type="text" id="rfLifePath"></div>
+      <div class="field"><label for="rfCompoundDestiny">Compound Destiny</label><input type="text" id="rfCompoundDestiny"></div>
+      <div class="field"><label for="rfDestinyNumber">Destiny Number</label><input type="text" id="rfDestinyNumber"></div>
+      <div class="field"><label for="rfSoulNumber">Soul Number</label><input type="text" id="rfSoulNumber"></div>
+      <div class="field"><label for="rfPersonalityNumber">Personality Number</label><input type="text" id="rfPersonalityNumber"></div>
+      <div class="field"><label for="rfCompletePlanes">Complete Planes</label><input type="text" id="rfCompletePlanes"></div>
+      <div class="field"><label for="rfCombinationInfo">Combination info line</label><input type="text" id="rfCombinationInfo"></div>
+
+      <div id="rfSuggestionsSection">
+        <p class="report-form-section-label">Numerology Suggestions</p>
+        <div class="field"><label for="rfSugName">Suggested name</label><input type="text" id="rfSugName"></div>
+        <div class="field"><label for="rfSugCompoundDestiny">Compound Destiny</label><input type="text" id="rfSugCompoundDestiny"></div>
+        <div class="field"><label for="rfSugDestinyNumber">Destiny Number</label><input type="text" id="rfSugDestinyNumber"></div>
+        <div class="field"><label for="rfSugSoulNumber">Soul Number</label><input type="text" id="rfSugSoulNumber"></div>
+        <div class="field"><label for="rfSugPersonalityNumber">Personality Number</label><input type="text" id="rfSugPersonalityNumber"></div>
+        <div class="field"><label for="rfSugPlanes">Complete Planes</label><input type="text" id="rfSugPlanes"></div>
+        <div class="field">
+          <label for="rfNameInterpretation">Name interpretation</label>
+          <textarea id="rfNameInterpretation" rows="3" class="report-form-textarea" placeholder="What this name/number means for the client"></textarea>
+        </div>
       </div>
+
+      <div class="field"><label for="rfLuckyNumbers">Lucky Numbers</label><input type="text" id="rfLuckyNumbers"></div>
+      <div class="field"><label for="rfNegativeNumbers">Negative Numbers</label><input type="text" id="rfNegativeNumbers"></div>
+      <div class="field"><label for="rfLuckyColours">Lucky Colours</label><input type="text" id="rfLuckyColours"></div>
+      <div class="field"><label for="rfNegativeColours">Negative Colours</label><input type="text" id="rfNegativeColours"></div>
+
+      <p class="report-form-section-label">Remedies</p>
       <div class="field">
-        <label for="reportKeyRecommendations">Key recommendations <span style="color:var(--text-muted);font-weight:400;">(one per line)</span></label>
-        <textarea id="reportKeyRecommendations" rows="3" style="width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;" placeholder="Your own consultation notes"></textarea>
+        <label for="reportRemedies">One per line</label>
+        <textarea id="reportRemedies" rows="6" class="report-form-textarea" placeholder="Each line becomes one remedy"></textarea>
       </div>
-      <div class="field"><label for="reportConsultantName">Consultant / brand name</label><input type="text" id="reportConsultantName" placeholder="e.g. Numerology by ..."></div>
-      <div class="field"><label for="reportWebsite">Website</label><input type="text" id="reportWebsite" placeholder="e.g. www.example.com"></div>
-      <div class="field"><label for="reportPhone">Phone / WhatsApp</label><input type="text" id="reportPhone" placeholder="e.g. +91 90000 00000"></div>
+
+      <p class="report-form-section-label">Consultant details <span style="color:var(--text-muted);font-weight:400;text-transform:none;">(optional)</span></p>
+      <div class="field"><label for="reportConsultantName">Consultant / brand name</label><input type="text" id="reportConsultantName"></div>
+      <div class="field"><label for="reportWebsite">Website</label><input type="text" id="reportWebsite"></div>
+      <div class="field"><label for="reportPhone">Phone / WhatsApp</label><input type="text" id="reportPhone"></div>
     </div>
     <div class="wizard-footer">
       <div style="flex:1;"></div>
@@ -3263,20 +3296,16 @@ function reportCoreNumberSection(title, numberValue, planet, knowledgeBase) {
   `;
 }
 
-function buildFullReportHtml(data, extras = {}) {
-  const { client, original, corrected, crystalCompatibility, bookInsights } = data;
-  const dobStr = `${String(client.day).padStart(2, '0')}/${String(client.month).padStart(2, '0')}/${client.year}`;
-  const reportDateStr = new Date(data.reportDate).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-  const kb = original.numberKnowledgeBase;
-  const brandName = extras.consultantName || 'Numerology Consultant Engine';
+function buildFullReportHtml(data, f) {
+  const { client, corrected, crystalCompatibility } = data;
+  const brandName = f.consultantName || 'Numerology Consultant Engine';
 
-  // ----- Cover page -----
   let html = `
     <div class="report-page report-cover">
       <p class="report-cover-kicker">${brandName}</p>
       <h1 class="report-cover-title">Numerology Consultation Report</h1>
-      <div class="report-cover-field">Prepared for<b>${client.name}</b></div>
-      <div class="report-cover-field">Date of Birth<b>${dobStr}</b></div>
+      <div class="report-cover-field">Prepared for<b>${f.name || client.name}</b></div>
+      <div class="report-cover-field">Date of Birth<b>${f.dob}</b></div>
       <p class="report-cover-footer">This report reflects a traditional numerology belief system, for personal interest. It is not medical, legal, or financial advice.</p>
     </div>
   `;
@@ -3284,158 +3313,95 @@ function buildFullReportHtml(data, extras = {}) {
   const pageHeader = () => `
     <div class="report-header">
       <span class="report-header-brand">${brandName.toUpperCase()}</span>
-      <span class="report-header-client">${client.name} \u00b7 ${dobStr}</span>
+      <span class="report-header-client">${f.name || client.name} \u00b7 ${f.dob}</span>
     </div>
   `;
-  const footerContact = [extras.website, extras.phone].filter(Boolean).join('  \u00b7  ');
+  const footerContact = [f.website, f.phone].filter(Boolean).join('  \u00b7  ');
   const pageFooter = (pageNum) => `<div class="report-footer"><span>${brandName}${footerContact ? '  \u00b7  ' + footerContact : ''}</span><span>Page ${pageNum}</span></div>`;
   let pageNum = 2;
 
-  // ----- Client Details -----
+  // ----- Your Details -----
   html += `
     <div class="report-page">
       ${pageHeader()}
-      <h2 class="report-section-title">Client Details</h2>
+      <h2 class="report-section-title">Your Details</h2>
       <div class="report-card-grid">
-        <div class="report-card"><h4>Name</h4><p>${client.name}</p></div>
-        <div class="report-card"><h4>Date of Birth</h4><p>${dobStr}</p></div>
-        ${extras.placeOfBirth ? `<div class="report-card"><h4>Place of Birth</h4><p>${extras.placeOfBirth}</p></div>` : ''}
-        ${extras.timeOfBirth ? `<div class="report-card"><h4>Time of Birth</h4><p>${extras.timeOfBirth}</p></div>` : ''}
-        ${client.phone ? `<div class="report-card"><h4>Phone</h4><p>${client.phone}</p></div>` : ''}
-        <div class="report-card"><h4>Report Date</h4><p>${reportDateStr}</p></div>
+        <div class="report-card"><h4>Name</h4><p>${f.name || '\u2014'}</p></div>
+        <div class="report-card"><h4>Date of Birth</h4><p>${f.dob || '\u2014'}</p></div>
+        <div class="report-card"><h4>Place of Birth</h4><p>${f.placeOfBirth || '\u2014'}</p></div>
+        <div class="report-card"><h4>Time of Birth</h4><p>${f.timeOfBirth || '\u2014'}</p></div>
       </div>
       ${pageFooter(pageNum++)}
     </div>
   `;
 
-  // ----- Numerology Snapshot -----
+  // ----- Numerology Analysis -----
   html += `
     <div class="report-page">
       ${pageHeader()}
-      <h2 class="report-section-title">Numerology Snapshot</h2>
+      <h2 class="report-section-title">Numerology Analysis</h2>
       <div class="report-number-cards">
-        ${reportNumberCardHtml('Driver Number', original.driverNumber.value)}
-        ${reportNumberCardHtml('Conductor Number', original.conductorNumber.value)}
-        ${original.nameNumber ? reportNumberCardHtml('Name Number', original.nameNumber.value) : ''}
-        ${original.soulUrgeNumber ? reportNumberCardHtml('Soul Urge', original.soulUrgeNumber.value) : ''}
-        ${original.personalityNumber ? reportNumberCardHtml('Personality', original.personalityNumber.value) : ''}
+        <div class="report-number-card"><div class="rnc-label">Main Planet Number</div><div class="rnc-value" style="font-size:20px;">${f.mainPlanet || '\u2014'}</div></div>
+        <div class="report-number-card"><div class="rnc-label">Life Path Number</div><div class="rnc-value" style="font-size:20px;">${f.lifePath || '\u2014'}</div></div>
+        <div class="report-number-card"><div class="rnc-label">Compound Destiny</div><div class="rnc-value" style="font-size:20px;">${f.compoundDestiny || '\u2014'}</div></div>
+        <div class="report-number-card"><div class="rnc-label">Destiny Number</div><div class="rnc-value" style="font-size:20px;">${f.destinyNumber || '\u2014'}</div></div>
+        <div class="report-number-card"><div class="rnc-label">Soul Number</div><div class="rnc-value" style="font-size:20px;">${f.soulNumber || '\u2014'}</div></div>
+        <div class="report-number-card"><div class="rnc-label">Personality Number</div><div class="rnc-value" style="font-size:20px;">${f.personalityNumber || '\u2014'}</div></div>
       </div>
-      <p class="report-subsection-title">Key Numerology Insight</p>
-      <ul class="report-insight-list">
-        <li>${original.interpretations.overallProfile}</li>
-        ${original.interpretations.strengths.slice(0, 2).map((s) => `<li>${s}</li>`).join('')}
-      </ul>
+      ${f.completePlanes ? `<p class="report-subsection-title">Complete Planes</p><p style="font-size:13px;color:#1F2933;">${f.completePlanes}</p>` : ''}
+      <p class="report-subsection-title">Lo Shu Grid \u2014 Original</p>
+      ${buildReportLoShuGridHtml(data.original.loShuGrid)}
+      ${f.combinationInfo ? `<p style="font-size:12px;color:#667085;text-align:center;margin-top:10px;">${f.combinationInfo}</p>` : ''}
       ${pageFooter(pageNum++)}
     </div>
   `;
 
-  // ----- Lo Shu Grid -----
-  html += `
-    <div class="report-page">
-      ${pageHeader()}
-      <h2 class="report-section-title">Lo Shu Grid Analysis</h2>
-      ${buildReportLoShuGridHtml(original.loShuGrid)}
-      <p class="report-subsection-title">Missing Numbers</p>
-      <div class="report-card-grid">
-        ${original.loShuGrid.missing.length === 0 ? '<p style="font-size:12px;color:#64748B;">None \u2014 every number 1\u20139 is present.</p>' :
-          original.loShuGrid.missing.map((n) => `<div class="report-card"><h4>Missing ${n}</h4><p>${(kb[n].keywords || []).join(', ')}</p></div>`).join('')}
-      </div>
-      <p class="report-subsection-title">Repeated Numbers</p>
-      <div class="report-card-grid">
-        ${original.loShuGrid.repeated.length === 0 ? '<p style="font-size:12px;color:#64748B;">None repeated more than once.</p>' :
-          original.loShuGrid.repeated.map((n) => `<div class="report-card"><h4>Repeated ${n} (\u00d7${original.loShuGrid.counts[n]})</h4><p>${(kb[n].keywords || []).join(', ')}</p></div>`).join('')}
-      </div>
-      ${pageFooter(pageNum++)}
-    </div>
-  `;
-
-  // ----- Planes & Arrows (only if genuinely detected) -----
-  const activePlanes = (original.planes || []).filter((p) => p.active);
-  const activeArrows = (original.arrows || []).filter((a) => a.active);
-  if (activePlanes.length > 0 || activeArrows.length > 0) {
+  // ----- Numerology Suggestions (only if a corrected name was saved) -----
+  if (corrected && (f.sugName || f.sugDestinyNumber)) {
     html += `
       <div class="report-page">
         ${pageHeader()}
-        <h2 class="report-section-title">Planes &amp; Arrows</h2>
-        ${activePlanes.length > 0 ? `<p class="report-subsection-title">Planes detected</p><div class="report-card-grid">${activePlanes.map((p) => `<div class="report-card"><h4>${p.name}</h4><p>${p.meaning || ''}</p></div>`).join('')}</div>` : ''}
-        ${activeArrows.length > 0 ? `<p class="report-subsection-title">Arrows detected</p><div class="report-card-grid">${activeArrows.map((a) => `<div class="report-card"><h4>${a.name}</h4><p>${a.meaning || ''}</p></div>`).join('')}</div>` : ''}
-        ${pageFooter(pageNum++)}
-      </div>
-    `;
-  }
-
-  // ----- Core Number Analysis -----
-  html += `
-    <div class="report-page">
-      ${pageHeader()}
-      <h2 class="report-section-title">Core Number Analysis</h2>
-      <div class="report-card-grid">
-        ${reportCoreNumberSection('Driver Number', original.driverNumber.value, null, kb)}
-        ${reportCoreNumberSection('Conductor Number', original.conductorNumber.value, null, kb)}
-        ${original.nameNumber ? reportCoreNumberSection('Name / Destiny Number', original.nameNumber.value, null, kb) : ''}
-      </div>
-      ${pageFooter(pageNum++)}
-    </div>
-  `;
-
-  // ----- Before vs After Name Correction (only if a correction exists) -----
-  if (corrected) {
-    const rows = [
-      ['Name Number', original.nameNumber?.value, corrected.nameNumber?.value],
-      ['Soul Urge', original.soulUrgeNumber?.value, corrected.soulUrgeNumber?.value],
-      ['Personality', original.personalityNumber?.value, corrected.personalityNumber?.value],
-      ['Missing Numbers', original.loShuGrid.missing.join(', ') || 'None', corrected.loShuGrid.missing.join(', ') || 'None'],
-      ['Repeated Numbers', original.loShuGrid.repeated.join(', ') || 'None', corrected.loShuGrid.repeated.join(', ') || 'None'],
-    ];
-    html += `
-      <div class="report-page">
-        ${pageHeader()}
-        <h2 class="report-section-title">Name Correction: Before vs After</h2>
-        <p style="font-size:12px;color:#64748B;margin:0 0 16px;">Original name: <b>${client.name}</b> &nbsp;\u2192&nbsp; Suggested name: <b>${data.corrected ? original.name === corrected.name ? '' : (corrected.name || '') : ''}</b></p>
-        <table class="report-before-after">
-          <thead><tr><th>Analysis</th><th>Original (${client.name})</th><th>Corrected</th></tr></thead>
-          <tbody>
-            ${rows.map(([label, a, b]) => `<tr><td>${label}</td><td>${a ?? '\u2014'}</td><td class="${a !== b ? 'rba-changed' : ''}">${b ?? '\u2014'}</td></tr>`).join('')}
-          </tbody>
-        </table>
-        <p class="report-subsection-title">What Changed</p>
-        <p style="font-size:12px;color:#334155;">${original.nameNumber && corrected.nameNumber && original.nameNumber.value !== corrected.nameNumber.value
-          ? `The corrected name shifts the Name Number from ${original.nameNumber.value} to ${corrected.nameNumber.value}, changing which Lo Shu positions the name's digits reinforce.`
-          : 'The corrected name produces the same Name Number as the original in this case \u2014 the underlying letters differ, but they reduce to the same digit.'}</p>
-        <p class="report-subsection-title" style="margin-top:20px;">Corrected Name \u2014 Lo Shu Grid</p>
+        <h2 class="report-section-title">Numerology Suggestions</h2>
+        <p class="report-subsection-title">1. Name &amp; Numbers</p>
+        <div class="report-card-grid">
+          <div class="report-card"><h4>Name</h4><p>${f.sugName || '\u2014'}</p></div>
+          <div class="report-card"><h4>Compound Destiny</h4><p>${f.sugCompoundDestiny || '\u2014'}</p></div>
+          <div class="report-card"><h4>Destiny Number</h4><p>${f.sugDestinyNumber || '\u2014'}</p></div>
+          <div class="report-card"><h4>Soul Number</h4><p>${f.sugSoulNumber || '\u2014'}</p></div>
+          <div class="report-card"><h4>Personality Number</h4><p>${f.sugPersonalityNumber || '\u2014'}</p></div>
+        </div>
+        <p class="report-subsection-title">2. Lo Shu Grid</p>
         ${buildReportLoShuGridHtml(corrected.loShuGrid)}
+        ${f.sugPlanes ? `<p class="report-subsection-title">3. Complete Planes</p><p style="font-size:13px;color:#1F2933;">${f.sugPlanes}</p>` : ''}
+        ${f.nameInterpretation ? `<p class="report-subsection-title">4. Name Interpretation</p><p style="font-size:13px;color:#1F2933;line-height:1.7;">${f.nameInterpretation}</p>` : ''}
         ${pageFooter(pageNum++)}
       </div>
     `;
   }
 
-  // ----- Lucky & Negative Numbers / Colours (per spec, as explicit sections) -----
+  // ----- Lucky & Negative Numbers / Colours -----
+  const chipList = (str, dangerStyle) => str ? str.split(',').map((s) => s.trim()).filter(Boolean).map((n) => `<span class="report-chip"${dangerStyle ? ' style="background:#FDEEEE;color:#B91C1C;"' : ''}>${n}</span>`).join('') : '<p style="font-size:12px;color:#667085;">No configured source available.</p>';
   const COLOR_HEX = { Red: '#DC2626', Orange: '#EA580C', Yellow: '#F4C542', Green: '#405C3D', Blue: '#2563EB', 'Dark Blue': '#1E3A8A', White: '#F8FAFC', Black: '#1F2933', Gold: '#F4C542', Brown: '#78350F', Grey: '#94A3B8', Gray: '#94A3B8', Cream: '#FEF3C7', Pink: '#EC4899', Purple: '#7C3AED', Silver: '#CBD5E1' };
-  const colorSwatch = (name) => `<span class="report-color-swatch"><i style="background:${COLOR_HEX[name] || '#CBD5E1'}"></i>${name}</span>`;
-
-  const favorableNums = (original.numbersAnalysis?.favorableNumbers || []).map((n) => n.number ?? n);
-  const challengingNums = (original.numbersAnalysis?.challengingNumbers || []).map((n) => n.number ?? n);
-  const luckyColors = (original.colorProfile?.best || []).map((c) => c.color);
-  const negativeColorNames = [...new Set((original.colorProfile?.useModerately || []).map((c) => c.color))];
+  const colorChips = (str) => str ? str.split(',').map((s) => s.trim()).filter(Boolean).map((name) => `<span class="report-color-swatch"><i style="background:${COLOR_HEX[name] || '#CBD5E1'}"></i>${name}</span>`).join('') : '<p style="font-size:12px;color:#667085;">No configured source available.</p>';
 
   html += `
     <div class="report-page">
       ${pageHeader()}
       <h2 class="report-section-title">Lucky &amp; Negative Numbers</h2>
       <p class="report-subsection-title">Lucky Numbers</p>
-      <div class="report-chip-row">${favorableNums.length ? favorableNums.map((n) => `<span class="report-chip">${n}</span>`).join('') : '<p style="font-size:12px;color:#667085;">No configured source available.</p>'}</div>
+      <div class="report-chip-row">${chipList(f.luckyNumbers, false)}</div>
       <p class="report-subsection-title">Negative Numbers</p>
-      <div class="report-chip-row">${challengingNums.length ? challengingNums.map((n) => `<span class="report-chip" style="background:#FDEEEE;color:#B91C1C;">${n}</span>`).join('') : '<p style="font-size:12px;color:#667085;">No configured source available.</p>'}</div>
+      <div class="report-chip-row">${chipList(f.negativeNumbers, true)}</div>
       <h2 class="report-section-title" style="margin-top:32px;">Lucky &amp; Negative Colours</h2>
       <p class="report-subsection-title">Lucky Colours</p>
-      <div class="report-color-row">${luckyColors.length ? luckyColors.map(colorSwatch).join('') : '<p style="font-size:12px;color:#667085;">No configured source available.</p>'}</div>
+      <div class="report-color-row">${colorChips(f.luckyColours)}</div>
       <p class="report-subsection-title">Negative Colours</p>
-      <div class="report-color-row">${negativeColorNames.length ? negativeColorNames.map(colorSwatch).join('') : '<p style="font-size:12px;color:#667085;">No configured source available.</p>'}</div>
+      <div class="report-color-row">${colorChips(f.negativeColours)}</div>
       ${pageFooter(pageNum++)}
     </div>
   `;
 
-  // ----- Crystal Recommendation -----
+  // ----- Crystal (real data, shown quietly if present) -----
   if (crystalCompatibility && crystalCompatibility[0]) {
     html += `
       <div class="report-page">
@@ -3448,86 +3414,33 @@ function buildFullReportHtml(data, extras = {}) {
   }
 
   // ----- Remedies (only the consultant's own entries -- never invented) -----
-  if (extras.remedies && extras.remedies.length > 0) {
+  if (f.remedies && f.remedies.length > 0) {
     html += `
       <div class="report-page">
         ${pageHeader()}
         <h2 class="report-section-title">Remedies</h2>
-        ${extras.remedies.map((r, i) => `
+        ${f.remedies.map((r, i) => `
           <div class="report-card" style="display:flex;gap:14px;align-items:flex-start;margin-bottom:12px;">
             <span style="background:#F4C542;color:#1F2933;font-weight:800;font-size:13px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${i + 1}</span>
-            <p style="margin:0;">${r}</p>
+            <p style="margin:0;white-space:pre-wrap;">${r}</p>
           </div>
         `).join('')}
         ${pageFooter(pageNum++)}
       </div>
     `;
   }
-
-  // ----- Sources -----
-  if (bookInsights && bookInsights.length > 0) {
-    html += `
-      <div class="report-page">
-        ${pageHeader()}
-        <h2 class="report-section-title">Sources &amp; Methodology</h2>
-        <p style="font-size:12px;color:#64748B;margin:0 0 16px;">This report's calculations follow the Chaldean/Lo Shu methodology used throughout this application. Where your book library contains directly relevant passages, they're cited below.</p>
-        ${bookInsights.map((t) => `
-          <div class="report-source-item">
-            <b>${t.label}</b>
-            ${t.books.map((b) => `${b.bookTitle}${b.bookAuthor ? ' \u2014 ' + b.bookAuthor : ''}, p.${b.excerpts[0] ? b.excerpts[0].page : '?'}`).join('<br>')}
-          </div>
-        `).join('')}
-        ${pageFooter(pageNum++)}
-      </div>
-    `;
-  }
-
-  // ----- Key Recommendations (consultant's own notes -- only if provided) -----
-  if (extras.keyRecommendations && extras.keyRecommendations.length > 0) {
-    html += `
-      <div class="report-page">
-        ${pageHeader()}
-        <h2 class="report-section-title">Key Recommendations</h2>
-        <ul class="report-insight-list">
-          ${extras.keyRecommendations.map((r) => `<li>${r}</li>`).join('')}
-        </ul>
-        ${pageFooter(pageNum++)}
-      </div>
-    `;
-  }
-
-  // ----- Executive Summary -----
-  const summaryPoints = [
-    `Core pattern: ${original.interpretations.overallProfile}`,
-    original.interpretations.strengths[0] ? `Major strength: ${original.interpretations.strengths[0]}` : null,
-    original.loShuGrid.missing.length ? `Development area: number ${original.loShuGrid.missing[0]} is missing from the Lo Shu grid.` : null,
-    corrected ? `Name correction: ${client.name} \u2192 ${corrected.name || 'suggested spelling'} was evaluated as a possible adjustment.` : null,
-    favorableNums.length ? `Supportive numbers: ${favorableNums.slice(0, 3).join(', ')}.` : null,
-    crystalCompatibility && crystalCompatibility[0] ? `Recommended crystal: ${crystalCompatibility[0].crystal}.` : null,
-  ].filter(Boolean);
-
-  html += `
-    <div class="report-page">
-      ${pageHeader()}
-      <h2 class="report-section-title">Your Numerology Summary</h2>
-      <ol class="report-insight-list">
-        ${summaryPoints.map((p) => `<li>${p}</li>`).join('')}
-      </ol>
-      ${pageFooter(pageNum++)}
-    </div>
-  `;
 
   // ----- Consultation / Services CTA (only if contact details were provided) -----
-  if (extras.consultantName || extras.website || extras.phone) {
+  if (f.consultantName || f.website || f.phone) {
     html += `
       <div class="report-page">
         ${pageHeader()}
         <div style="text-align:center;padding-top:60px;">
           <h2 class="report-section-title" style="text-align:center;">Continue Your Consultation</h2>
           <p style="font-size:13px;color:#667085;max-width:380px;margin:0 auto 24px;">For a deeper personal consultation, name correction guidance, or follow-up readings, get in touch.</p>
-          ${extras.consultantName ? `<p style="font-size:16px;font-weight:700;color:#405C3D;margin:0 0 8px;">${extras.consultantName}</p>` : ''}
-          ${extras.website ? `<p style="font-size:13px;color:#1F2933;margin:0 0 4px;">${extras.website}</p>` : ''}
-          ${extras.phone ? `<p style="font-size:13px;color:#1F2933;margin:0;">${extras.phone}</p>` : ''}
+          ${f.consultantName ? `<p style="font-size:16px;font-weight:700;color:#405C3D;margin:0 0 8px;">${f.consultantName}</p>` : ''}
+          ${f.website ? `<p style="font-size:13px;color:#1F2933;margin:0 0 4px;">${f.website}</p>` : ''}
+          ${f.phone ? `<p style="font-size:13px;color:#1F2933;margin:0;">${f.phone}</p>` : ''}
         </div>
         ${pageFooter(pageNum++)}
       </div>
@@ -3537,7 +3450,11 @@ function buildFullReportHtml(data, extras = {}) {
   return html;
 }
 
-let _pendingReportData = null;
+function planesTextSummary(planes) {
+  const complete = (planes || []).filter((p) => p.complete);
+  if (complete.length === 0) return '';
+  return complete.map((p) => `${p.nums.join(',')} - ${p.name}`).join(' | ');
+}
 
 async function generateFullReport(profileId) {
   const btn = document.getElementById('caseDrawerReportBtn');
@@ -3549,13 +3466,59 @@ async function generateFullReport(profileId) {
     if (!res.ok) { alert(data.error || 'Could not generate the report.'); return; }
 
     _pendingReportData = data;
-    const summaryEl = document.getElementById('reportFormCalculatedSummary');
-    summaryEl.innerHTML = `
-      <h3>Already calculated (from the app, not editable here)</h3>
-      <p>Client: <b>${data.client.name}</b> \u00b7 DOB: <b>${String(data.client.day).padStart(2, '0')}/${String(data.client.month).padStart(2, '0')}/${data.client.year}</b></p>
-      <p>Driver ${data.original.driverNumber.value} \u00b7 Conductor ${data.original.conductorNumber.value}${data.original.nameNumber ? ' \u00b7 Name Number ' + data.original.nameNumber.value : ''}</p>
-      ${data.corrected ? `<p>Name correction on file: <b>${data.corrected.name}</b></p>` : ''}
-    `;
+    const o = data.original;
+    const dobStr = `${String(data.client.day).padStart(2, '0')}/${String(data.client.month).padStart(2, '0')}/${data.client.year}`;
+    const kb = o.numberKnowledgeBase;
+    const driverPlanet = kb[o.driverNumber.value] ? kb[o.driverNumber.value].chaldeanPlanet : '';
+    const conductorPlanet = kb[o.conductorNumber.value] ? kb[o.conductorNumber.value].chaldeanPlanet : '';
+    const namePlanet = o.nameNumber && kb[o.nameNumber.value] ? kb[o.nameNumber.value].chaldeanPlanet : '';
+
+    document.getElementById('rfName').value = data.client.name || '';
+    document.getElementById('rfDob').value = dobStr;
+    document.getElementById('rfPlaceOfBirth').value = '';
+    document.getElementById('rfTimeOfBirth').value = '';
+
+    document.getElementById('rfMainPlanet').value = driverPlanet ? `${o.driverNumber.value} (${driverPlanet})` : String(o.driverNumber.value);
+    document.getElementById('rfLifePath').value = conductorPlanet ? `${o.conductorNumber.value} (${conductorPlanet})` : String(o.conductorNumber.value);
+    document.getElementById('rfCompoundDestiny').value = o.compoundNumbers && o.compoundNumbers.name ? String(o.compoundNumbers.name) : '';
+    document.getElementById('rfDestinyNumber').value = o.nameNumber ? (namePlanet ? `${o.nameNumber.value} (${namePlanet})` : String(o.nameNumber.value)) : '';
+    document.getElementById('rfSoulNumber').value = o.soulUrgeNumber ? String(o.soulUrgeNumber.value) : '';
+    document.getElementById('rfPersonalityNumber').value = o.personalityNumber ? String(o.personalityNumber.value) : '';
+    document.getElementById('rfCompletePlanes').value = planesTextSummary(o.planes);
+    document.getElementById('rfCombinationInfo').value = o.nameNumber
+      ? `Combination of ${o.driverNumber.value} (${driverPlanet}) and ${o.conductorNumber.value} (${conductorPlanet}) with name on ${o.nameNumber.value} (${namePlanet})`
+      : `Combination of ${o.driverNumber.value} (${driverPlanet}) and ${o.conductorNumber.value} (${conductorPlanet})`;
+
+    const suggestSection = document.getElementById('rfSuggestionsSection');
+    if (data.corrected) {
+      suggestSection.style.display = 'block';
+      const c = data.corrected;
+      const cNamePlanet = c.nameNumber && kb[c.nameNumber.value] ? kb[c.nameNumber.value].chaldeanPlanet : '';
+      document.getElementById('rfSugName').value = c.name || '';
+      document.getElementById('rfSugCompoundDestiny').value = c.compoundNumbers && c.compoundNumbers.name ? String(c.compoundNumbers.name) : '';
+      document.getElementById('rfSugDestinyNumber').value = c.nameNumber ? (cNamePlanet ? `${c.nameNumber.value} (${cNamePlanet})` : String(c.nameNumber.value)) : '';
+      document.getElementById('rfSugSoulNumber').value = c.soulUrgeNumber ? String(c.soulUrgeNumber.value) : '';
+      document.getElementById('rfSugPersonalityNumber').value = c.personalityNumber ? String(c.personalityNumber.value) : '';
+      document.getElementById('rfSugPlanes').value = planesTextSummary(c.planes);
+      document.getElementById('rfNameInterpretation').value = '';
+    } else {
+      suggestSection.style.display = 'none';
+    }
+
+    const favorableNums = (o.numbersAnalysis?.favorableNumbers || []).map((n) => n.number ?? n);
+    const challengingNums = (o.numbersAnalysis?.challengingNumbers || []).map((n) => n.number ?? n);
+    const luckyColors = (o.colorProfile?.best || []).map((c) => c.color);
+    const negativeColors = [...new Set((o.colorProfile?.useModerately || []).map((c) => c.color))];
+    document.getElementById('rfLuckyNumbers').value = favorableNums.join(', ');
+    document.getElementById('rfNegativeNumbers').value = challengingNums.join(', ');
+    document.getElementById('rfLuckyColours').value = luckyColors.join(', ');
+    document.getElementById('rfNegativeColours').value = negativeColors.join(', ');
+
+    document.getElementById('reportRemedies').value = '';
+    document.getElementById('reportConsultantName').value = '';
+    document.getElementById('reportWebsite').value = '';
+    document.getElementById('reportPhone').value = '';
+
     document.getElementById('reportFormOverlay').style.display = 'flex';
   } catch (err) {
     alert('Could not reach the server to build the report.');
@@ -3573,17 +3536,21 @@ async function finalizeAndPrintReport() {
   const genBtn = document.getElementById('reportFormGenerateBtn');
   genBtn.disabled = true; genBtn.textContent = 'Building\u2026';
 
-  const extras = {
-    placeOfBirth: document.getElementById('reportPlaceOfBirth').value.trim(),
-    timeOfBirth: document.getElementById('reportTimeOfBirth').value.trim(),
+  const v = (id) => document.getElementById(id).value.trim();
+  const fields = {
+    name: v('rfName'), dob: v('rfDob'), placeOfBirth: v('rfPlaceOfBirth'), timeOfBirth: v('rfTimeOfBirth'),
+    mainPlanet: v('rfMainPlanet'), lifePath: v('rfLifePath'), compoundDestiny: v('rfCompoundDestiny'),
+    destinyNumber: v('rfDestinyNumber'), soulNumber: v('rfSoulNumber'), personalityNumber: v('rfPersonalityNumber'),
+    completePlanes: v('rfCompletePlanes'), combinationInfo: v('rfCombinationInfo'),
+    sugName: v('rfSugName'), sugCompoundDestiny: v('rfSugCompoundDestiny'), sugDestinyNumber: v('rfSugDestinyNumber'),
+    sugSoulNumber: v('rfSugSoulNumber'), sugPersonalityNumber: v('rfSugPersonalityNumber'), sugPlanes: v('rfSugPlanes'),
+    nameInterpretation: v('rfNameInterpretation'),
+    luckyNumbers: v('rfLuckyNumbers'), negativeNumbers: v('rfNegativeNumbers'), luckyColours: v('rfLuckyColours'), negativeColours: v('rfNegativeColours'),
     remedies: document.getElementById('reportRemedies').value.split('\n').map((s) => s.trim()).filter(Boolean),
-    keyRecommendations: document.getElementById('reportKeyRecommendations').value.split('\n').map((s) => s.trim()).filter(Boolean),
-    consultantName: document.getElementById('reportConsultantName').value.trim(),
-    website: document.getElementById('reportWebsite').value.trim(),
-    phone: document.getElementById('reportPhone').value.trim(),
+    consultantName: v('reportConsultantName'), website: v('reportWebsite'), phone: v('reportPhone'),
   };
 
-  document.getElementById('fullReportPrintArea').innerHTML = buildFullReportHtml(_pendingReportData, extras);
+  document.getElementById('fullReportPrintArea').innerHTML = buildFullReportHtml(_pendingReportData, fields);
   document.getElementById('fullReportPrintArea').style.display = 'block';
   closeReportForm();
   window.print();
