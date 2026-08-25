@@ -739,11 +739,6 @@
       <input type="text" id="actorsSearchInput" placeholder="Search by name\u2026" class="actors-search-input">
       <div class="actors-chip-group" id="actorsCategoryChips">
         <button type="button" class="actors-chip active" data-category="">All</button>
-        <button type="button" class="actors-chip" data-category="Bollywood">Bollywood</button>
-        <button type="button" class="actors-chip" data-category="Tollywood">Tollywood</button>
-        <button type="button" class="actors-chip" data-category="Tamil">Tamil</button>
-        <button type="button" class="actors-chip" data-category="Malayalam">Malayalam</button>
-        <button type="button" class="actors-chip" data-category="Kannada">Kannada</button>
       </div>
       <div class="actors-chip-group" id="actorsGenderChips">
         <button type="button" class="actors-chip active" data-gender="">All</button>
@@ -763,6 +758,7 @@
 </div>
 
 <div class="wizard-overlay" id="actorsAddOverlay" style="display:none;">
+  <datalist id="actorsCategoryDatalist"></datalist>
   <div class="wizard-shell" style="max-width:560px;">
     <div class="wizard-header">
       <div><h2>Add Actors</h2></div>
@@ -778,14 +774,8 @@
         <div class="field"><label for="actorAddName">Name</label><input type="text" id="actorAddName" placeholder="e.g. B. Saroja Devi"></div>
         <div class="field"><label for="actorAddDob">Date of birth</label><input type="date" id="actorAddDob"></div>
         <div class="field">
-          <label for="actorAddCategory">Category</label>
-          <select id="actorAddCategory" style="width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;">
-            <option value="Bollywood">Bollywood</option>
-            <option value="Tollywood" selected>Tollywood</option>
-            <option value="Tamil">Tamil</option>
-            <option value="Malayalam">Malayalam</option>
-            <option value="Kannada">Kannada</option>
-          </select>
+          <label for="actorAddCategory">Category <span style="color:var(--text-muted);font-weight:400;">(pick one or type a new one)</span></label>
+          <input type="text" id="actorAddCategory" list="actorsCategoryDatalist" value="Tollywood" style="width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;">
         </div>
         <div class="field">
           <label for="actorAddGender">Gender</label>
@@ -805,14 +795,8 @@
           <textarea id="actorsBulkText" rows="10" class="report-form-textarea" placeholder="B. Saroja Devi \u2013 7 January 1938&#10;K. Jamuna \u2013 30 August 1936"></textarea>
         </div>
         <div class="field">
-          <label for="actorsBulkCategory">Category (applies to all)</label>
-          <select id="actorsBulkCategory" style="width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;">
-            <option value="Bollywood">Bollywood</option>
-            <option value="Tollywood" selected>Tollywood</option>
-            <option value="Tamil">Tamil</option>
-            <option value="Malayalam">Malayalam</option>
-            <option value="Kannada">Kannada</option>
-          </select>
+          <label for="actorsBulkCategory">Category (applies to all) <span style="color:var(--text-muted);font-weight:400;">(pick one or type a new one)</span></label>
+          <input type="text" id="actorsBulkCategory" list="actorsCategoryDatalist" value="Tollywood" style="width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;">
         </div>
         <div class="field">
           <label for="actorsBulkGender">Gender (applies to all)</label>
@@ -2238,6 +2222,7 @@ document.getElementById('tabNav').addEventListener('click', (e) => {
     loadNews();
   }
   if (btn.dataset.tab === 'tab10') {
+    loadActorsCategories();
     loadActorsList();
   }
   window.scrollTo(0, 0);
@@ -3304,6 +3289,22 @@ function toggleDailyReadingAudio(topic, excerptTexts, btn) {
 let _actorsState = { category: '', gender: '', search: '', showAll: false };
 let _actorsSearchDebounce = null;
 
+async function loadActorsCategories() {
+  try {
+    const res = await fetch('/api/actors/categories');
+    const data = await res.json();
+    const categories = data.categories || [];
+
+    const chipGroup = document.getElementById('actorsCategoryChips');
+    const currentCategory = _actorsState.category;
+    chipGroup.innerHTML = '<button type="button" class="actors-chip' + (currentCategory === '' ? ' active' : '') + '" data-category="">All</button>' +
+      categories.map((c) => `<button type="button" class="actors-chip${c === currentCategory ? ' active' : ''}" data-category="${c}">${c}</button>`).join('');
+
+    const datalist = document.getElementById('actorsCategoryDatalist');
+    datalist.innerHTML = categories.map((c) => `<option value="${c}">`).join('');
+  } catch (err) { /* filter chips just stay at "All" if this fails -- non-critical */ }
+}
+
 async function loadActorsList() {
   const grid = document.getElementById('actorsResultsGrid');
   if (!grid) return;
@@ -3509,6 +3510,7 @@ document.getElementById('actorsAddSubmitBtn').addEventListener('click', async ()
     } else {
       document.getElementById('actorsBulkText').value = '';
     }
+    loadActorsCategories();
     loadActorsList();
   } catch (err) {
     resultEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';

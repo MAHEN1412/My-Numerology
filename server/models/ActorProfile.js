@@ -13,7 +13,7 @@ const ActorProfileSchema = new mongoose.Schema({
   day: { type: Number, required: true, min: 1, max: 31 },
   month: { type: Number, required: true, min: 1, max: 12 },
   year: { type: Number, required: true, min: 1000, max: 9999 },
-  category: { type: String, required: true, enum: ['Bollywood', 'Tollywood', 'Tamil', 'Malayalam', 'Kannada'], index: true },
+  category: { type: String, required: true, trim: true, maxlength: 40, index: true }, // free-text, not a fixed list -- new categories can be added any time
   gender: { type: String, required: true, enum: ['Actor', 'Actress'], index: true },
   trending: { type: Boolean, default: false, index: true }, // shown in the initial view before "Show All"
   createdAt: { type: Date, default: Date.now },

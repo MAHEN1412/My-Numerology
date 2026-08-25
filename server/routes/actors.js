@@ -6,6 +6,20 @@ const { requireAdmin } = require('../utils/adminAuth');
 const router = express.Router();
 
 // GET /api/actors?category=Tollywood&gender=Actress&search=priya&trendingOnly=true&limit=20
+// GET /api/actors/categories -- distinct categories actually in use, so
+// the frontend's filter chips and Add form reflect reality instead of a
+// hardcoded list that can't grow.
+router.get('/categories', async (req, res) => {
+  try {
+    const inUse = await ActorProfile.distinct('category');
+    const defaults = ['Bollywood', 'Tollywood', 'Tamil', 'Malayalam', 'Kannada'];
+    const all = Array.from(new Set([...defaults, ...inUse])).sort();
+    res.json({ categories: all });
+  } catch (err) {
+    res.status(500).json({ error: 'Could not load categories.' });
+  }
+});
+
 router.get('/', async (req, res) => {
   try {
     const { category, gender, search, trendingOnly, limit } = req.query;
@@ -63,7 +77,6 @@ router.post('/bulk-import', requireAdmin, async (req, res) => {
       return res.status(400).json({ error: 'Provide a non-empty actors array.' });
     }
 
-    const validCategories = ['Bollywood', 'Tollywood', 'Tamil', 'Malayalam', 'Kannada'];
     let inserted = 0;
     let skipped = 0;
     const errors = [];
@@ -73,8 +86,9 @@ router.post('/bulk-import', requireAdmin, async (req, res) => {
         errors.push(`Skipped "${a.name || 'unnamed'}" -- missing required field.`);
         continue;
       }
-      if (!validCategories.includes(a.category)) {
-        errors.push(`Skipped "${a.name}" -- invalid category "${a.category}".`);
+      const category = String(a.category).trim();
+      if (!category || category.length > 40) {
+        errors.push(`Skipped "${a.name}" -- category must be 1-40 characters.`);
         continue;
       }
       if (!['Actor', 'Actress'].includes(a.gender)) {
@@ -86,7 +100,7 @@ router.post('/bulk-import', requireAdmin, async (req, res) => {
 
       await ActorProfile.create({
         name: a.name, day: a.day, month: a.month, year: a.year,
-        category: a.category, gender: a.gender, trending: !!a.trending,
+        category, gender: a.gender, trending: !!a.trending,
       });
       inserted++;
     }
