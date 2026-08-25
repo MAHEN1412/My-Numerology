@@ -731,6 +731,10 @@
   </header>
 
   <div class="wrap" style="padding-bottom:56px;">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+      <button type="button" id="actorsAddBtn">+ Add Actors</button>
+    </div>
+
     <div class="actors-filter-bar">
       <input type="text" id="actorsSearchInput" placeholder="Search by name\u2026" class="actors-search-input">
       <div class="actors-chip-group" id="actorsCategoryChips">
@@ -754,6 +758,75 @@
 
     <div style="text-align:center;margin-top:24px;">
       <button type="button" class="ghost" id="actorsShowAllBtn">Show All</button>
+    </div>
+  </div>
+</div>
+
+<div class="wizard-overlay" id="actorsAddOverlay" style="display:none;">
+  <div class="wizard-shell" style="max-width:560px;">
+    <div class="wizard-header">
+      <div><h2>Add Actors</h2></div>
+      <button type="button" class="case-drawer-close" id="actorsAddCloseBtn">&#10005;</button>
+    </div>
+    <div class="wizard-body">
+      <div class="actors-chip-group" style="margin-bottom:18px;">
+        <button type="button" class="actors-chip active" id="actorsAddModeSingle">Add one</button>
+        <button type="button" class="actors-chip" id="actorsAddModeBulk">Paste a list</button>
+      </div>
+
+      <div id="actorsAddSingleForm">
+        <div class="field"><label for="actorAddName">Name</label><input type="text" id="actorAddName" placeholder="e.g. B. Saroja Devi"></div>
+        <div class="field"><label for="actorAddDob">Date of birth</label><input type="date" id="actorAddDob"></div>
+        <div class="field">
+          <label for="actorAddCategory">Category</label>
+          <select id="actorAddCategory" style="width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;">
+            <option value="Bollywood">Bollywood</option>
+            <option value="Tollywood" selected>Tollywood</option>
+            <option value="Tamil">Tamil</option>
+            <option value="Malayalam">Malayalam</option>
+            <option value="Kannada">Kannada</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="actorAddGender">Gender</label>
+          <select id="actorAddGender" style="width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;">
+            <option value="Actress" selected>Actress</option>
+            <option value="Actor">Actor</option>
+          </select>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-dim);margin-bottom:14px;"><input type="checkbox" id="actorAddTrending"> Show in trending / initial view</label>
+        <div id="actorsAddSingleResult"></div>
+      </div>
+
+      <div id="actorsAddBulkForm" style="display:none;">
+        <p style="font-size:12px;color:var(--text-dim);margin:0 0 12px;">Paste a list, one person per line, in the format: <code>Name \u2013 DD Month YYYY</code>. The category and gender below apply to every line pasted.</p>
+        <div class="field">
+          <label for="actorsBulkText">Paste list</label>
+          <textarea id="actorsBulkText" rows="10" class="report-form-textarea" placeholder="B. Saroja Devi \u2013 7 January 1938&#10;K. Jamuna \u2013 30 August 1936"></textarea>
+        </div>
+        <div class="field">
+          <label for="actorsBulkCategory">Category (applies to all)</label>
+          <select id="actorsBulkCategory" style="width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;">
+            <option value="Bollywood">Bollywood</option>
+            <option value="Tollywood" selected>Tollywood</option>
+            <option value="Tamil">Tamil</option>
+            <option value="Malayalam">Malayalam</option>
+            <option value="Kannada">Kannada</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="actorsBulkGender">Gender (applies to all)</label>
+          <select id="actorsBulkGender" style="width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;">
+            <option value="Actress" selected>Actress</option>
+            <option value="Actor">Actor</option>
+          </select>
+        </div>
+        <div id="actorsAddBulkResult"></div>
+      </div>
+    </div>
+    <div class="wizard-footer">
+      <div style="flex:1;"></div>
+      <button type="button" id="actorsAddSubmitBtn">Add</button>
     </div>
   </div>
 </div>
@@ -3328,6 +3401,120 @@ document.getElementById('actorsShowAllBtn').addEventListener('click', () => {
   _actorsState.showAll = !_actorsState.showAll;
   document.getElementById('actorsShowAllBtn').textContent = _actorsState.showAll ? 'Show Trending Only' : 'Show All';
   loadActorsList();
+});
+
+// ===== Add Actors modal =====
+const ACTORS_MONTHS = {
+  january: 1, february: 2, march: 3, april: 4, may: 5, june: 6,
+  july: 7, august: 8, september: 9, october: 10, november: 11, december: 12,
+};
+
+// Parses lines like "Name – DD Month YYYY" -- same logic used to prepare
+// the very first batch, now available directly in the app so nothing
+// needs to be run on a separate computer again.
+function parseActorLines(text, category, gender) {
+  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+  const parsed = [];
+  const skipped = [];
+
+  const pattern = /^(.+?)\s*[\u2013-]\s*(\d{1,2})\s+(\w+)\s+(\d{4})$/;
+
+  lines.forEach((line) => {
+    const m = line.match(pattern);
+    if (!m) { skipped.push({ line, reason: 'Did not match "Name \u2013 DD Month YYYY" format' }); return; }
+    const [, name, dayStr, monthName, yearStr] = m;
+    const month = ACTORS_MONTHS[monthName.toLowerCase()];
+    if (!month) { skipped.push({ line, reason: `Unrecognized month: ${monthName}` }); return; }
+    const day = Number(dayStr);
+    const year = Number(yearStr);
+    if (day < 1 || day > 31) { skipped.push({ line, reason: `Invalid day: ${day}` }); return; }
+    parsed.push({ name: name.trim(), day, month, year, category, gender, trending: false });
+  });
+
+  return { parsed, skipped };
+}
+
+function openActorsAddModal() {
+  document.getElementById('actorsAddOverlay').style.display = 'flex';
+  document.getElementById('actorsAddSingleResult').innerHTML = '';
+  document.getElementById('actorsAddBulkResult').innerHTML = '';
+}
+document.getElementById('actorsAddBtn').addEventListener('click', openActorsAddModal);
+document.getElementById('actorsAddCloseBtn').addEventListener('click', () => {
+  document.getElementById('actorsAddOverlay').style.display = 'none';
+});
+
+document.getElementById('actorsAddModeSingle').addEventListener('click', () => {
+  document.getElementById('actorsAddModeSingle').classList.add('active');
+  document.getElementById('actorsAddModeBulk').classList.remove('active');
+  document.getElementById('actorsAddSingleForm').style.display = 'block';
+  document.getElementById('actorsAddBulkForm').style.display = 'none';
+  document.getElementById('actorsAddSubmitBtn').textContent = 'Add';
+});
+document.getElementById('actorsAddModeBulk').addEventListener('click', () => {
+  document.getElementById('actorsAddModeBulk').classList.add('active');
+  document.getElementById('actorsAddModeSingle').classList.remove('active');
+  document.getElementById('actorsAddBulkForm').style.display = 'block';
+  document.getElementById('actorsAddSingleForm').style.display = 'none';
+  document.getElementById('actorsAddSubmitBtn').textContent = 'Import list';
+});
+
+document.getElementById('actorsAddSubmitBtn').addEventListener('click', async () => {
+  const isBulk = document.getElementById('actorsAddBulkForm').style.display !== 'none';
+  const btn = document.getElementById('actorsAddSubmitBtn');
+  const resultEl = isBulk ? document.getElementById('actorsAddBulkResult') : document.getElementById('actorsAddSingleResult');
+
+  let actors = [];
+  if (isBulk) {
+    const text = document.getElementById('actorsBulkText').value;
+    const category = document.getElementById('actorsBulkCategory').value;
+    const gender = document.getElementById('actorsBulkGender').value;
+    const { parsed, skipped } = parseActorLines(text, category, gender);
+    if (parsed.length === 0) {
+      resultEl.innerHTML = '<p class="wizard-skip-note">Nothing valid to import \u2014 check the format.</p>';
+      return;
+    }
+    actors = parsed;
+    if (skipped.length > 0) {
+      resultEl.innerHTML = `<p class="wizard-skip-note">${skipped.length} line(s) skipped: ${skipped.map((s) => s.line).join('; ')}</p>`;
+    }
+  } else {
+    const name = document.getElementById('actorAddName').value.trim();
+    const dobVal = document.getElementById('actorAddDob').value;
+    if (!name || !dobVal) { resultEl.innerHTML = '<p class="wizard-skip-note">Name and date of birth are required.</p>'; return; }
+    const [year, month, day] = dobVal.split('-').map(Number);
+    actors = [{
+      name, day, month, year,
+      category: document.getElementById('actorAddCategory').value,
+      gender: document.getElementById('actorAddGender').value,
+      trending: document.getElementById('actorAddTrending').checked,
+    }];
+  }
+
+  btn.disabled = true; btn.textContent = 'Saving\u2026';
+  try {
+    const res = await fetch('/api/actors/bulk-import', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ actors }),
+    });
+    const data = await res.json();
+    if (!res.ok) { resultEl.innerHTML = `<p class="wizard-skip-note">${data.error || 'Could not save.'}</p>`; return; }
+
+    const summary = `<p style="font-size:13px;color:var(--text);margin-top:8px;">Added ${data.inserted}${data.skipped ? `, skipped ${data.skipped} already on file` : ''}${data.errors && data.errors.length ? `, ${data.errors.length} error(s)` : ''}.</p>`;
+    resultEl.innerHTML = resultEl.innerHTML + summary;
+
+    if (!isBulk) {
+      document.getElementById('actorAddName').value = '';
+      document.getElementById('actorAddDob').value = '';
+    } else {
+      document.getElementById('actorsBulkText').value = '';
+    }
+    loadActorsList();
+  } catch (err) {
+    resultEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';
+  } finally {
+    btn.disabled = false; btn.textContent = isBulk ? 'Import list' : 'Add';
+  }
 });
 
 async function loadTodaysBirthdays(filter = 'world') {

@@ -1,6 +1,7 @@
 const express = require('express');
 const ActorProfile = require('../models/ActorProfile');
 const calc = require('../utils/calculationEngine');
+const { requireAdmin } = require('../utils/adminAuth');
 
 const router = express.Router();
 
@@ -55,7 +56,7 @@ router.get('/:id/loshu', async (req, res) => {
 // POST /api/actors/bulk-import
 // body: { actors: [{ name, day, month, year, category, gender, trending? }, ...] }
 // Skips duplicates (same name + DOB already on file) rather than erroring the whole batch.
-router.post('/bulk-import', async (req, res) => {
+router.post('/bulk-import', requireAdmin, async (req, res) => {
   try {
     const { actors } = req.body;
     if (!Array.isArray(actors) || actors.length === 0) {
