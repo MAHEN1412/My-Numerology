@@ -71,16 +71,49 @@ router.get('/list', requireAdmin, async (req, res) => {
 // PUT /api/dashboard/:id — edit user notes and/or status (everything else is a historical record)
 router.put('/:id', requireAdmin, async (req, res) => {
   try {
-    const { userNotes, status, correctedNameSuggestion } = req.body;
+    const { userNotes, status, correctedNameSuggestion, name, phone, day, month, year, crystalSuggestion } = req.body;
+    const existing = await SavedProfile.findById(req.params.id);
+    if (!existing) return res.status(404).json({ error: 'Profile not found.' });
+
     const update = { updatedAt: new Date() };
     if (userNotes !== undefined) update.userNotes = userNotes || '';
     if (status !== undefined && ['Active', 'Review', 'Completed', 'Follow-up'].includes(status)) update.status = status;
     if (correctedNameSuggestion !== undefined) update.correctedNameSuggestion = correctedNameSuggestion || '';
+    if (name !== undefined) update.name = String(name).trim();
+    if (phone !== undefined) update.phone = String(phone).trim();
+    if (day !== undefined) update.day = Number(day);
+    if (month !== undefined) update.month = Number(month);
+    if (year !== undefined) update.year = Number(year);
+    if (crystalSuggestion !== undefined) update.crystalSuggestion = String(crystalSuggestion).trim();
+
+    // If the DOB or name actually changed, the previously-stored
+    // Driver/Conductor/Name numbers would otherwise go stale -- recompute
+    // them from the (possibly new) values so the saved case stays
+    // internally consistent with what it now says.
+    const dobChanged = day !== undefined || month !== undefined || year !== undefined;
+    const nameChanged = name !== undefined;
+    if (dobChanged || nameChanged) {
+      const finalDay = update.day ?? existing.day;
+      const finalMonth = update.month ?? existing.month;
+      const finalYear = update.year ?? existing.year;
+      const finalName = update.name !== undefined ? update.name : existing.name;
+      if (finalDay && finalMonth && finalYear) {
+        const driver = calc.calculateDriverNumber(finalDay);
+        const conductor = calc.calculateConductorNumber(finalDay, finalMonth, finalYear);
+        update.driverNumber = driver.value;
+        update.conductorNumber = conductor.value;
+        if (finalName) {
+          const nameNum = calc.calculateNameNumber(finalName, existing.system || 'chaldean');
+          update.nameNumber = nameNum ? nameNum.value : undefined;
+        }
+      }
+    }
 
     const profile = await SavedProfile.findByIdAndUpdate(req.params.id, update, { new: true });
     if (!profile) return res.status(404).json({ error: 'Profile not found.' });
     res.json({ profile });
   } catch (err) {
+    console.error('Case update failed:', err.message);
     res.status(400).json({ error: 'Could not update this profile.' });
   }
 });

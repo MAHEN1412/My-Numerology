@@ -1570,6 +1570,26 @@
 
 <div id="fullReportPrintArea"></div>
 
+<div class="wizard-overlay" id="caseEditOverlay" style="display:none;">
+  <div class="wizard-shell" style="max-width:480px;">
+    <div class="wizard-header">
+      <div><h2>Edit Case Details</h2></div>
+      <button type="button" class="case-drawer-close" id="caseEditCloseBtn">&#10005;</button>
+    </div>
+    <div class="wizard-body">
+      <div class="field"><label for="caseEditName">Name</label><input type="text" id="caseEditName"></div>
+      <div class="field"><label for="caseEditPhone">Phone</label><input type="text" id="caseEditPhone"></div>
+      <div class="field"><label for="caseEditDob">Date of birth</label><input type="date" id="caseEditDob"></div>
+      <div class="field"><label for="caseEditCrystal">Crystal suggestion</label><input type="text" id="caseEditCrystal"></div>
+      <div id="caseEditResult"></div>
+    </div>
+    <div class="wizard-footer">
+      <div style="flex:1;"></div>
+      <button type="button" id="caseEditSaveBtn">Save changes</button>
+    </div>
+  </div>
+</div>
+
 <div class="wizard-overlay" id="reportFormOverlay" style="display:none;">
   <div class="wizard-shell" style="max-width:640px;max-height:90vh;">
     <div class="wizard-header">
@@ -4193,6 +4213,63 @@ function initials(name) {
   return name.trim().split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
 }
 
+function openCaseEditModal(p) {
+  document.getElementById('caseEditName').value = p.name || '';
+  document.getElementById('caseEditPhone').value = p.phone || '';
+  if (p.day && p.month && p.year) {
+    document.getElementById('caseEditDob').value = `${p.year}-${String(p.month).padStart(2, '0')}-${String(p.day).padStart(2, '0')}`;
+  } else {
+    document.getElementById('caseEditDob').value = '';
+  }
+  document.getElementById('caseEditCrystal').value = p.crystalSuggestion || '';
+  document.getElementById('caseEditResult').innerHTML = '';
+  document.getElementById('caseEditOverlay').style.display = 'flex';
+
+  document.getElementById('caseEditSaveBtn').onclick = () => saveCaseEdit(p._id);
+}
+
+async function saveCaseEdit(caseId) {
+  const btn = document.getElementById('caseEditSaveBtn');
+  const resultEl = document.getElementById('caseEditResult');
+  const name = document.getElementById('caseEditName').value.trim();
+  const phone = document.getElementById('caseEditPhone').value.trim();
+  const dobVal = document.getElementById('caseEditDob').value;
+  const crystalSuggestion = document.getElementById('caseEditCrystal').value.trim();
+
+  const body = { name, phone, crystalSuggestion };
+  if (dobVal) {
+    const [year, month, day] = dobVal.split('-').map(Number);
+    Object.assign(body, { day, month, year });
+  }
+
+  btn.disabled = true; btn.textContent = 'Saving\u2026';
+  try {
+    const res = await fetch('/api/dashboard/' + caseId, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) { resultEl.innerHTML = `<p class="wizard-skip-note">${data.error || 'Could not save.'}</p>`; return; }
+
+    document.getElementById('caseEditOverlay').style.display = 'none';
+    closeCaseDrawer();
+    // Reopen the drawer fresh with the updated data, and refresh the
+    // underlying case list + KPIs so the table reflects the change too.
+    if (window._savedProfilesById) window._savedProfilesById[caseId] = data.profile;
+    openCaseDrawer(caseId);
+    loadSavedProfiles();
+    loadKPIs();
+  } catch (err) {
+    resultEl.innerHTML = `<p class="wizard-skip-note">Error: ${err.name || 'Unknown'} \u2014 ${err.message || 'no message'}</p>`;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save changes';
+  }
+}
+
+document.getElementById('caseEditCloseBtn').addEventListener('click', () => {
+  document.getElementById('caseEditOverlay').style.display = 'none';
+});
+
 function closeCaseDrawer() {
   const existing = document.getElementById('caseDrawerRoot');
   if (existing) existing.remove();
@@ -4219,10 +4296,24 @@ function openCaseDrawer(id) {
           </div>
         </div>
         <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;">
+          <button type="button" class="ghost" id="caseDrawerEditBtn" style="padding:8px 14px;font-size:13px;">Edit Details</button>
+          <button type="button" class="ghost" id="caseDrawerEditBtn" style="padding:8px 14px;font-size:13px;">Edit</button>
           <button type="button" class="ghost" id="caseDrawerReportBtn" style="padding:8px 14px;font-size:13px;">Generate Full Report</button>
           <button type="button" class="ghost" id="caseDrawerPrintBtn" style="padding:8px 14px;font-size:13px;">Quick Print</button>
           <button type="button" class="case-drawer-close" id="caseDrawerCloseBtn">\u2715</button>
         </div>
+      </div>
+
+      <div class="case-panel no-print" id="caseDrawerEditForm" style="display:none;">
+        <h3>Edit case details</h3>
+        <div class="field"><label for="caseDrawerEditName">Name</label><input type="text" id="caseDrawerEditName" value="${p.name || ''}"></div>
+        <div class="field"><label for="caseDrawerEditPhone">Phone</label><input type="text" id="caseDrawerEditPhone" value="${p.phone || ''}"></div>
+        <div class="field"><label for="caseDrawerEditDob">Date of birth</label><input type="date" id="caseDrawerEditDob" value="${p.day && p.month && p.year ? `${p.year}-${String(p.month).padStart(2, '0')}-${String(p.day).padStart(2, '0')}` : ''}"></div>
+        <div style="display:flex;gap:8px;">
+          <button type="button" id="caseDrawerEditSaveBtn">Save</button>
+          <button type="button" class="ghost" id="caseDrawerEditCancelBtn">Cancel</button>
+        </div>
+        <div id="caseDrawerEditResult" style="margin-top:8px;"></div>
       </div>
 
       <div id="casePrintArea">
@@ -4285,12 +4376,57 @@ function openCaseDrawer(id) {
   root.querySelector('.case-overlay').addEventListener('click', closeCaseDrawer);
   document.getElementById('caseDrawerPrintBtn').addEventListener('click', () => window.print());
   document.getElementById('caseDrawerReportBtn').addEventListener('click', () => generateFullReport(p._id));
+  document.getElementById('caseDrawerEditBtn').addEventListener('click', () => openCaseEditModal(p));
   document.getElementById('caseDrawerNameCorrectionBtn').addEventListener('click', () => runCaseDrawerNameCorrection(p));
   document.getElementById('caseDrawerNameCorrectionInput').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') runCaseDrawerNameCorrection(p);
   });
 
+  document.getElementById('caseDrawerEditBtn').addEventListener('click', () => {
+    document.getElementById('caseDrawerEditForm').style.display = 'block';
+  });
+  document.getElementById('caseDrawerEditCancelBtn').addEventListener('click', () => {
+    document.getElementById('caseDrawerEditForm').style.display = 'none';
+  });
+  document.getElementById('caseDrawerEditSaveBtn').addEventListener('click', () => saveCaseDrawerEdit(p));
+
   loadCaseDrawerFullAnalysis(p);
+}
+
+async function saveCaseDrawerEdit(p) {
+  const btn = document.getElementById('caseDrawerEditSaveBtn');
+  const resultEl = document.getElementById('caseDrawerEditResult');
+  const name = document.getElementById('caseDrawerEditName').value.trim();
+  const phone = document.getElementById('caseDrawerEditPhone').value.trim();
+  const dobVal = document.getElementById('caseDrawerEditDob').value;
+
+  const payload = { name, phone };
+  if (dobVal) {
+    const [year, month, day] = dobVal.split('-').map(Number);
+    Object.assign(payload, { day, month, year });
+  }
+
+  btn.disabled = true; btn.textContent = 'Saving\u2026';
+  try {
+    const res = await fetch('/api/dashboard/' + p._id, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) { resultEl.innerHTML = `<p class="wizard-skip-note">${data.error || 'Could not save.'}</p>`; return; }
+
+    // Refresh the whole dashboard list (simplest way to keep the table in
+    // sync) and reopen this same case's drawer with the updated data,
+    // rather than trying to patch every displayed value individually.
+    if (window._savedProfilesById) window._savedProfilesById[p._id] = data.profile;
+    closeCaseDrawer();
+    loadDashboard();
+    openCaseDrawer(p._id);
+  } catch (err) {
+    resultEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save';
+  }
 }
 
 async function runCaseDrawerNameCorrection(p) {
