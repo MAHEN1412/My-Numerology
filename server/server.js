@@ -49,6 +49,7 @@ const businessNameRouter = require('./routes/businessName');
 const genericNumberRouter = require('./routes/genericNumber');
 const relationshipRouter = require('./routes/relationship');
 const dashboardRouter = require('./routes/dashboard');
+const actorsRouter = require('./routes/actors');
 const newsRouter = require('./routes/news');
 
 const app = express();
@@ -64,7 +65,7 @@ if (!process.env.ADMIN_PASSWORD || !process.env.SESSION_SECRET) {
   console.warn('ADMIN_PASSWORD and/or SESSION_SECRET not set — the book management admin panel will be inaccessible until both are configured. See .env.example.');
 }
 
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 
 // Basic abuse protection on the write endpoint
 const createLimiter = rateLimit({
@@ -108,6 +109,7 @@ app.use('/api/business-name', businessNameRouter);
 app.use('/api/numbers', genericNumberRouter);
 app.use('/api/relationship', relationshipRouter);
 app.use('/api/dashboard', dashboardRouter);
+app.use('/api/actors', actorsRouter);
 app.use('/api/news', newsRouter);
 
 app.get('/api/health', (req, res) => {
