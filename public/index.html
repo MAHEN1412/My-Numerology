@@ -789,7 +789,7 @@
       </div>
 
       <div id="actorsAddBulkForm" style="display:none;">
-        <p style="font-size:12px;color:var(--text-dim);margin:0 0 12px;">Paste a list, one person per line, in the format: <code>Name \u2013 DD Month YYYY</code>. The category and gender below apply to every line pasted.</p>
+        <p style="font-size:12px;color:var(--text-dim);margin:0 0 12px;">Paste a list, one person per line: <code>Name DD Month YYYY</code>, e.g. <code>Posani Krishna Murali 22 January 1958</code>. A dash before the date (<code>Name \u2013 DD Month YYYY</code>) also works. The category and gender below apply to every line pasted.</p>
         <div class="field">
           <label for="actorsBulkText">Paste list</label>
           <textarea id="actorsBulkText" rows="10" class="report-form-textarea" placeholder="B. Saroja Devi \u2013 7 January 1938&#10;K. Jamuna \u2013 30 August 1936"></textarea>
@@ -3418,18 +3418,21 @@ function parseActorLines(text, category, gender) {
   const parsed = [];
   const skipped = [];
 
-  const pattern = /^(.+?)\s*[\u2013-]\s*(\d{1,2})\s+(\w+)\s+(\d{4})$/;
+  // Accepts a separating dash (en-dash or hyphen) OR just a space between
+  // the name and the date -- some people naturally type it without a dash.
+  const pattern = /^(.+?)\s+(\d{1,2})\s+(\w+)\s+(\d{4})\s*(?:\([^)]*\))?$/;
 
   lines.forEach((line) => {
     const m = line.match(pattern);
-    if (!m) { skipped.push({ line, reason: 'Did not match "Name \u2013 DD Month YYYY" format' }); return; }
-    const [, name, dayStr, monthName, yearStr] = m;
+    if (!m) { skipped.push({ line, reason: 'Did not match "Name DD Month YYYY" format' }); return; }
+    let [, name, dayStr, monthName, yearStr] = m;
+    name = name.replace(/[\u2013-]\s*$/, '').trim(); // strip a trailing dash left over from "Name – "
     const month = ACTORS_MONTHS[monthName.toLowerCase()];
     if (!month) { skipped.push({ line, reason: `Unrecognized month: ${monthName}` }); return; }
     const day = Number(dayStr);
     const year = Number(yearStr);
     if (day < 1 || day > 31) { skipped.push({ line, reason: `Invalid day: ${day}` }); return; }
-    parsed.push({ name: name.trim(), day, month, year, category, gender, trending: false });
+    parsed.push({ name, day, month, year, category, gender, trending: false });
   });
 
   return { parsed, skipped };
@@ -3498,7 +3501,18 @@ document.getElementById('actorsAddSubmitBtn').addEventListener('click', async ()
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ actors }),
     });
-    const data = await res.json();
+
+    const rawText = await res.text();
+    let data;
+    try {
+      data = JSON.parse(rawText);
+    } catch (parseErr) {
+      // The server responded, but not with JSON -- likely a platform-level
+      // error page (timeout, crash, proxy error), not a clean API response.
+      resultEl.innerHTML = `<p class="wizard-skip-note">Server returned status ${res.status} but not valid JSON. First 200 chars of response: ${rawText.slice(0, 200).replace(/</g, '&lt;')}</p>`;
+      return;
+    }
+
     if (!res.ok) { resultEl.innerHTML = `<p class="wizard-skip-note">${data.error || 'Could not save.'}</p>`; return; }
 
     const summary = `<p style="font-size:13px;color:var(--text);margin-top:8px;">Added ${data.inserted}${data.skipped ? `, skipped ${data.skipped} already on file` : ''}${data.errors && data.errors.length ? `, ${data.errors.length} error(s)` : ''}.</p>`;
@@ -3513,7 +3527,7 @@ document.getElementById('actorsAddSubmitBtn').addEventListener('click', async ()
     loadActorsCategories();
     loadActorsList();
   } catch (err) {
-    resultEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';
+    resultEl.innerHTML = `<p class="wizard-skip-note">Error: ${err.name || 'Unknown'} \u2014 ${err.message || 'no message'}</p>`;
   } finally {
     btn.disabled = false; btn.textContent = isBulk ? 'Import list' : 'Add';
   }
