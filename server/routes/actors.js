@@ -50,6 +50,46 @@ router.get('/', async (req, res) => {
 });
 
 // GET /api/actors/:id/loshu -- full Lo Shu grid for one actor, computed live
+// GET /api/actors/match?day=X&month=Y&year=Z
+// Finds public figures who share either the EXACT same date of birth, or
+// the same Lo Shu grid pattern (identical digit counts across all 9
+// positions -- many different birth dates can share one pattern, since
+// Lo Shu depends on which digits appear and how often, not the date
+// itself). Both are real, computed comparisons -- never a fuzzy or
+// invented "similarity" score.
+router.get('/match', async (req, res) => {
+  try {
+    const day = Number(req.query.day);
+    const month = Number(req.query.month);
+    const year = Number(req.query.year);
+    if (!day || !month || !year) return res.status(400).json({ error: 'day, month, and year are required.' });
+
+    const clientGrid = calc.generateLoShuGrid(day, month, year, {});
+    const clientPattern = Array.from({ length: 9 }, (_, i) => clientGrid[i + 1] || 0).join(',');
+
+    const allActors = await ActorProfile.find({});
+
+    const exactDobMatches = [];
+    const loShuPatternMatches = [];
+
+    for (const a of allActors) {
+      const isExactDob = a.day === day && a.month === month && a.year === year;
+      const actorGrid = calc.generateLoShuGrid(a.day, a.month, a.year, {});
+      const actorPattern = Array.from({ length: 9 }, (_, i) => actorGrid[i + 1] || 0).join(',');
+      const isPatternMatch = actorPattern === clientPattern;
+
+      const summary = { _id: a._id, name: a.name, category: a.category, gender: a.gender, day: a.day, month: a.month, year: a.year };
+      if (isExactDob) exactDobMatches.push(summary);
+      else if (isPatternMatch) loShuPatternMatches.push(summary); // don't double-list an exact match in both
+    }
+
+    res.json({ exactDobMatches, loShuPatternMatches });
+  } catch (err) {
+    console.error('Actor match failed:', err.message);
+    res.status(500).json({ error: 'Could not check for matches right now.' });
+  }
+});
+
 router.get('/:id/loshu', async (req, res) => {
   try {
     const a = await ActorProfile.findById(req.params.id);
