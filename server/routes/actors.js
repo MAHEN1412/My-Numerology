@@ -146,4 +146,40 @@ router.post('/bulk-import', requireAdmin, async (req, res) => {
   }
 });
 
+// PUT /api/actors/:id -- edit an existing actor's details
+router.put('/:id', requireAdmin, async (req, res) => {
+  try {
+    const { name, day, month, year, category, gender, trending } = req.body;
+    const update = {};
+    if (name !== undefined) update.name = String(name).trim();
+    if (day !== undefined) update.day = Number(day);
+    if (month !== undefined) update.month = Number(month);
+    if (year !== undefined) update.year = Number(year);
+    if (category !== undefined) update.category = String(category).trim();
+    if (gender !== undefined) {
+      if (!['Actor', 'Actress'].includes(gender)) return res.status(400).json({ error: 'Gender must be Actor or Actress.' });
+      update.gender = gender;
+    }
+    if (trending !== undefined) update.trending = !!trending;
+
+    const actor = await ActorProfile.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true });
+    if (!actor) return res.status(404).json({ error: 'Actor not found.' });
+    res.json({ actor });
+  } catch (err) {
+    console.error('Actor edit failed:', err.message);
+    res.status(400).json({ error: 'Could not update this actor.' });
+  }
+});
+
+// DELETE /api/actors/:id
+router.delete('/:id', requireAdmin, async (req, res) => {
+  try {
+    const actor = await ActorProfile.findByIdAndDelete(req.params.id);
+    if (!actor) return res.status(404).json({ error: 'Actor not found.' });
+    res.json({ deleted: true });
+  } catch (err) {
+    res.status(400).json({ error: 'Could not delete this actor.' });
+  }
+});
+
 module.exports = router;

@@ -111,7 +111,14 @@
   .actors-chip{background:var(--surface);border:1px solid var(--border-strong);border-radius:20px;padding:7px 16px;font-size:13px;font-weight:600;color:var(--text-dim);cursor:pointer;}
   .actors-chip.active{background:var(--indigo);color:#fff;border-color:var(--indigo);}
   .actors-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
-  .actor-card{background:var(--surface);border:1px solid #EDF1F5;border-radius:14px;padding:18px;cursor:pointer;box-shadow:0 1px 2px rgba(15,23,42,0.03);}
+  .actor-card{background:var(--surface);border:1px solid #EDF1F5;border-radius:14px;padding:18px;box-shadow:0 1px 2px rgba(15,23,42,0.03);position:relative;}
+  .ac-clickable{cursor:pointer;}
+  .ac-menu-wrap{position:absolute;top:10px;right:10px;}
+  .ac-menu-btn{background:none;border:none;font-size:18px;color:var(--text-muted);cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1;}
+  .ac-menu-btn:hover{background:var(--navy-2);}
+  .ac-menu{position:absolute;top:28px;right:0;background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;box-shadow:0 4px 16px rgba(15,23,42,0.12);z-index:10;min-width:150px;overflow:hidden;}
+  .ac-menu button{display:block;width:100%;text-align:left;padding:10px 14px;background:none;border:none;font-size:13px;color:var(--text);cursor:pointer;}
+  .ac-menu button:hover{background:var(--navy-2);}
   .actor-card:hover{border-color:var(--violet);}
   .actor-card .ac-name{font-size:14px;font-weight:700;color:var(--text);margin:0 0 4px;}
   .actor-card .ac-meta{font-size:11px;color:var(--text-muted);margin:0 0 12px;}
@@ -3327,22 +3334,86 @@ async function loadActorsList() {
 
     grid.innerHTML = data.actors.map((a) => `
       <div class="actor-card" data-id="${a._id}">
-        <p class="ac-name">${a.name}</p>
-        <p class="ac-meta">${a.category} \u00b7 ${a.gender} \u00b7 ${String(a.day).padStart(2, '0')}/${String(a.month).padStart(2, '0')}/${a.year}</p>
-        <div class="ac-numbers">
-          <div class="ac-num"><div class="ac-num-value">${a.driverNumber}</div><div class="ac-num-label">Driver</div></div>
-          <div class="ac-num"><div class="ac-num-value">${a.conductorNumber}</div><div class="ac-num-label">Conductor</div></div>
+        <div class="ac-menu-wrap">
+          <button type="button" class="ac-menu-btn" data-menu-toggle="${a._id}">\u22ee</button>
+          <div class="ac-menu" id="acMenu${a._id}" style="display:none;">
+            <button type="button" data-action="view" data-id="${a._id}">View Lo Shu Grid</button>
+            <button type="button" data-action="edit" data-id="${a._id}">Edit</button>
+            <button type="button" data-action="delete" data-id="${a._id}" style="color:var(--danger);">Delete</button>
+          </div>
+        </div>
+        <div class="ac-clickable" data-id="${a._id}">
+          <p class="ac-name">${a.name}</p>
+          <p class="ac-meta">${a.category} \u00b7 ${a.gender} \u00b7 ${String(a.day).padStart(2, '0')}/${String(a.month).padStart(2, '0')}/${a.year}</p>
+          <div class="ac-numbers">
+            <div class="ac-num"><div class="ac-num-value">${a.driverNumber}</div><div class="ac-num-label">Driver</div></div>
+            <div class="ac-num"><div class="ac-num-value">${a.conductorNumber}</div><div class="ac-num-label">Conductor</div></div>
+          </div>
         </div>
       </div>
     `).join('');
 
-    grid.querySelectorAll('.actor-card').forEach((card) => {
-      card.addEventListener('click', () => openActorLoShuModal(card.dataset.id));
+    grid.querySelectorAll('.ac-clickable').forEach((el) => {
+      el.addEventListener('click', () => openActorLoShuModal(el.dataset.id));
+    });
+
+    grid.querySelectorAll('[data-menu-toggle]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const menu = document.getElementById('acMenu' + btn.dataset.menuToggle);
+        const isOpen = menu.style.display !== 'none';
+        grid.querySelectorAll('.ac-menu').forEach((m) => { m.style.display = 'none'; });
+        menu.style.display = isOpen ? 'none' : 'block';
+      });
+    });
+
+    grid.querySelectorAll('[data-action]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        const action = btn.dataset.action;
+        if (action === 'view') openActorLoShuModal(id);
+        if (action === 'edit') openActorEditModal(id, data.actors.find((a) => a._id === id));
+        if (action === 'delete') deleteActor(id);
+      });
     });
   } catch (err) {
     grid.innerHTML = '<p class="loading-note">Could not load actors right now.</p>';
   }
 }
+
+let _editingActorId = null;
+
+function openActorEditModal(id, actorSummary) {
+  openActorsAddModal();
+  _editingActorId = id;
+  document.getElementById('actorsAddModeSingle').click();
+  document.getElementById('actorsAddModeBulk').style.display = 'none'; // editing is single-entry only
+
+  document.getElementById('actorAddName').value = actorSummary.name;
+  const dobStr = `${actorSummary.year}-${String(actorSummary.month).padStart(2, '0')}-${String(actorSummary.day).padStart(2, '0')}`;
+  document.getElementById('actorAddDob').value = dobStr;
+  document.getElementById('actorAddCategory').value = actorSummary.category;
+  document.getElementById('actorAddGender').value = actorSummary.gender;
+  document.getElementById('actorAddTrending').checked = !!actorSummary.trending;
+  document.getElementById('actorsAddSubmitBtn').textContent = 'Save changes';
+  document.querySelector('#actorsAddOverlay .wizard-header h2').textContent = 'Edit Actor';
+}
+
+async function deleteActor(id) {
+  if (!confirm('Delete this actor? This cannot be undone.')) return;
+  try {
+    const res = await fetch('/api/actors/' + id, { method: 'DELETE' });
+    if (!res.ok) { const data = await res.json(); alert(data.error || 'Could not delete.'); return; }
+    loadActorsList();
+  } catch (err) {
+    alert('Could not reach the server.');
+  }
+}
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.ac-menu').forEach((m) => { m.style.display = 'none'; });
+});
 
 async function openActorLoShuModal(actorId) {
   try {
@@ -3439,9 +3510,16 @@ function parseActorLines(text, category, gender) {
 }
 
 function openActorsAddModal() {
+  _editingActorId = null;
   document.getElementById('actorsAddOverlay').style.display = 'flex';
   document.getElementById('actorsAddSingleResult').innerHTML = '';
   document.getElementById('actorsAddBulkResult').innerHTML = '';
+  document.getElementById('actorsAddModeBulk').style.display = 'inline-block';
+  document.getElementById('actorsAddSubmitBtn').textContent = 'Add';
+  document.querySelector('#actorsAddOverlay .wizard-header h2').textContent = 'Add Actors';
+  document.getElementById('actorAddName').value = '';
+  document.getElementById('actorAddDob').value = '';
+  document.getElementById('actorAddTrending').checked = false;
 }
 document.getElementById('actorsAddBtn').addEventListener('click', openActorsAddModal);
 document.getElementById('actorsAddCloseBtn').addEventListener('click', () => {
@@ -3467,6 +3545,37 @@ document.getElementById('actorsAddSubmitBtn').addEventListener('click', async ()
   const isBulk = document.getElementById('actorsAddBulkForm').style.display !== 'none';
   const btn = document.getElementById('actorsAddSubmitBtn');
   const resultEl = isBulk ? document.getElementById('actorsAddBulkResult') : document.getElementById('actorsAddSingleResult');
+
+  // Editing an existing actor is a separate, simpler path: one PUT call,
+  // not the bulk-import pipeline used for adding new entries.
+  if (_editingActorId) {
+    const name = document.getElementById('actorAddName').value.trim();
+    const dobVal = document.getElementById('actorAddDob').value;
+    if (!name || !dobVal) { resultEl.innerHTML = '<p class="wizard-skip-note">Name and date of birth are required.</p>'; return; }
+    const [year, month, day] = dobVal.split('-').map(Number);
+    btn.disabled = true; btn.textContent = 'Saving\u2026';
+    try {
+      const res = await fetch('/api/actors/' + _editingActorId, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name, day, month, year,
+          category: document.getElementById('actorAddCategory').value,
+          gender: document.getElementById('actorAddGender').value,
+          trending: document.getElementById('actorAddTrending').checked,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) { resultEl.innerHTML = `<p class="wizard-skip-note">${data.error || 'Could not save.'}</p>`; return; }
+      document.getElementById('actorsAddOverlay').style.display = 'none';
+      loadActorsCategories();
+      loadActorsList();
+    } catch (err) {
+      resultEl.innerHTML = `<p class="wizard-skip-note">Error: ${err.name || 'Unknown'} \u2014 ${err.message || 'no message'}</p>`;
+    } finally {
+      btn.disabled = false; btn.textContent = 'Save changes';
+    }
+    return;
+  }
 
   let actors = [];
   if (isBulk) {
