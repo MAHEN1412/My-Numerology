@@ -15,7 +15,7 @@
  * claim this project doesn't actually have data for.
  */
 
-const { CRYSTAL_37 } = require('./crystalDatabase37');
+const CrystalStone = require('../models/CrystalStone');
 const { getNumberRecord } = require('./numberKnowledge');
 
 const WEIGHTS = {
@@ -94,7 +94,7 @@ function scoreStone(stone, profile) {
   const rawScore = scoreComponents.coreCompatibility + scoreComponents.loShuBalance + scoreComponents.planetaryCompatibility + scoreComponents.purposeMatch + scoreComponents.conflictPenalty;
 
   return {
-    id: stone.id,
+    id: stone.stoneId,
     name: stone.name,
     hasDirectNumberData: stone.numberAssociations.length > 0,
     sourceNotes: stone.sourceNotes,
@@ -137,8 +137,9 @@ function classifyTiers(ranked) {
   return tiers;
 }
 
-function calculateCrystalRecommendations(numerologyProfile) {
-  const scored = CRYSTAL_37.map((stone) => scoreStone(stone, numerologyProfile));
+async function calculateCrystalRecommendations(numerologyProfile) {
+  const stones = await CrystalStone.find({ active: true });
+  const scored = stones.map((stone) => scoreStone(stone, numerologyProfile));
   const normalized = normalizeScores(scored);
   const ranked = [...normalized].sort((a, b) => b.finalScore - a.finalScore);
   const tiers = classifyTiers(ranked);

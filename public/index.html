@@ -2975,6 +2975,12 @@ document.getElementById('analyzeMobileBtn').addEventListener('click', () => {
 
 let lastCrystalResult = null;
 
+const RATNA_HINDI_NAMES = {
+  'Ruby': 'Manik', 'Pearl': 'Moti', 'Red Coral': 'Moonga', 'Emerald': 'Panna',
+  'Yellow Sapphire': 'Pukhraj', 'Diamond': 'Heera', 'Blue Sapphire': 'Neelam',
+  'Hessonite': 'Gomed', "Cat's Eye": 'Lehsunia', 'Moonstone': 'Moti (substitute)',
+};
+
 document.getElementById('crystalAnalyzeBtn').addEventListener('click', async () => {
   const dobRaw = document.getElementById('crystalDobInput').value;
   const errorEl = document.getElementById('crystalError');
@@ -2991,28 +2997,77 @@ document.getElementById('crystalAnalyzeBtn').addEventListener('click', async () 
   resultsEl.innerHTML = '<p class="loading-note">Scoring crystals against your profile\u2026</p>';
   document.getElementById('crystalBookInsightsContainer').innerHTML = '';
   document.getElementById('crystalSaveBtnWrap').style.display = 'none';
+  document.getElementById('crystalV2BtnWrap').style.display = 'none';
 
   try {
-    const res = await fetch('/api/crystals/analyze', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ day: d, month: m, year: y, name: name || undefined, system: currentSystem, purpose: purpose || undefined }),
-    });
-    const data = await res.json();
-    if (!res.ok) { errorEl.textContent = data.error || 'Could not analyze crystal compatibility.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return; }
+    const [v2Res, v1Res] = await Promise.all([
+      fetch('/api/crystals/analyze-v2', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ day: d, month: m, year: y, name: name || undefined, system: currentSystem, purpose: purpose || undefined }),
+      }),
+      fetch('/api/crystals/analyze', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ day: d, month: m, year: y, name: name || undefined, system: currentSystem, purpose: purpose || undefined }),
+      }),
+    ]);
+    const v2Data = await v2Res.json();
+    const data = await v1Res.json();
+    if (!v1Res.ok) { errorEl.textContent = data.error || 'Could not analyze crystal compatibility.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return; }
 
+    // ----- PRIMARY: the new 37-stone crystal engine, shown first -----
+    let primaryHtml = '';
+    if (v2Res.ok) {
+      const tierCard = (label, entry) => {
+        if (!entry) return `<div class="report-card"><h4>${label}</h4><p style="font-size:12px;color:var(--text-muted);">No stone currently qualifies for this role.</p></div>`;
+        const topReason = entry.matchedRules[0] ? entry.matchedRules[0].text : (entry.hasDirectNumberData ? '' : 'No existing number association on file for this stone.');
+        return `<div class="report-card"><h4>${label}: ${entry.name} <span style="color:var(--indigo);">${entry.finalScore}/100</span></h4><p style="font-size:12px;color:var(--text-dim);">${topReason}</p></div>`;
+      };
+      primaryHtml = `
+        <p class="report-form-section-label" style="margin-top:0;">Crystal Recommendations</p>
+        <div class="report-card-grid" style="grid-template-columns:1fr 1fr;">
+          ${tierCard('Primary', v2Data.tiers.primary)}
+          ${tierCard('Harmony', v2Data.tiers.harmony)}
+          ${tierCard('Balance', v2Data.tiers.balance)}
+          ${tierCard('Alternative', v2Data.tiers.alternative)}
+        </div>
+        <button type="button" class="ghost" id="crystalV2ShowAllBtnInline" style="margin-top:12px;">View Full 37-Stone Ranking</button>
+        <div id="crystalV2FullTableInline" style="display:none;margin-top:16px;overflow-x:auto;">
+          <table class="video-compare-table">
+            <thead><tr><th>Rank</th><th>Stone</th><th>Score</th><th>Has data</th><th>Key reason</th></tr></thead>
+            <tbody>${v2Data.ranked.map((s, i) => `<tr><td>${i + 1}</td><td>${s.name}</td><td>${s.finalScore}</td><td>${s.hasDirectNumberData ? '\u2713' : '\u2014'}</td><td style="font-size:12px;color:var(--text-dim);">${s.matchedRules[0] ? s.matchedRules[0].text : (s.hasDirectNumberData ? '' : 'No existing number association on file.')}</td></tr>`).join('')}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    // ----- SECONDARY: the traditional Vedic astrology gemstones (Ratna) -----
     const summaryLine = `<p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Based on Driver ${data.coreNumbers.driverNumber}, Conductor ${data.coreNumbers.conductorNumber}${data.coreNumbers.nameNumber ? `, Name Number ${data.coreNumbers.nameNumber}` : ''}${data.loshuMissing.length ? `, and missing Lo Shu numbers ${data.loshuMissing.join(', ')}` : ''}.</p>`;
-
     const cards = data.compatibility.map(c => `
       <div class="crystal-card ${c.classification}">
         <div class="cr-header">
-          <span class="cr-name">${c.crystal}</span>
+          <span class="cr-name">${c.crystal}${RATNA_HINDI_NAMES[c.crystal] ? ` <span style="font-size:12px;color:var(--text-muted);font-weight:400;">(${RATNA_HINDI_NAMES[c.crystal]})</span>` : ''}</span>
           <span><span class="cr-stars">${'\u2b50'.repeat(c.stars)}${'\u2606'.repeat(5 - c.stars)}</span><span class="cr-label ${c.classification}">${c.classification}</span></span>
         </div>
         <div class="cr-reasons">${c.reasons.map(r => `<div>${r.points > 0 ? '+' : ''}${r.points} &mdash; ${r.text}</div>`).join('')}</div>
       </div>
     `).join('');
 
-    resultsEl.innerHTML = summaryLine + cards;
+    const secondaryHtml = `
+      <p class="report-form-section-label">Astrology Gemstones (Ratna) <span style="color:var(--text-muted);font-weight:400;text-transform:none;">&mdash; secondary reference, traditional Vedic/Jyotish planetary gemstones, a different system from the crystal recommendations above</span></p>
+      ${summaryLine}${cards}
+    `;
+
+    resultsEl.innerHTML = primaryHtml + secondaryHtml;
+
+    const showAllBtn = document.getElementById('crystalV2ShowAllBtnInline');
+    if (showAllBtn) {
+      showAllBtn.addEventListener('click', (e) => {
+        const table = document.getElementById('crystalV2FullTableInline');
+        const isOpen = table.style.display !== 'none';
+        table.style.display = isOpen ? 'none' : 'block';
+        e.target.textContent = isOpen ? 'View Full 37-Stone Ranking' : 'Hide Full Ranking';
+      });
+    }
 
     lastCrystalResult = { name, day: d, month: m, year: y, system: currentSystem, coreNumbers: data.coreNumbers, topCrystal: data.compatibility[0] ? data.compatibility[0].crystal : '' };
     document.getElementById('crystalSaveBtnWrap').style.display = 'block';
