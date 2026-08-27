@@ -1,6 +1,7 @@
 const express = require('express');
 const calc = require('../utils/calculationEngine');
 const { buildCrystalCompatibility } = require('../knowledge/crystalEngine');
+const { calculateCrystalRecommendations } = require('../knowledge/crystalEngineV2');
 const { buildCrystalBookInsights } = require('../knowledge/bookSearch');
 const { getVideosForCategory } = require('./videos');
 
@@ -62,6 +63,42 @@ router.post('/analyze', async (req, res) => {
     });
   } catch (err) {
     console.error('Crystal analyze failed:', err.message);
+    res.status(500).json({ error: 'Could not analyze crystal compatibility right now.' });
+  }
+});
+
+// POST /api/crystals/analyze-v2 -- the new 37-stone, multi-factor,
+// auditable engine. Deliberately a SEPARATE endpoint from /analyze above,
+// which continues to work exactly as before for any existing callers.
+router.post('/analyze-v2', async (req, res) => {
+  try {
+    const { day, month, year, name, system, purpose } = req.body;
+    const d = Number(day), m = Number(month), y = Number(year);
+
+    if (!isValidCalendarDate(d, m, y)) {
+      return res.status(400).json({ error: 'Please enter a valid date of birth.' });
+    }
+    const cleanPurpose = VALID_PURPOSES.includes(purpose) ? purpose : null;
+    const cleanSystem = system === 'pythagorean' ? 'pythagorean' : 'chaldean';
+
+    const driverNumber = calc.calculateDriverNumber(d).value;
+    const conductorNumber = calc.calculateConductorNumber(d, m, y).value;
+    const nameNumber = name ? calc.calculateNameNumber(name, cleanSystem).value : null;
+    const loshuCounts = calc.generateLoShuGrid(d, m, y);
+    const missingNumbers = calc.getMissingNumbers(loshuCounts);
+    const dominantNumbers = calc.getRepeatedNumbers(loshuCounts);
+
+    const result = calculateCrystalRecommendations({
+      driverNumber, conductorNumber, nameNumber, missingNumbers, dominantNumbers, purpose: cleanPurpose,
+    });
+
+    res.json({
+      coreNumbers: { driverNumber, conductorNumber, nameNumber },
+      missingNumbers, dominantNumbers, purpose: cleanPurpose,
+      ...result,
+    });
+  } catch (err) {
+    console.error('Crystal analyze-v2 failed:', err.message);
     res.status(500).json({ error: 'Could not analyze crystal compatibility right now.' });
   }
 });
