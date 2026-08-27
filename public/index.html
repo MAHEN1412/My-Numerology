@@ -1159,6 +1159,9 @@
 
   <div class="wrap" style="padding-bottom:56px;">
     <div id="crystalResultsContainer"></div>
+    <div id="crystalV2BtnWrap" style="display:none;text-align:center;padding:16px 0;">
+      <button type="button" class="ghost" id="crystalV2Btn">View New 37-Stone Analysis (Beta)</button>
+    </div>
     <div id="crystalSaveBtnWrap" style="display:none;text-align:center;padding:16px 0;">
       <button type="button" class="btn-ghost" id="crystalSaveToDashboardBtn">Save to Dashboard</button>
     </div>
@@ -3013,6 +3016,7 @@ document.getElementById('crystalAnalyzeBtn').addEventListener('click', async () 
 
     lastCrystalResult = { name, day: d, month: m, year: y, system: currentSystem, coreNumbers: data.coreNumbers, topCrystal: data.compatibility[0] ? data.compatibility[0].crystal : '' };
     document.getElementById('crystalSaveBtnWrap').style.display = 'block';
+    document.getElementById('crystalV2BtnWrap').style.display = 'block';
 
     const videosEl = document.getElementById('crystalVideosContainer');
     if (data.videos && data.videos.length > 0) {
@@ -3033,6 +3037,7 @@ document.getElementById('crystalAnalyzeBtn').addEventListener('click', async () 
   }
 });
 
+document.getElementById('crystalV2Btn').addEventListener('click', openCrystalV2Modal);
 document.getElementById('crystalSaveToDashboardBtn').addEventListener('click', (e) => {
   if (!lastCrystalResult) return;
   const r = lastCrystalResult;
@@ -3434,6 +3439,88 @@ async function deleteActor(id) {
 document.addEventListener('click', () => {
   document.querySelectorAll('.ac-menu').forEach((m) => { m.style.display = 'none'; });
 });
+
+async function openCrystalV2Modal() {
+  if (!lastCrystalResult) return;
+  const { day, month, year, name, system } = lastCrystalResult;
+
+  const root = document.createElement('div');
+  root.id = 'crystalV2ModalRoot';
+  root.innerHTML = `
+    <div class="case-overlay"></div>
+    <div class="case-drawer" style="max-width:640px;">
+      <div class="case-drawer-header">
+        <h2 style="font-size:18px;margin:0;">37-Stone Crystal Analysis <span style="font-size:11px;color:var(--text-muted);font-weight:400;">(Beta)</span></h2>
+        <button type="button" class="case-drawer-close" id="crystalV2ModalCloseBtn">\u2715</button>
+      </div>
+      <div id="crystalV2Content" style="margin-top:16px;"><p class="loading-note">Scoring all 37 stones\u2026</p></div>
+    </div>
+  `;
+  document.body.appendChild(root);
+  document.getElementById('crystalV2ModalCloseBtn').addEventListener('click', () => root.remove());
+  root.querySelector('.case-overlay').addEventListener('click', () => root.remove());
+
+  const contentEl = document.getElementById('crystalV2Content');
+  try {
+    const res = await fetch('/api/crystals/analyze-v2', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ day, month, year, name: name || undefined, system }),
+    });
+    const data = await res.json();
+    if (!res.ok) { contentEl.innerHTML = `<p class="wizard-skip-note">${data.error}</p>`; return; }
+
+    const tierCard = (label, entry) => {
+      if (!entry) return `<div class="report-card"><h4>${label}</h4><p style="font-size:12px;color:var(--text-muted);">No stone currently qualifies for this role.</p></div>`;
+      const topReason = entry.matchedRules[0] ? entry.matchedRules[0].text : (entry.hasDirectNumberData ? '' : 'No existing number association on file for this stone.');
+      return `
+        <div class="report-card">
+          <h4>${label}: ${entry.name} <span style="color:var(--indigo);">${entry.finalScore}/100</span></h4>
+          <p style="font-size:12px;color:var(--text-dim);">${topReason}</p>
+        </div>
+      `;
+    };
+
+    const tiersHtml = `
+      <div class="report-card-grid" style="grid-template-columns:1fr 1fr;">
+        ${tierCard('Primary', data.tiers.primary)}
+        ${tierCard('Harmony', data.tiers.harmony)}
+        ${tierCard('Balance', data.tiers.balance)}
+        ${tierCard('Alternative', data.tiers.alternative)}
+      </div>
+    `;
+
+    const fullTableRows = data.ranked.map((s, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${s.name}</td>
+        <td>${s.finalScore}</td>
+        <td>${s.hasDirectNumberData ? '\u2713' : '\u2014'}</td>
+        <td style="font-size:12px;color:var(--text-dim);">${s.matchedRules[0] ? s.matchedRules[0].text : (s.hasDirectNumberData ? '' : 'No existing number association on file.')}</td>
+      </tr>
+    `).join('');
+
+    contentEl.innerHTML = `
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 16px;">Experimental multi-factor engine: scores every stone on real Driver/Conductor/Name Number associations, Lo Shu balance, and (if set) your stated purpose \u2014 not just \u201cmissing number = crystal.\u201d Roles are left blank rather than forced when nothing genuinely qualifies. Only 12 of these 37 stones have a documented number association in this app's existing data; the rest are scored on Lo Shu balance alone and marked accordingly.</p>
+      ${tiersHtml}
+      <button type="button" class="ghost" id="crystalV2ShowAllBtn" style="margin-top:16px;">View Full 37-Stone Ranking</button>
+      <div id="crystalV2FullTable" style="display:none;margin-top:16px;overflow-x:auto;">
+        <table class="video-compare-table">
+          <thead><tr><th>Rank</th><th>Stone</th><th>Score</th><th>Has data</th><th>Key reason</th></tr></thead>
+          <tbody>${fullTableRows}</tbody>
+        </table>
+      </div>
+    `;
+
+    document.getElementById('crystalV2ShowAllBtn').addEventListener('click', (e) => {
+      const table = document.getElementById('crystalV2FullTable');
+      const isOpen = table.style.display !== 'none';
+      table.style.display = isOpen ? 'none' : 'block';
+      e.target.textContent = isOpen ? 'View Full 37-Stone Ranking' : 'Hide Full Ranking';
+    });
+  } catch (err) {
+    contentEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';
+  }
+}
 
 async function openActorLoShuModal(actorId) {
   try {
