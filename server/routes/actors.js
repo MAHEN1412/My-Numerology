@@ -57,6 +57,34 @@ router.get('/', async (req, res) => {
 // Lo Shu depends on which digits appear and how often, not the date
 // itself). Both are real, computed comparisons -- never a fuzzy or
 // invented "similarity" score.
+// GET /api/actors/todays-birthdays
+// Anyone in the actors database whose day+month matches today's calendar
+// date (any birth year) -- your own curated list, likely far better
+// Indian-celebrity coverage than a general-purpose external feed.
+router.get('/todays-birthdays', async (req, res) => {
+  try {
+    const now = new Date();
+    const day = now.getDate();
+    const month = now.getMonth() + 1;
+
+    const matches = await ActorProfile.find({ day, month });
+    const withNumerology = matches.map((a) => {
+      const driver = calc.calculateDriverNumber(a.day);
+      const conductor = calc.calculateConductorNumber(a.day, a.month, a.year);
+      return {
+        _id: a._id, name: a.name, day: a.day, month: a.month, year: a.year,
+        category: a.category, gender: a.gender,
+        driverNumber: driver.value, conductorNumber: conductor.value,
+      };
+    });
+
+    res.json({ day, month, people: withNumerology });
+  } catch (err) {
+    console.error('Actors todays-birthdays failed:', err.message);
+    res.status(500).json({ error: 'Could not check today\'s birthdays right now.' });
+  }
+});
+
 router.get('/match', async (req, res) => {
   try {
     const day = Number(req.query.day);

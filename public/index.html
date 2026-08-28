@@ -3401,7 +3401,7 @@ function toggleDailyReadingAudio(topic, excerptTexts, btn) {
 }
 
 // ===== Actors Profile =====
-let _actorsState = { category: '', gender: '', search: '', showAll: false };
+let _actorsState = { category: '', gender: '', search: '', showAll: false, todaysOnly: true };
 let _actorsSearchDebounce = null;
 
 async function loadActorsCategories() {
@@ -3425,20 +3425,34 @@ async function loadActorsList() {
   if (!grid) return;
   grid.innerHTML = '<p class="loading-note">Loading\u2026</p>';
   try {
-    const params = new URLSearchParams();
-    if (_actorsState.category) params.set('category', _actorsState.category);
-    if (_actorsState.gender) params.set('gender', _actorsState.gender);
-    if (_actorsState.search) params.set('search', _actorsState.search);
-    if (!_actorsState.showAll && !_actorsState.search) params.set('trendingOnly', 'true');
-    params.set('limit', _actorsState.showAll ? '200' : '24');
+    let actors;
 
-    const res = await fetch('/api/actors?' + params.toString());
-    const data = await res.json();
+    if (_actorsState.todaysOnly && !_actorsState.category && !_actorsState.gender && !_actorsState.search && !_actorsState.showAll) {
+      const res = await fetch('/api/actors/todays-birthdays');
+      const data = await res.json();
+      actors = data.people || [];
+      if (actors.length === 0) {
+        grid.innerHTML = '<p class="loading-note">No one in your Actors Profile database has a birthday today. Click \u201cShow All\u201d to browse everyone.</p>';
+        return;
+      }
+    } else {
+      const params = new URLSearchParams();
+      if (_actorsState.category) params.set('category', _actorsState.category);
+      if (_actorsState.gender) params.set('gender', _actorsState.gender);
+      if (_actorsState.search) params.set('search', _actorsState.search);
+      if (!_actorsState.showAll && !_actorsState.search) params.set('trendingOnly', 'true');
+      params.set('limit', _actorsState.showAll ? '200' : '24');
 
-    if (!data.actors || data.actors.length === 0) {
-      grid.innerHTML = '<p class="loading-note">No actors found for this filter yet.</p>';
-      return;
+      const res = await fetch('/api/actors?' + params.toString());
+      const data = await res.json();
+      actors = data.actors || [];
+      if (actors.length === 0) {
+        grid.innerHTML = '<p class="loading-note">No actors found for this filter yet.</p>';
+        return;
+      }
     }
+
+    const data = { actors };
 
     grid.innerHTML = data.actors.map((a) => `
       <div class="actor-card" data-id="${a._id}">
@@ -3661,7 +3675,7 @@ document.getElementById('actorsSearchInput').addEventListener('input', (e) => {
 
 document.getElementById('actorsShowAllBtn').addEventListener('click', () => {
   _actorsState.showAll = !_actorsState.showAll;
-  document.getElementById('actorsShowAllBtn').textContent = _actorsState.showAll ? 'Show Trending Only' : 'Show All';
+  document.getElementById('actorsShowAllBtn').textContent = _actorsState.showAll ? "Show Today's Birthdays Only" : 'Show All';
   loadActorsList();
 });
 
@@ -3974,15 +3988,21 @@ async function loadTodaysBirthdays(filter = 'world') {
   if (!el) return;
   el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);">Loading\u2026</p>';
   try {
-    const res = await fetch('/api/reference/todays-birthdays' + (filter === 'indian' ? '?filter=indian' : ''));
-    const data = await res.json();
-    if (!data.people || data.people.length === 0) {
-      el.innerHTML = filter === 'indian'
-        ? '<p style="font-size:12px;color:var(--text-muted);">No Indian personalities matched among today\u2019s birthdays in this feed.</p>'
-        : '<p style="font-size:12px;color:var(--text-muted);">Could not load today\u2019s birthdays right now.</p>';
-      return;
-    }
-    el.innerHTML = data.people.map((p) => {
+    const [wikiRes, actorsRes] = await Promise.all([
+      fetch('/api/reference/todays-birthdays' + (filter === 'indian' ? '?filter=indian' : '')),
+      fetch('/api/actors/todays-birthdays'),
+    ]);
+    const wikiData = await wikiRes.json();
+    const actorsData = actorsRes.ok ? await actorsRes.json() : { people: [] };
+
+    const actorsHtml = (actorsData.people || []).map((p) => `
+      <div class="rp-item">
+        <b>${p.name} <span style="font-weight:400;color:var(--text-muted);">(${p.year})</span></b>
+        <span>${p.category} \u00b7 ${p.gender} \u00b7 Driver ${p.driverNumber} \u00b7 Conductor ${p.conductorNumber}</span>
+      </div>
+    `).join('');
+
+    const wikiHtml = (wikiData.people || []).map((p) => {
       const numText = p.numerology ? `Driver ${p.numerology.driver} \u00b7 Conductor ${p.numerology.conductor}` : 'Numerology unavailable for this birth year';
       const desc = p.description ? ` \u00b7 ${p.description}` : '';
       return `
@@ -3992,6 +4012,20 @@ async function loadTodaysBirthdays(filter = 'world') {
         </a>
       `;
     }).join('');
+
+    if (!actorsHtml && !wikiHtml) {
+      el.innerHTML = filter === 'indian'
+        ? '<p style="font-size:12px;color:var(--text-muted);">No Indian personalities matched among today\u2019s birthdays.</p>'
+        : '<p style="font-size:12px;color:var(--text-muted);">Could not load today\u2019s birthdays right now.</p>';
+      return;
+    }
+
+    // Your own curated Actors Profile data shown first -- it's the more
+    // relevant, purpose-built source; the general Wikipedia feed follows.
+    const sectionLabel = (label) => `<p style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin:10px 0 6px;">${label}</p>`;
+    el.innerHTML =
+      (actorsHtml ? sectionLabel('From your Actors Profile') + actorsHtml : '') +
+      (wikiHtml ? sectionLabel('From Wikipedia') + wikiHtml : '');
   } catch (err) {
     el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);">Could not load today\u2019s birthdays right now.</p>';
   }
