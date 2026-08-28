@@ -119,6 +119,14 @@
   .ac-menu{position:absolute;top:28px;right:0;background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;box-shadow:0 4px 16px rgba(15,23,42,0.12);z-index:10;min-width:150px;overflow:hidden;}
   .ac-menu button{display:block;width:100%;text-align:left;padding:10px 14px;background:none;border:none;font-size:13px;color:var(--text);cursor:pointer;}
   .ac-menu button:hover{background:var(--navy-2);}
+  .curation-stone{border:1px solid var(--border-strong);border-radius:12px;padding:16px;margin-bottom:12px;}
+  .curation-stone-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .curation-stone-name{font-size:15px;font-weight:700;}
+  .curation-assoc-chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface-2);color:var(--violet);font-size:12px;font-weight:600;padding:5px 10px;border-radius:14px;margin:0 6px 6px 0;}
+  .curation-assoc-chip button{background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;padding:0;line-height:1;}
+  .curation-evidence-item{background:var(--navy-2);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:12px;}
+  .curation-evidence-item .ce-source{font-weight:600;color:var(--text);margin-bottom:4px;}
+  .curation-evidence-item .ce-text{color:var(--text-dim);line-height:1.5;margin-bottom:8px;}
   .actor-card:hover{border-color:var(--violet);}
   .actor-card .ac-name{font-size:14px;font-weight:700;color:var(--text);margin:0 0 4px;}
   .actor-card .ac-meta{font-size:11px;color:var(--text-muted);margin:0 0 12px;}
@@ -764,6 +772,25 @@
   </div>
 </div>
 
+<div class="wizard-overlay" id="crystalCurationOverlay" style="display:none;">
+  <div class="wizard-shell" style="max-width:700px;max-height:90vh;">
+    <div class="wizard-header">
+      <div>
+        <h2>Manage Crystal Data</h2>
+        <p class="wizard-step-label" style="margin-top:4px;">Every association here requires a source \u2014 nothing gets added without saying where it came from.</p>
+      </div>
+      <button type="button" class="case-drawer-close" id="crystalCurationCloseBtn">&#10005;</button>
+    </div>
+    <div class="wizard-body">
+      <div class="actors-chip-group" style="margin-bottom:16px;">
+        <button type="button" class="actors-chip active" data-filter="unmapped">Needs data (25)</button>
+        <button type="button" class="actors-chip" data-filter="all">All 37 stones</button>
+      </div>
+      <div id="crystalCurationList"><p class="loading-note">Loading\u2026</p></div>
+    </div>
+  </div>
+</div>
+
 <div class="wizard-overlay" id="actorsAddOverlay" style="display:none;">
   <datalist id="actorsCategoryDatalist"></datalist>
   <div class="wizard-shell" style="max-width:560px;">
@@ -1119,6 +1146,7 @@
       <p class="kicker">Crystal compatibility</p>
       <h1>Find crystals aligned with your numbers</h1>
       <p class="lead">Traditional crystal associations, scored against your Driver, Conductor, Name, and Lo Shu missing numbers &mdash; with reasons, not just a rating.</p>
+      <button type="button" class="ghost" id="crystalManageDataBtn" style="margin-top:16px;">Manage Crystal Data</button>
     </div>
   </header>
 
@@ -3669,6 +3697,143 @@ function parseActorLines(text, category, gender) {
   });
 
   return { parsed, skipped };
+}
+
+// ===== Crystal Data Curation =====
+let _curationFilter = 'unmapped';
+let _curationStones = [];
+
+async function openCrystalCurationModal() {
+  document.getElementById('crystalCurationOverlay').style.display = 'flex';
+  await loadCurationStones();
+}
+document.getElementById('crystalManageDataBtn').addEventListener('click', openCrystalCurationModal);
+document.getElementById('crystalCurationCloseBtn').addEventListener('click', () => {
+  document.getElementById('crystalCurationOverlay').style.display = 'none';
+});
+document.querySelectorAll('#crystalCurationOverlay .actors-chip').forEach((chip) => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#crystalCurationOverlay .actors-chip').forEach((c) => c.classList.remove('active'));
+    chip.classList.add('active');
+    _curationFilter = chip.dataset.filter;
+    renderCurationList();
+  });
+});
+
+async function loadCurationStones() {
+  const listEl = document.getElementById('crystalCurationList');
+  listEl.innerHTML = '<p class="loading-note">Loading\u2026</p>';
+  try {
+    const res = await fetch('/api/crystals/stones');
+    const data = await res.json();
+    _curationStones = data.stones || [];
+    renderCurationList();
+  } catch (err) {
+    listEl.innerHTML = '<p class="loading-note">Could not load stones.</p>';
+  }
+}
+
+function renderCurationList() {
+  const listEl = document.getElementById('crystalCurationList');
+  const stones = _curationFilter === 'unmapped'
+    ? _curationStones.filter((s) => s.numberAssociations.length === 0)
+    : _curationStones;
+
+  if (stones.length === 0) {
+    listEl.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Every stone now has at least one sourced association. Nice.</p>';
+    return;
+  }
+
+  listEl.innerHTML = stones.map((s) => `
+    <div class="curation-stone" data-stone-id="${s.stoneId}">
+      <div class="curation-stone-header">
+        <span class="curation-stone-name">${s.name}</span>
+        <button type="button" class="ghost" data-search-books="${s.stoneId}" style="padding:6px 12px;font-size:12px;">Search My Books</button>
+      </div>
+      <div class="curation-assocs">
+        ${s.numberAssociations.length === 0
+          ? '<p style="font-size:12px;color:var(--text-muted);margin:0 0 10px;">No association yet.</p>'
+          : s.numberAssociations.map((a, i) => `<span class="curation-assoc-chip" title="${a.source}">Number ${a.number} (${a.role}) <button type="button" data-remove="${s.stoneId}" data-index="${i}">\u2715</button></span>`).join('')}
+      </div>
+      <div class="curation-evidence" id="curationEvidence-${s.stoneId}"></div>
+      <div class="curation-add-form" style="display:flex;gap:8px;align-items:flex-end;margin-top:10px;flex-wrap:wrap;">
+        <div style="width:70px;"><label style="font-size:11px;color:var(--text-muted);">Number</label><select id="curationNumber-${s.stoneId}" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border-strong);background:var(--navy-2);color:var(--text);">${[1,2,3,4,5,6,7,8,9].map((n) => `<option value="${n}">${n}</option>`).join('')}</select></div>
+        <div style="width:100px;"><label style="font-size:11px;color:var(--text-muted);">Role</label><select id="curationRole-${s.stoneId}" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border-strong);background:var(--navy-2);color:var(--text);"><option value="supporting">Supporting</option><option value="primary">Primary</option></select></div>
+        <div style="flex:1;min-width:160px;"><label style="font-size:11px;color:var(--text-muted);">Source (required)</label><input type="text" id="curationSource-${s.stoneId}" placeholder="Book, author, page, or your own methodology" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border-strong);background:var(--navy-2);color:var(--text);"></div>
+        <button type="button" data-add="${s.stoneId}" style="padding:8px 14px;">Add</button>
+      </div>
+      <div id="curationResult-${s.stoneId}"></div>
+    </div>
+  `).join('');
+
+  listEl.querySelectorAll('[data-search-books]').forEach((btn) => {
+    btn.addEventListener('click', () => searchBooksForStone(btn.dataset.searchBooks));
+  });
+  listEl.querySelectorAll('[data-remove]').forEach((btn) => {
+    btn.addEventListener('click', () => removeAssociation(btn.dataset.remove, btn.dataset.index));
+  });
+  listEl.querySelectorAll('[data-add]').forEach((btn) => {
+    btn.addEventListener('click', () => addAssociation(btn.dataset.add));
+  });
+}
+
+async function searchBooksForStone(stoneId) {
+  const evidenceEl = document.getElementById('curationEvidence-' + stoneId);
+  evidenceEl.innerHTML = '<p style="font-size:12px;color:var(--text-dim);">Searching your books\u2026</p>';
+  try {
+    const res = await fetch('/api/crystals/stones/' + stoneId + '/book-search');
+    const data = await res.json();
+    if (!res.ok) { evidenceEl.innerHTML = `<p class="wizard-skip-note">${data.error}</p>`; return; }
+    if (data.sourceCount === 0) {
+      evidenceEl.innerHTML = '<p style="font-size:12px;color:var(--text-muted);">No passages in your uploaded books mention this stone together with a number.</p>';
+      return;
+    }
+    evidenceEl.innerHTML = data.books.map((b) => b.excerpts.map((e) => `
+      <div class="curation-evidence-item">
+        <div class="ce-source">${b.bookTitle}${b.bookAuthor ? ' \u2014 ' + b.bookAuthor : ''}, p.${e.page}</div>
+        <div class="ce-text">${e.excerpt}</div>
+        <button type="button" class="ghost" data-use-source="${stoneId}" data-source-text="${(b.bookTitle + (b.bookAuthor ? ', ' + b.bookAuthor : '') + ', p.' + e.page).replace(/"/g, '&quot;')}" style="padding:5px 10px;font-size:11px;">Use as source</button>
+      </div>
+    `).join('')).join('');
+
+    evidenceEl.querySelectorAll('[data-use-source]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.getElementById('curationSource-' + btn.dataset.useSource).value = btn.dataset.sourceText;
+      });
+    });
+  } catch (err) {
+    evidenceEl.innerHTML = '<p class="wizard-skip-note">Could not search books right now.</p>';
+  }
+}
+
+async function addAssociation(stoneId) {
+  const number = document.getElementById('curationNumber-' + stoneId).value;
+  const role = document.getElementById('curationRole-' + stoneId).value;
+  const source = document.getElementById('curationSource-' + stoneId).value.trim();
+  const resultEl = document.getElementById('curationResult-' + stoneId);
+  if (!source) { resultEl.innerHTML = '<p class="wizard-skip-note">A source is required.</p>'; return; }
+
+  try {
+    const res = await fetch('/api/crystals/stones/' + stoneId + '/associations', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ number: Number(number), role, source }),
+    });
+    const data = await res.json();
+    if (!res.ok) { resultEl.innerHTML = `<p class="wizard-skip-note">${data.error}</p>`; return; }
+    await loadCurationStones();
+  } catch (err) {
+    resultEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';
+  }
+}
+
+async function removeAssociation(stoneId, index) {
+  if (!confirm('Remove this association?')) return;
+  try {
+    await fetch('/api/crystals/stones/' + stoneId + '/associations/' + index, { method: 'DELETE' });
+    await loadCurationStones();
+  } catch (err) {
+    alert('Could not reach the server.');
+  }
 }
 
 function openActorsAddModal() {
