@@ -15,6 +15,8 @@
  *   Personality Number          = consonants of the name only
  */
 
+const { Solar } = require('lunar-javascript');
+
 const MASTER_NUMBERS = [11, 22, 33];
 
 // --- Configurable letter-value mappings -----------------------------------
@@ -98,12 +100,24 @@ function calculateConductorNumber(day, month, year) {
 // arithmetic for birth years before vs. from 2000, and for male vs.
 // female. A calculated result of 5 has no standalone Kua number in this
 // system and is always substituted: 2 for males, 8 for females.
-function calculateKuaNumber(year, gender) {
+//
+// Feng Shui follows the lunar calendar, not January 1st -- someone born
+// before that year's Lunar New Year (which falls between Jan 21 and Feb
+// 20 depending on the year) belongs to the PREVIOUS lunar year for this
+// calculation. Uses the lunar-javascript library (verified against
+// several independently-confirmed Lunar New Year dates, including the
+// exact worked example of Jan 15 1990 -> lunar year 1989 from one of the
+// source articles) rather than a manually-transcribed date table.
+function calculateKuaNumber(day, month, year, gender) {
   if (!['Male', 'Female'].includes(gender)) {
     throw new Error('Kua Number requires gender to be exactly "Male" or "Female".');
   }
 
-  const lastTwoDigits = year % 100;
+  const solar = Solar.fromYmd(year, month, day);
+  const lunarYear = solar.getLunar().getYear();
+  const lunarAdjustmentApplied = lunarYear !== year;
+
+  const lastTwoDigits = lunarYear % 100;
   const rawSum = Math.floor(lastTwoDigits / 10) + (lastTwoDigits % 10);
   let digitSum = rawSum;
   const reductionSteps = [];
@@ -113,7 +127,7 @@ function calculateKuaNumber(year, gender) {
     digitSum = next;
   }
 
-  const isPost2000 = year >= 2000;
+  const isPost2000 = lunarYear >= 2000;
   let kua;
   let formulaText;
 
@@ -121,7 +135,7 @@ function calculateKuaNumber(year, gender) {
     const base = isPost2000 ? 9 : 10;
     kua = base - digitSum;
     if (kua === 0) kua = 9; // only possible for post-2000 males when digitSum is 9
-    formulaText = `Male, born ${isPost2000 ? '2000 or later' : 'before 2000'}: ${base} - ${digitSum} = ${kua}`;
+    formulaText = `Male, born ${isPost2000 ? '2000 or later' : 'before 2000'} (lunar year): ${base} - ${digitSum} = ${kua}`;
   } else {
     const addend = isPost2000 ? 6 : 5;
     let sum = digitSum + addend;
@@ -132,7 +146,7 @@ function calculateKuaNumber(year, gender) {
       sum = next;
     }
     kua = sum;
-    formulaText = `Female, born ${isPost2000 ? '2000 or later' : 'before 2000'}: ${addSteps.join(' | ')}`;
+    formulaText = `Female, born ${isPost2000 ? '2000 or later' : 'before 2000'} (lunar year): ${addSteps.join(' | ')}`;
   }
 
   let specialRuleApplied = false;
@@ -142,7 +156,10 @@ function calculateKuaNumber(year, gender) {
   }
 
   const steps = [
-    `Last two digits of birth year ${year}: ${lastTwoDigits}`,
+    lunarAdjustmentApplied
+      ? `Birth date ${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year} falls before that year's Lunar New Year \u2192 using lunar year ${lunarYear} instead of calendar year ${year}`
+      : `Lunar year for this birth date matches the calendar year: ${lunarYear}`,
+    `Last two digits of lunar year ${lunarYear}: ${lastTwoDigits}`,
     `${Math.floor(lastTwoDigits / 10)} + ${lastTwoDigits % 10} = ${rawSum}`,
     ...reductionSteps,
     formulaText,
@@ -150,7 +167,7 @@ function calculateKuaNumber(year, gender) {
     `Kua Number = ${kua}`,
   ].filter(Boolean).join('\n');
 
-  return { value: kua, steps, specialRuleApplied };
+  return { value: kua, steps, specialRuleApplied, lunarYear, lunarAdjustmentApplied };
 }
 
 // --- Name-based numbers ------------------------------------------------------

@@ -193,15 +193,15 @@ router.get('/:id', async (req, res) => {
 // birth year + gender, not the full DOB/name profile.
 router.post('/kua-number', async (req, res) => {
   try {
-    const { year, gender } = req.body;
-    const y = Number(year);
-    if (!y || y < 1000 || y > 9999) return res.status(400).json({ error: 'A valid birth year is required.' });
+    const { day, month, year, gender } = req.body;
+    const d = Number(day), m = Number(month), y = Number(year);
+    if (!isValidCalendarDate(d, m, y)) return res.status(400).json({ error: 'A valid full date of birth (day, month, year) is required -- the lunar-year adjustment needs the exact date, not just the year.' });
     if (!['Male', 'Female'].includes(gender)) return res.status(400).json({ error: 'Gender must be Male or Female to calculate Kua Number.' });
 
-    const kua = calc.calculateKuaNumber(y, gender);
+    const kua = calc.calculateKuaNumber(d, m, y, gender);
     const reference = calc.KUA_REFERENCE[kua.value];
 
-    res.json({ value: kua.value, steps: kua.steps, specialRuleApplied: kua.specialRuleApplied, reference });
+    res.json({ value: kua.value, steps: kua.steps, specialRuleApplied: kua.specialRuleApplied, lunarYear: kua.lunarYear, lunarAdjustmentApplied: kua.lunarAdjustmentApplied, reference });
   } catch (err) {
     res.status(400).json({ error: err.message || 'Could not calculate Kua Number.' });
   }
