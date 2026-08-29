@@ -229,11 +229,12 @@ router.post('/total-chaldean', async (req, res) => {
 
     // DOB is optional here -- Birth Number and Destiny Number are only
     // included if a complete, valid date was actually given.
-    let birthNumber = null, destinyNumber = null;
+    let birthNumber = null, destinyNumber = null, destinyChunked = null;
     const d = Number(day), m = Number(month), y = Number(year);
     if (isValidCalendarDate(d, m, y)) {
       birthNumber = calc.calculateDriverNumber(d);
       destinyNumber = calc.calculateConductorNumber(d, m, y);
+      destinyChunked = calc.calculateDestinyNumberChunked(d, m, y);
     }
 
     const VOWEL_SET = new Set(['A', 'E', 'I', 'O', 'U']);
@@ -281,8 +282,9 @@ router.post('/total-chaldean', async (req, res) => {
 
     res.json({
       name, chaldean, pythagorean, compoundTableRange: { min: 10, max: 80 },
-      birthNumber: birthNumber ? { value: birthNumber.value, steps: birthNumber.steps } : null,
-      destinyNumber: destinyNumber ? { value: destinyNumber.value, steps: destinyNumber.steps } : null,
+      birthNumber: birthNumber ? { value: birthNumber.value, steps: birthNumber.steps, chaldeanLetters: calc.lettersForNumber(birthNumber.value, 'chaldean') } : null,
+      destinyNumber: destinyNumber ? { value: destinyNumber.value, steps: destinyNumber.steps, chaldeanLetters: calc.lettersForNumber(destinyNumber.value, 'chaldean') } : null,
+      destinyChunked,
     });
   } catch (err) {
     console.error('Total Chaldean failed:', err.message);

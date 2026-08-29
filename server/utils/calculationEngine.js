@@ -41,6 +41,14 @@ const PYTHAGOREAN_MAP = (() => {
 })();
 
 const LETTER_SYSTEMS = { chaldean: CHALDEAN_MAP, pythagorean: PYTHAGOREAN_MAP };
+
+// Reverse lookup: given a number, which letters map to it in the chosen
+// system? Used to answer "what letters correspond to my Destiny Number"
+// style questions -- e.g. lettersForNumber(6, 'chaldean') -> ['U','V','W'].
+function lettersForNumber(number, system) {
+  const map = LETTER_SYSTEMS[system];
+  return Object.keys(map).filter((letter) => map[letter] === number).sort();
+}
 const VOWELS = new Set(['A', 'E', 'I', 'O', 'U']);
 
 // --- Core digit reduction ---------------------------------------------------
@@ -93,6 +101,40 @@ function calculateConductorNumber(day, month, year) {
   const dobText = `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
   const steps = `${dobText}\n${digits.join(' + ')} = ${total}\n${stepsText(log)}\nConductor Number = ${result}`;
   return { value: result, steps, encounteredMasters, compound: total };
+}
+
+// Destiny Number, shown as 4 chunks (Day, Month, Year, then their sum
+// reduced to the final total) rather than summing every digit at once.
+// Mathematically always agrees with calculateConductorNumber's result --
+// digital-root reduction is additive -- this is purely an alternate,
+// more granular presentation of the same calculation, verified to match
+// across multiple test dates before being added.
+function reduceToSingleDigit(n) {
+  const stepsLog = [];
+  while (n > 9) {
+    const digits = String(n).split('').map(Number);
+    const next = digits.reduce((a, b) => a + b, 0);
+    stepsLog.push(`${digits.join(' + ')} = ${next}`);
+    n = next;
+  }
+  return { value: n, stepsLog };
+}
+
+function calculateDestinyNumberChunked(day, month, year) {
+  const dayReduced = reduceToSingleDigit(day);
+  const monthReduced = reduceToSingleDigit(month);
+  const yearReduced = reduceToSingleDigit(year);
+  const combined = dayReduced.value + monthReduced.value + yearReduced.value;
+  const finalReduced = reduceToSingleDigit(combined);
+
+  return {
+    day: { raw: day, total: dayReduced.value, steps: dayReduced.stepsLog },
+    month: { raw: month, total: monthReduced.value, steps: monthReduced.stepsLog },
+    year: { raw: year, total: yearReduced.value, steps: yearReduced.stepsLog },
+    combinedSum: combined,
+    finalTotal: finalReduced.value,
+    finalSteps: finalReduced.stepsLog,
+  };
 }
 
 // Kua Number (Feng Shui / Eight Mansions system). Formula verified against
@@ -486,6 +528,8 @@ module.exports = {
   COMPOUND_NUMBER_TABLE,
   LETTER_COMPATIBILITY_TABLE,
   alphabetPosition,
+  lettersForNumber,
+  calculateDestinyNumberChunked,
   calculateNameNumber,
   calculateSoulUrgeNumber,
   calculatePersonalityNumber,
