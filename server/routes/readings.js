@@ -235,6 +235,9 @@ router.post('/total-chaldean', async (req, res) => {
       birthNumber = calc.calculateDriverNumber(d);
       destinyNumber = calc.calculateConductorNumber(d, m, y);
       destinyChunked = calc.calculateDestinyNumberChunked(d, m, y);
+      destinyChunked.day.chaldeanLetters = calc.lettersForNumber(destinyChunked.day.total, 'chaldean');
+      destinyChunked.month.chaldeanLetters = calc.lettersForNumber(destinyChunked.month.total, 'chaldean');
+      destinyChunked.year.chaldeanLetters = calc.lettersForNumber(destinyChunked.year.total, 'chaldean');
     }
 
     const VOWEL_SET = new Set(['A', 'E', 'I', 'O', 'U']);

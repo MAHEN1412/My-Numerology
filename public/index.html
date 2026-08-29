@@ -3910,6 +3910,18 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
         </div>
         <p class="report-form-section-label">Letters for Your Numbers</p>
         <div class="lc-group-row" style="max-width:1100px;">
+          <span style="font-size:13px;color:var(--text-dim);margin-right:6px;">Date Total ${data.destinyChunked.day.total} letters:</span>
+          ${letterChips(data.destinyChunked.day.chaldeanLetters)}
+        </div>
+        <div class="lc-group-row" style="max-width:1100px;">
+          <span style="font-size:13px;color:var(--text-dim);margin-right:6px;">Month Total ${data.destinyChunked.month.total} letters:</span>
+          ${letterChips(data.destinyChunked.month.chaldeanLetters)}
+        </div>
+        <div class="lc-group-row" style="max-width:1100px;">
+          <span style="font-size:13px;color:var(--text-dim);margin-right:6px;">Year Total ${data.destinyChunked.year.total} letters:</span>
+          ${letterChips(data.destinyChunked.year.chaldeanLetters)}
+        </div>
+        <div class="lc-group-row" style="max-width:1100px;">
           <span style="font-size:13px;color:var(--text-dim);margin-right:6px;">Birth Number ${data.birthNumber.value} letters:</span>
           ${letterChips(data.birthNumber.chaldeanLetters)}
         </div>
@@ -3973,12 +3985,11 @@ document.getElementById('letterCompBtn').addEventListener('click', async () => {
 
     resultsEl.innerHTML = `
       <p style="font-size:13px;color:var(--text-dim);margin:0 0 20px;">Driver Number <b>${data.driverNumber}</b> (from day of birth ${data.day})</p>
-      <p class="report-form-section-label" style="margin-top:0;">Ascendant (best match)</p>
-      <div class="lc-group-row">${chipGroup(data.ascendant, 'lc-ascendant')}</div>
-      <p class="report-form-section-label">Harmonious</p>
-      <div class="lc-group-row">${chipGroup(data.harmonious, 'lc-harmonious')}</div>
-      <p class="report-form-section-label">Clashing</p>
-      <div class="lc-group-row">${chipGroup(data.clashing, 'lc-clashing')}</div>
+      <div class="tc-equation" style="max-width:1100px;">
+        <div class="tc-eq-part"><div class="tc-eq-value" style="font-size:16px;letter-spacing:2px;">${data.ascendant.join('')}</div><div class="tc-eq-label">Ascendant (best match)</div></div>
+        <div class="tc-eq-part"><div class="tc-eq-value" style="font-size:16px;letter-spacing:2px;">${data.harmonious.join('')}</div><div class="tc-eq-label">Harmonious</div></div>
+        <div class="tc-eq-part"><div class="tc-eq-value" style="font-size:16px;letter-spacing:2px;">${data.clashing.join('')}</div><div class="tc-eq-label">Clashing</div></div>
+      </div>
       ${nameHtml}
     `;
   } catch (err) {
