@@ -815,6 +815,10 @@
         <label for="totalChaldeanInput">Name</label>
         <input type="text" id="totalChaldeanInput" placeholder="e.g. RAMAN">
       </div>
+      <div class="field">
+        <label for="totalChaldeanDobInput">Date of birth (optional \u2014 adds Birth Number &amp; Destiny Number)</label>
+        <input type="date" id="totalChaldeanDobInput">
+      </div>
       <button type="button" class="calc-btn" id="totalChaldeanBtn">Calculate</button>
       <div class="field-error" id="totalChaldeanError" role="alert"></div>
     </div>
@@ -3823,9 +3827,15 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
   btn.disabled = true; btn.textContent = 'Calculating\u2026';
   resultsEl.innerHTML = '<p class="loading-note">Calculating\u2026</p>';
   try {
+    const dobVal = document.getElementById('totalChaldeanDobInput').value;
+    const body = { name };
+    if (dobVal) {
+      const [y, m, d] = dobVal.split('-').map(Number);
+      Object.assign(body, { day: d, month: m, year: y });
+    }
     const res = await fetch('/api/readings/total-chaldean', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name }),
+      body: JSON.stringify(body),
     });
     const data = await res.json();
     if (!res.ok) { errorEl.textContent = data.error || 'Could not calculate.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return; }
@@ -3878,7 +3888,18 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
       <p style="font-size:11px;color:var(--text-muted);margin-top:16px;">Reduced Name Number (for reference): ${data.pythagorean.reducedNameNumber}</p>
     `;
 
+    let birthDestinyHtml = '';
+    if (data.birthNumber && data.destinyNumber) {
+      birthDestinyHtml = `
+        <div class="tc-equation" style="max-width:1100px;margin-bottom:24px;">
+          <div class="tc-eq-part"><div class="tc-eq-value">${data.birthNumber.value}</div><div class="tc-eq-label">Birth Number</div></div>
+          <div class="tc-eq-part"><div class="tc-eq-value">${data.destinyNumber.value}</div><div class="tc-eq-label">Destiny Number</div></div>
+        </div>
+      `;
+    }
+
     resultsEl.innerHTML = `
+      ${birthDestinyHtml}
       <div class="tc-systems-grid">
         <div class="tc-system-col">${chaldeanHtml}</div>
         <div class="tc-system-col">${pythagoreanHtml}</div>

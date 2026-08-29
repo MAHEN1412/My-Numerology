@@ -224,8 +224,17 @@ router.post('/kua-number', async (req, res) => {
 // traditionally read for names, nicknames, phone/vehicle numbers, etc.
 router.post('/total-chaldean', async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, day, month, year } = req.body;
     if (!name || !name.trim()) return res.status(400).json({ error: 'Enter a name to calculate.' });
+
+    // DOB is optional here -- Birth Number and Destiny Number are only
+    // included if a complete, valid date was actually given.
+    let birthNumber = null, destinyNumber = null;
+    const d = Number(day), m = Number(month), y = Number(year);
+    if (isValidCalendarDate(d, m, y)) {
+      birthNumber = calc.calculateDriverNumber(d);
+      destinyNumber = calc.calculateConductorNumber(d, m, y);
+    }
 
     const VOWEL_SET = new Set(['A', 'E', 'I', 'O', 'U']);
     const lookupCompound = (value) => (value >= 10 && value <= 80) ? { value, ...calc.COMPOUND_NUMBER_TABLE[value] } : null;
@@ -270,7 +279,11 @@ router.post('/total-chaldean', async (req, res) => {
       reducedNameNumber: pyNameResult.value,
     };
 
-    res.json({ name, chaldean, pythagorean, compoundTableRange: { min: 10, max: 80 } });
+    res.json({
+      name, chaldean, pythagorean, compoundTableRange: { min: 10, max: 80 },
+      birthNumber: birthNumber ? { value: birthNumber.value, steps: birthNumber.steps } : null,
+      destinyNumber: destinyNumber ? { value: destinyNumber.value, steps: destinyNumber.steps } : null,
+    });
   } catch (err) {
     console.error('Total Chaldean failed:', err.message);
     res.status(400).json({ error: 'Could not calculate right now.' });
