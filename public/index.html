@@ -137,6 +137,9 @@
   .tc-equation .tc-eq-value{font-size:24px;font-weight:800;color:var(--text);}
   .tc-equation .tc-eq-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;}
   .tc-equation .tc-eq-op{font-size:20px;color:var(--text-muted);}
+  .tc-systems-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:1100px;}
+  .tc-system-col{min-width:0;}
+  @media (max-width:900px){.tc-systems-grid{grid-template-columns:1fr;}}
   .actor-card:hover{border-color:var(--violet);}
   .actor-card .ac-name{font-size:14px;font-weight:700;color:var(--text);margin:0 0 4px;}
   .actor-card .ac-meta{font-size:11px;color:var(--text-muted);margin:0 0 12px;}
@@ -793,13 +796,15 @@
     </div>
   </header>
 
-  <div class="wrap" style="padding-bottom:56px;max-width:640px;">
-    <div class="field">
-      <label for="totalChaldeanInput">Name</label>
-      <input type="text" id="totalChaldeanInput" placeholder="e.g. RAMAN">
+  <div class="wrap" style="padding-bottom:56px;">
+    <div style="max-width:640px;">
+      <div class="field">
+        <label for="totalChaldeanInput">Name</label>
+        <input type="text" id="totalChaldeanInput" placeholder="e.g. RAMAN">
+      </div>
+      <button type="button" class="calc-btn" id="totalChaldeanBtn">Calculate</button>
+      <div class="field-error" id="totalChaldeanError" role="alert"></div>
     </div>
-    <button type="button" class="calc-btn" id="totalChaldeanBtn">Calculate</button>
-    <div class="field-error" id="totalChaldeanError" role="alert"></div>
 
     <div id="totalChaldeanResults" style="margin-top:28px;"></div>
   </div>
@@ -3785,20 +3790,20 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
     const data = await res.json();
     if (!res.ok) { errorEl.textContent = data.error || 'Could not calculate.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return; }
 
-    const letterTiles = data.letters.map((l) => `
+    const letterTilesHtml = (letters) => letters.map((l) => `
       <div class="tc-letter-tile${l.isVowel ? ' tc-vowel' : ''}">
         <div class="tc-letter">${l.letter}</div>
         <div class="tc-value">${l.value}</div>
       </div>
     `).join('');
 
-    const equationHtml = `
+    const equationHtml = (section) => `
       <div class="tc-equation">
-        <div class="tc-eq-part"><div class="tc-eq-value">${data.vowelTotal}</div><div class="tc-eq-label">Vowel Total</div></div>
+        <div class="tc-eq-part"><div class="tc-eq-value">${section.vowelTotal}</div><div class="tc-eq-label">Vowel Total</div></div>
         <div class="tc-eq-op">+</div>
-        <div class="tc-eq-part"><div class="tc-eq-value">${data.consonantTotal}</div><div class="tc-eq-label">Consonant Total</div></div>
+        <div class="tc-eq-part"><div class="tc-eq-value">${section.consonantTotal}</div><div class="tc-eq-label">Consonant Total</div></div>
         <div class="tc-eq-op">=</div>
-        <div class="tc-eq-part"><div class="tc-eq-value">${data.total}</div><div class="tc-eq-label">Total (Compound)</div></div>
+        <div class="tc-eq-part"><div class="tc-eq-value">${section.total}</div><div class="tc-eq-label">Total</div></div>
       </div>
     `;
 
@@ -3814,19 +3819,30 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
       return `<div class="report-card"><h4>${label}: ${totalValue}</h4><p style="font-size:12px;color:var(--text-muted);">The compound number table covers 10\u201380. This total falls outside that range, so no reading is shown.</p></div>`;
     };
 
-    const compoundHtml = `
-      ${compoundCard('Vowel Total', data.vowelTotal, data.vowelCompound)}
-      ${compoundCard('Consonant Total', data.consonantTotal, data.consonantCompound)}
-      ${compoundCard('Grand Total', data.total, data.compound)}
+    const chaldeanHtml = `
+      <p class="report-form-section-label" style="margin-top:0;">Chaldean</p>
+      <div class="tc-letter-row">${letterTilesHtml(data.chaldean.letters)}</div>
+      ${equationHtml(data.chaldean)}
+      <p class="report-form-section-label">Compound Number Reading</p>
+      ${compoundCard('Vowel Total', data.chaldean.vowelTotal, data.chaldean.vowelCompound)}
+      ${compoundCard('Consonant Total', data.chaldean.consonantTotal, data.chaldean.consonantCompound)}
+      ${compoundCard('Grand Total', data.chaldean.total, data.chaldean.compound)}
+      <p style="font-size:11px;color:var(--text-muted);margin-top:16px;">Reduced Name Number (for reference): ${data.chaldean.reducedNameNumber}</p>
+    `;
+
+    const pythagoreanHtml = `
+      <p class="report-form-section-label" style="margin-top:0;">Pythagorean</p>
+      <div class="tc-letter-row">${letterTilesHtml(data.pythagorean.letters)}</div>
+      ${equationHtml(data.pythagorean)}
+      <p style="font-size:12px;color:var(--text-muted);margin-top:12px;">The Compound Number table (10\u201380) is specifically a Chaldean concept, so no compound reading is shown here \u2014 only the Pythagorean letter values and totals.</p>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:16px;">Reduced Name Number (for reference): ${data.pythagorean.reducedNameNumber}</p>
     `;
 
     resultsEl.innerHTML = `
-      <p class="report-form-section-label" style="margin-top:0;">Letter Breakdown</p>
-      <div class="tc-letter-row">${letterTiles}</div>
-      ${equationHtml}
-      <p class="report-form-section-label">Compound Number Reading</p>
-      ${compoundHtml}
-      <p style="font-size:11px;color:var(--text-muted);margin-top:16px;">Reduced Name Number (for reference): ${data.reducedNameNumber}</p>
+      <div class="tc-systems-grid">
+        <div class="tc-system-col">${chaldeanHtml}</div>
+        <div class="tc-system-col">${pythagoreanHtml}</div>
+      </div>
     `;
   } catch (err) {
     errorEl.textContent = 'Could not reach the server.'; errorEl.classList.add('show'); resultsEl.innerHTML = '';

@@ -227,39 +227,50 @@ router.post('/total-chaldean', async (req, res) => {
     const { name } = req.body;
     if (!name || !name.trim()) return res.status(400).json({ error: 'Enter a name to calculate.' });
 
-    const nameResult = calc.calculateNameNumber(name, 'chaldean');
-    const vowelResult = calc.calculateSoulUrgeNumber(name, 'chaldean');
-    const consonantResult = calc.calculatePersonalityNumber(name, 'chaldean');
-
-    const total = nameResult.compound;
-    const vowelTotal = vowelResult.compound;
-    const consonantTotal = consonantResult.compound;
-
-    // Compound table only covers 10-80. If a total falls outside that
-    // range, say so honestly rather than guessing at a value the table
-    // doesn't define. Applied to all three totals, not just the grand
-    // total, since vowel and consonant totals are read the same way.
-    const lookupCompound = (value) => (value >= 10 && value <= 80) ? { value, ...calc.COMPOUND_NUMBER_TABLE[value] } : null;
-    const compound = lookupCompound(total);
-    const vowelCompound = lookupCompound(vowelTotal);
-    const consonantCompound = lookupCompound(consonantTotal);
-
     const VOWEL_SET = new Set(['A', 'E', 'I', 'O', 'U']);
-    const letters = nameResult.breakdown.map((l) => ({ ...l, isVowel: VOWEL_SET.has(l.letter) }));
+    const lookupCompound = (value) => (value >= 10 && value <= 80) ? { value, ...calc.COMPOUND_NUMBER_TABLE[value] } : null;
 
-    res.json({
-      name,
-      letters,
-      total,
-      vowelTotal,
-      consonantTotal,
-      identityCheck: vowelTotal + consonantTotal === total, // always true; shown as the "equal to" the user asked for
-      reducedNameNumber: nameResult.value,
-      compound,
-      vowelCompound,
-      consonantCompound,
-      compoundTableRange: { min: 10, max: 80 },
-    });
+    // ----- Chaldean (with Compound Number reading -- a Chaldean-specific concept) -----
+    const chNameResult = calc.calculateNameNumber(name, 'chaldean');
+    const chVowelResult = calc.calculateSoulUrgeNumber(name, 'chaldean');
+    const chConsonantResult = calc.calculatePersonalityNumber(name, 'chaldean');
+    const chTotal = chNameResult.compound;
+    const chVowelTotal = chVowelResult.compound;
+    const chConsonantTotal = chConsonantResult.compound;
+
+    const chaldean = {
+      letters: chNameResult.breakdown.map((l) => ({ ...l, isVowel: VOWEL_SET.has(l.letter) })),
+      total: chTotal,
+      vowelTotal: chVowelTotal,
+      consonantTotal: chConsonantTotal,
+      identityCheck: chVowelTotal + chConsonantTotal === chTotal,
+      reducedNameNumber: chNameResult.value,
+      compound: lookupCompound(chTotal),
+      vowelCompound: lookupCompound(chVowelTotal),
+      consonantCompound: lookupCompound(chConsonantTotal),
+    };
+
+    // ----- Pythagorean (letter breakdown + totals only -- NO compound
+    // number reading, since that table is specifically a Chaldean
+    // concept and applying it here would mix two different traditions'
+    // methods) -----
+    const pyNameResult = calc.calculateNameNumber(name, 'pythagorean');
+    const pyVowelResult = calc.calculateSoulUrgeNumber(name, 'pythagorean');
+    const pyConsonantResult = calc.calculatePersonalityNumber(name, 'pythagorean');
+    const pyTotal = pyNameResult.compound;
+    const pyVowelTotal = pyVowelResult.compound;
+    const pyConsonantTotal = pyConsonantResult.compound;
+
+    const pythagorean = {
+      letters: pyNameResult.breakdown.map((l) => ({ ...l, isVowel: VOWEL_SET.has(l.letter) })),
+      total: pyTotal,
+      vowelTotal: pyVowelTotal,
+      consonantTotal: pyConsonantTotal,
+      identityCheck: pyVowelTotal + pyConsonantTotal === pyTotal,
+      reducedNameNumber: pyNameResult.value,
+    };
+
+    res.json({ name, chaldean, pythagorean, compoundTableRange: { min: 10, max: 80 } });
   } catch (err) {
     console.error('Total Chaldean failed:', err.message);
     res.status(400).json({ error: 'Could not calculate right now.' });
