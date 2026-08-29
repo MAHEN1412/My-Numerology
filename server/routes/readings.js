@@ -29,12 +29,21 @@ function buildResultObject({ name, day, month, year, system }) {
   const driverNumber = calc.calculateDriverNumber(day);
   const conductorNumber = calc.calculateConductorNumber(day, month, year);
 
-  let nameNumber = null, soulUrgeNumber = null, personalityNumber = null, karmicNumbers = null;
+  let nameNumber = null, soulUrgeNumber = null, personalityNumber = null, karmicNumbers = null, pyramidNumber = null;
   if (name) {
     nameNumber = calc.calculateNameNumber(name, system);
     soulUrgeNumber = calc.calculateSoulUrgeNumber(name, system);
     personalityNumber = calc.calculatePersonalityNumber(name, system);
     karmicNumbers = calc.calculateKarmicNumbers(name, system);
+    pyramidNumber = calc.calculatePyramidNumber(name, system);
+    if (pyramidNumber) {
+      // "Destiny Match" per the source method: the pyramid apex matching
+      // either the Driver (birth day) or Conductor (full date sum) is
+      // considered a notable alignment -- a real, checkable fact about
+      // the two numbers, not an invented claim about outcomes.
+      pyramidNumber.matchesDriver = pyramidNumber.value === driverNumber.value;
+      pyramidNumber.matchesConductor = pyramidNumber.value === conductorNumber.value;
+    }
   }
 
   // Per the app owner's explicit request, when a name is given, the Name
@@ -96,6 +105,7 @@ function buildResultObject({ name, day, month, year, system }) {
     },
     masterNumbers: masterNumbersEncountered,
     karmicNumbers,
+    pyramidNumber,
     loShuGrid: loshu,
     numberFrequency: loshuCounts,
     missingNumbers: loshu.missing,

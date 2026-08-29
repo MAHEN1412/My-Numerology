@@ -21,6 +21,7 @@ const SavedProfileSchema = new mongoose.Schema({
   driverNumber: { type: Number },
   conductorNumber: { type: Number },
   kuaNumber: { type: Number },
+  pyramidNumber: { type: Number },
   nameNumber: { type: Number },
 
   crystalSuggestion: { type: String, trim: true, maxlength: 200 }, // top recommended crystal, if applicable

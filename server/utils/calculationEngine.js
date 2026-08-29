@@ -216,6 +216,46 @@ function calculateKarmicNumbers(fullName, system) {
   return karmic;
 }
 
+/**
+ * Pyramid Number (aka "Triangle of Life" in some traditions): start with
+ * each letter's Chaldean value as the base row, then build each
+ * successive row by summing adjacent pairs, reducing EACH pair-sum to a
+ * single digit immediately (not accumulating multi-digit values across
+ * rows, and not preserving master numbers -- e.g. 5+6=11 reduces to 2,
+ * matching the worked example this was verified against). Continue until
+ * a single apex number remains.
+ */
+function reduceSingleDigit(n) {
+  while (n > 9) {
+    n = String(n).split('').reduce((a, d) => a + Number(d), 0);
+  }
+  return n;
+}
+
+function calculatePyramidNumber(fullName, system) {
+  const map = LETTER_SYSTEMS[system];
+  const letters = lettersOf(fullName);
+  if (letters.length === 0) return null;
+
+  let row = letters.map((l) => map[l] || 0);
+  const rows = [row.slice()];
+
+  while (row.length > 1) {
+    const nextRow = [];
+    for (let i = 0; i < row.length - 1; i++) {
+      nextRow.push(reduceSingleDigit(row[i] + row[i + 1]));
+    }
+    rows.push(nextRow.slice());
+    row = nextRow;
+  }
+
+  const apex = row[0];
+  const rowsText = rows.map((r, i) => `Row ${i + 1}: ${r.join(' ')}`).join('\n');
+  const steps = `${fullName}\n${letters.join(' ')}\n${rowsText}\nPyramid (Apex) Number = ${apex}`;
+
+  return { value: apex, rows, steps };
+}
+
 // --- Lo Shu grid --------------------------------------------------------------
 
 const LOSHU_LAYOUT = [[4, 9, 2], [3, 5, 7], [8, 1, 6]];
@@ -342,6 +382,7 @@ module.exports = {
   calculateSoulUrgeNumber,
   calculatePersonalityNumber,
   calculateKarmicNumbers,
+  calculatePyramidNumber,
   generateLoShuGrid,
   getPresentNumbers,
   getMissingNumbers,

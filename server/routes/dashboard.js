@@ -14,7 +14,7 @@ const router = express.Router();
 router.post('/save', requireAdmin, async (req, res) => {
   try {
     const {
-      name, phone, day, month, year, system, tabSource, driverNumber, conductorNumber, nameNumber, kuaNumber,
+      name, phone, day, month, year, system, tabSource, driverNumber, conductorNumber, nameNumber, kuaNumber, pyramidNumber,
       crystalSuggestion, matchScore, autoSummary, userNotes, status, gender,
       correctedNameSuggestion, mobileNumberChecked, mobileAnalysisLabel,
       businessNameChecked, businessNameScore, genericNumberType, genericNumberValue,
@@ -37,6 +37,7 @@ router.post('/save', requireAdmin, async (req, res) => {
       conductorNumber: conductorNumber ?? undefined,
       nameNumber: nameNumber ?? undefined,
       kuaNumber: kuaNumber ?? undefined,
+      pyramidNumber: pyramidNumber ?? undefined,
       crystalSuggestion: crystalSuggestion || '',
       matchScore: matchScore ?? undefined,
       correctedNameSuggestion: correctedNameSuggestion || '',

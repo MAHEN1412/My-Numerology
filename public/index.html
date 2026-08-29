@@ -4677,6 +4677,7 @@ function openCaseDrawer(id) {
         <p>Driver Number: <b>${p.driverNumber ?? '\u2014'}</b></p>
         <p>Conductor Number: <b>${p.conductorNumber ?? '\u2014'}</b></p>
         <p>Kua Number: <b>${p.kuaNumber ?? '\u2014'}</b>${p.kuaNumber && KUA_TABLE_DATA[p.kuaNumber] ? ` <span style="font-weight:400;color:var(--text-muted);">(${KUA_TABLE_DATA[p.kuaNumber].element}, ${KUA_TABLE_DATA[p.kuaNumber].group} Group)</span>` : (p.gender ? '' : ' <span style="font-size:11px;color:var(--text-muted);">(no gender on file \u2014 edit this case to add it)</span>')}</p>
+        <p>Pyramid Number: <b>${p.pyramidNumber ?? '\u2014'}</b>${p.pyramidNumber && (p.pyramidNumber === p.driverNumber || p.pyramidNumber === p.conductorNumber) ? ' <span style="font-size:11px;color:var(--text-muted);">(matches ' + [p.pyramidNumber === p.driverNumber ? 'Driver' : null, p.pyramidNumber === p.conductorNumber ? 'Conductor' : null].filter(Boolean).join(' & ') + ')</span>' : ''}</p>
         <p>Name Number: <b>${p.nameNumber ?? '\u2014'}</b></p>
         <div class="nc-name-compare-row" id="caseDrawerNameCompareRow" style="${p.correctedNameSuggestion ? '' : 'display:none;'}">
           <div><span class="nc-name-compare-label">Original</span><br><b>${p.name || '\u2014'}</b></div>
@@ -5016,7 +5017,7 @@ function resetWizardState() {
   wizardState = {
     currentStep: 0,
     name: '', phone: '', day: null, month: null, year: null, system: 'chaldean', gender: '',
-    driverNumber: null, conductorNumber: null, kuaNumber: null,
+    driverNumber: null, conductorNumber: null, kuaNumber: null, pyramidNumber: null,
     correctedNameSuggestion: '',
     mobileNumberChecked: '', mobileAnalysisLabel: '', matchScore: null,
     businessNameChecked: '', businessNameScore: null,
@@ -5111,6 +5112,17 @@ function renderWizardBasics() {
       const result = data.result;
       wizardState.driverNumber = result.driverNumber.value;
       wizardState.conductorNumber = result.conductorNumber.value;
+      wizardState.pyramidNumber = result.pyramidNumber ? result.pyramidNumber.value : null;
+
+      let pyramidHtml = '';
+      if (result.pyramidNumber) {
+        const pn = result.pyramidNumber;
+        pyramidHtml = `<div class="wizard-result-row"><span>Pyramid Number</span><b>${pn.value}</b></div>`;
+        if (pn.matchesDriver || pn.matchesConductor) {
+          const matchList = [pn.matchesDriver ? 'Driver Number' : null, pn.matchesConductor ? 'Conductor Number' : null].filter(Boolean).join(' and ');
+          pyramidHtml += `<p style="font-size:11px;color:var(--text-muted);margin:4px 0 0;">This matches the ${matchList} \u2014 considered a notable alignment in this method.</p>`;
+        }
+      }
 
       let kuaHtml = '';
       if (kuaRes.ok) {
@@ -5149,6 +5161,7 @@ function renderWizardBasics() {
         <div class="wizard-result-row"><span>Conductor Number</span><b>${result.conductorNumber.value}</b></div>
         ${result.nameNumber ? `<div class="wizard-result-row"><span>Name Number</span><b>${result.nameNumber.value}</b></div>` : ''}
         ${kuaHtml}
+        ${pyramidHtml}
         ${nameCorrectionHtml}
       `;
     } catch (err) {
@@ -5349,7 +5362,7 @@ async function wizardSaveCase() {
         name: wizardState.name, phone: wizardState.phone, gender: wizardState.gender,
         day: wizardState.day, month: wizardState.month, year: wizardState.year, system: 'chaldean',
         tabSource: 'new-case-wizard',
-        driverNumber: wizardState.driverNumber, conductorNumber: wizardState.conductorNumber, kuaNumber: wizardState.kuaNumber,
+        driverNumber: wizardState.driverNumber, conductorNumber: wizardState.conductorNumber, kuaNumber: wizardState.kuaNumber, pyramidNumber: wizardState.pyramidNumber,
         crystalSuggestion: wizardState.crystalSuggestion, matchScore: wizardState.matchScore,
         correctedNameSuggestion: wizardState.correctedNameSuggestion,
         mobileNumberChecked: wizardState.mobileNumberChecked, mobileAnalysisLabel: wizardState.mobileAnalysisLabel,
