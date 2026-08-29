@@ -14,8 +14,8 @@ const router = express.Router();
 router.post('/save', requireAdmin, async (req, res) => {
   try {
     const {
-      name, phone, day, month, year, system, tabSource, driverNumber, conductorNumber, nameNumber,
-      crystalSuggestion, matchScore, autoSummary, userNotes, status,
+      name, phone, day, month, year, system, tabSource, driverNumber, conductorNumber, nameNumber, kuaNumber,
+      crystalSuggestion, matchScore, autoSummary, userNotes, status, gender,
       correctedNameSuggestion, mobileNumberChecked, mobileAnalysisLabel,
       businessNameChecked, businessNameScore, genericNumberType, genericNumberValue,
       relationshipPersonBName, relationshipScore,
@@ -32,9 +32,11 @@ router.post('/save', requireAdmin, async (req, res) => {
       system: system === 'pythagorean' ? 'pythagorean' : 'chaldean',
       tabSource,
       status: ['Active', 'Review', 'Completed', 'Follow-up'].includes(status) ? status : 'Active',
+      gender: ['Male', 'Female'].includes(gender) ? gender : undefined,
       driverNumber: driverNumber ?? undefined,
       conductorNumber: conductorNumber ?? undefined,
       nameNumber: nameNumber ?? undefined,
+      kuaNumber: kuaNumber ?? undefined,
       crystalSuggestion: crystalSuggestion || '',
       matchScore: matchScore ?? undefined,
       correctedNameSuggestion: correctedNameSuggestion || '',
@@ -71,7 +73,7 @@ router.get('/list', requireAdmin, async (req, res) => {
 // PUT /api/dashboard/:id — edit user notes and/or status (everything else is a historical record)
 router.put('/:id', requireAdmin, async (req, res) => {
   try {
-    const { userNotes, status, correctedNameSuggestion, name, phone, day, month, year, crystalSuggestion } = req.body;
+    const { userNotes, status, correctedNameSuggestion, name, phone, day, month, year, crystalSuggestion, gender } = req.body;
     const existing = await SavedProfile.findById(req.params.id);
     if (!existing) return res.status(404).json({ error: 'Profile not found.' });
 
@@ -85,6 +87,10 @@ router.put('/:id', requireAdmin, async (req, res) => {
     if (month !== undefined) update.month = Number(month);
     if (year !== undefined) update.year = Number(year);
     if (crystalSuggestion !== undefined) update.crystalSuggestion = String(crystalSuggestion).trim();
+    if (gender !== undefined) {
+      if (!['Male', 'Female'].includes(gender)) return res.status(400).json({ error: 'Gender must be Male or Female.' });
+      update.gender = gender;
+    }
 
     // If the DOB or name actually changed, the previously-stored
     // Driver/Conductor/Name numbers would otherwise go stale -- recompute

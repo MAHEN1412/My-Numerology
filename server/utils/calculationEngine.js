@@ -93,6 +93,66 @@ function calculateConductorNumber(day, month, year) {
   return { value: result, steps, encounteredMasters, compound: total };
 }
 
+// Kua Number (Feng Shui / Eight Mansions system). Formula verified against
+// multiple independent sources and their worked examples -- different
+// arithmetic for birth years before vs. from 2000, and for male vs.
+// female. A calculated result of 5 has no standalone Kua number in this
+// system and is always substituted: 2 for males, 8 for females.
+function calculateKuaNumber(year, gender) {
+  if (!['Male', 'Female'].includes(gender)) {
+    throw new Error('Kua Number requires gender to be exactly "Male" or "Female".');
+  }
+
+  const lastTwoDigits = year % 100;
+  const rawSum = Math.floor(lastTwoDigits / 10) + (lastTwoDigits % 10);
+  let digitSum = rawSum;
+  const reductionSteps = [];
+  while (digitSum > 9) {
+    const next = Math.floor(digitSum / 10) + (digitSum % 10);
+    reductionSteps.push(`${digitSum} \u2192 ${Math.floor(digitSum / 10)} + ${digitSum % 10} = ${next}`);
+    digitSum = next;
+  }
+
+  const isPost2000 = year >= 2000;
+  let kua;
+  let formulaText;
+
+  if (gender === 'Male') {
+    const base = isPost2000 ? 9 : 10;
+    kua = base - digitSum;
+    if (kua === 0) kua = 9; // only possible for post-2000 males when digitSum is 9
+    formulaText = `Male, born ${isPost2000 ? '2000 or later' : 'before 2000'}: ${base} - ${digitSum} = ${kua}`;
+  } else {
+    const addend = isPost2000 ? 6 : 5;
+    let sum = digitSum + addend;
+    const addSteps = [`${digitSum} + ${addend} = ${sum}`];
+    while (sum > 9) {
+      const next = Math.floor(sum / 10) + (sum % 10);
+      addSteps.push(`${sum} \u2192 ${Math.floor(sum / 10)} + ${sum % 10} = ${next}`);
+      sum = next;
+    }
+    kua = sum;
+    formulaText = `Female, born ${isPost2000 ? '2000 or later' : 'before 2000'}: ${addSteps.join(' | ')}`;
+  }
+
+  let specialRuleApplied = false;
+  if (kua === 5) {
+    specialRuleApplied = true;
+    kua = gender === 'Male' ? 2 : 8;
+  }
+
+  const steps = [
+    `Last two digits of birth year ${year}: ${lastTwoDigits}`,
+    `${Math.floor(lastTwoDigits / 10)} + ${lastTwoDigits % 10} = ${rawSum}`,
+    ...reductionSteps,
+    formulaText,
+    specialRuleApplied ? `Result was 5 (no standalone Kua 5 in this system) \u2192 substituted to ${kua} for ${gender}` : null,
+    `Kua Number = ${kua}`,
+  ].filter(Boolean).join('\n');
+
+  return { value: kua, steps, specialRuleApplied };
+}
+
 // --- Name-based numbers ------------------------------------------------------
 // These preserve master numbers in the final value (standard Western
 // convention for name-derived numbers, distinct from Driver/Conductor).
@@ -238,12 +298,29 @@ function findArrows(counts) {
   return ARROWS.map((a) => ({ ...a, active: a.nums.every((n) => counts[n] > 0) }));
 }
 
+// Kua Number reference table -- Element, Group, and favorable directions
+// are the standard Eight Mansions Feng Shui associations for each Kua
+// number (no Kua 5 exists as its own entry; it's always substituted per
+// calculateKuaNumber above).
+const KUA_REFERENCE = {
+  1: { element: 'Water', group: 'East', favorableDirections: ['North', 'East', 'Southeast', 'South'], summary: 'Associated with wisdom, intuition, and adaptable communication.' },
+  2: { element: 'Earth', group: 'West', favorableDirections: ['Southwest', 'West', 'Northwest', 'Northeast'], summary: 'Associated with steadiness, patience, and a nurturing temperament.' },
+  3: { element: 'Wood', group: 'East', favorableDirections: ['East', 'Southeast', 'South', 'North'], summary: 'Associated with ambition, drive, and forward momentum.' },
+  4: { element: 'Wood', group: 'East', favorableDirections: ['Southeast', 'East', 'South', 'North'], summary: 'Associated with creativity, sharp thinking, and gentleness.' },
+  6: { element: 'Metal', group: 'West', favorableDirections: ['Northwest', 'West', 'Northeast', 'Southwest'], summary: 'Associated with leadership, discipline, and resolve.' },
+  7: { element: 'Metal', group: 'West', favorableDirections: ['West', 'Northwest', 'Southwest', 'Northeast'], summary: 'Associated with charm, sociability, and helpfulness.' },
+  8: { element: 'Earth', group: 'West', favorableDirections: ['Northeast', 'Southwest', 'West', 'Northwest'], summary: 'Associated with groundedness, security, and steady success.' },
+  9: { element: 'Fire', group: 'East', favorableDirections: ['South', 'Southeast', 'East', 'North'], summary: 'Associated with visibility, clarity, and enthusiasm.' },
+};
+
 module.exports = {
   LETTER_SYSTEMS,
   MASTER_NUMBERS,
   reduceNumber,
   calculateDriverNumber,
   calculateConductorNumber,
+  calculateKuaNumber,
+  KUA_REFERENCE,
   calculateNameNumber,
   calculateSoulUrgeNumber,
   calculatePersonalityNumber,

@@ -188,5 +188,24 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// POST /api/readings/kua-number
+// Separate from the main /readings calculation since Kua only needs
+// birth year + gender, not the full DOB/name profile.
+router.post('/kua-number', async (req, res) => {
+  try {
+    const { year, gender } = req.body;
+    const y = Number(year);
+    if (!y || y < 1000 || y > 9999) return res.status(400).json({ error: 'A valid birth year is required.' });
+    if (!['Male', 'Female'].includes(gender)) return res.status(400).json({ error: 'Gender must be Male or Female to calculate Kua Number.' });
+
+    const kua = calc.calculateKuaNumber(y, gender);
+    const reference = calc.KUA_REFERENCE[kua.value];
+
+    res.json({ value: kua.value, steps: kua.steps, specialRuleApplied: kua.specialRuleApplied, reference });
+  } catch (err) {
+    res.status(400).json({ error: err.message || 'Could not calculate Kua Number.' });
+  }
+});
+
 module.exports = router;
 module.exports.buildResultObject = buildResultObject;

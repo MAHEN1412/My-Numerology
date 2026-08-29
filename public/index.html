@@ -3003,6 +3003,20 @@ document.getElementById('analyzeMobileBtn').addEventListener('click', () => {
 
 let lastCrystalResult = null;
 
+// Mirrors server/utils/calculationEngine.js's KUA_REFERENCE -- static
+// reference data, not computed, so duplicating it here avoids an extra
+// API round-trip just to show element/group in the drawer.
+const KUA_TABLE_DATA = {
+  1: { element: 'Water', group: 'East' },
+  2: { element: 'Earth', group: 'West' },
+  3: { element: 'Wood', group: 'East' },
+  4: { element: 'Wood', group: 'East' },
+  6: { element: 'Metal', group: 'West' },
+  7: { element: 'Metal', group: 'West' },
+  8: { element: 'Earth', group: 'West' },
+  9: { element: 'Fire', group: 'East' },
+};
+
 const RATNA_HINDI_NAMES = {
   'Ruby': 'Manik', 'Pearl': 'Moti', 'Red Coral': 'Moonga', 'Emerald': 'Panna',
   'Yellow Sapphire': 'Pukhraj', 'Diamond': 'Heera', 'Blue Sapphire': 'Neelam',
@@ -4662,6 +4676,7 @@ function openCaseDrawer(id) {
         <h3>Numerology</h3>
         <p>Driver Number: <b>${p.driverNumber ?? '\u2014'}</b></p>
         <p>Conductor Number: <b>${p.conductorNumber ?? '\u2014'}</b></p>
+        <p>Kua Number: <b>${p.kuaNumber ?? '\u2014'}</b>${p.kuaNumber && KUA_TABLE_DATA[p.kuaNumber] ? ` <span style="font-weight:400;color:var(--text-muted);">(${KUA_TABLE_DATA[p.kuaNumber].element}, ${KUA_TABLE_DATA[p.kuaNumber].group} Group)</span>` : (p.gender ? '' : ' <span style="font-size:11px;color:var(--text-muted);">(no gender on file \u2014 edit this case to add it)</span>')}</p>
         <p>Name Number: <b>${p.nameNumber ?? '\u2014'}</b></p>
         <div class="nc-name-compare-row" id="caseDrawerNameCompareRow" style="${p.correctedNameSuggestion ? '' : 'display:none;'}">
           <div><span class="nc-name-compare-label">Original</span><br><b>${p.name || '\u2014'}</b></div>
@@ -5000,8 +5015,8 @@ let wizardState = {};
 function resetWizardState() {
   wizardState = {
     currentStep: 0,
-    name: '', phone: '', day: null, month: null, year: null, system: 'chaldean',
-    driverNumber: null, conductorNumber: null,
+    name: '', phone: '', day: null, month: null, year: null, system: 'chaldean', gender: '',
+    driverNumber: null, conductorNumber: null, kuaNumber: null,
     correctedNameSuggestion: '',
     mobileNumberChecked: '', mobileAnalysisLabel: '', matchScore: null,
     businessNameChecked: '', businessNameScore: null,
@@ -5055,6 +5070,14 @@ function renderWizardBasics() {
   body.innerHTML = `
     ${wizardField('Full name', 'wizName', wizardState.name, 'e.g. Ravi Kumar')}
     ${wizardField('Date of birth', 'wizDob', wizardState.day ? `${wizardState.year}-${String(wizardState.month).padStart(2, '0')}-${String(wizardState.day).padStart(2, '0')}` : '', '', 'date')}
+    <div class="field">
+      <label for="wizGender">Gender <span style="color:var(--danger);">*</span></label>
+      <select id="wizGender" required>
+        <option value="" disabled ${!wizardState.gender ? 'selected' : ''}>Select gender (required for Kua Number)</option>
+        <option value="Male" ${wizardState.gender === 'Male' ? 'selected' : ''}>Male</option>
+        <option value="Female" ${wizardState.gender === 'Female' ? 'selected' : ''}>Female</option>
+      </select>
+    </div>
     ${wizardField('Phone', 'wizPhone', wizardState.phone, 'e.g. 9876543210')}
     <button type="button" id="wizAnalyzeBasics" class="calc-btn" style="margin-top:8px;">Calculate</button>
     <div id="wizBasicsResults" style="margin-top:20px;"></div>
@@ -5062,24 +5085,39 @@ function renderWizardBasics() {
   document.getElementById('wizAnalyzeBasics').addEventListener('click', async () => {
     const name = document.getElementById('wizName').value.trim();
     const dobVal = document.getElementById('wizDob').value;
+    const gender = document.getElementById('wizGender').value;
     const phone = document.getElementById('wizPhone').value.trim();
     if (!dobVal) { alert('Enter a date of birth to continue.'); return; }
+    if (!gender) { alert('Select a gender \u2014 it\u2019s required to calculate the Kua Number.'); return; }
     const [y, m, d] = dobVal.split('-').map(Number);
-    wizardState.name = name; wizardState.phone = phone;
+    wizardState.name = name; wizardState.phone = phone; wizardState.gender = gender;
     wizardState.day = d; wizardState.month = m; wizardState.year = y;
 
     const resultsEl = document.getElementById('wizBasicsResults');
     resultsEl.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Calculating\u2026</p>';
     try {
-      const res = await fetch('/api/readings', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ day: d, month: m, year: y, name: name || undefined, system: 'chaldean' }),
-      });
+      const [res, kuaRes] = await Promise.all([
+        fetch('/api/readings', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ day: d, month: m, year: y, name: name || undefined, system: 'chaldean' }),
+        }),
+        fetch('/api/readings/kua-number', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ year: y, gender }),
+        }),
+      ]);
       const data = await res.json();
       if (!res.ok) { resultsEl.innerHTML = `<p class="wizard-skip-note">${data.error || 'Could not calculate.'}</p>`; return; }
       const result = data.result;
       wizardState.driverNumber = result.driverNumber.value;
       wizardState.conductorNumber = result.conductorNumber.value;
+
+      let kuaHtml = '';
+      if (kuaRes.ok) {
+        const kuaData = await kuaRes.json();
+        wizardState.kuaNumber = kuaData.value;
+        kuaHtml = `<div class="wizard-result-row"><span>Kua Number</span><b>${kuaData.value} <span style="font-weight:400;color:var(--text-muted);">(${kuaData.reference.element}, ${kuaData.reference.group} Group)</span></b></div>`;
+      }
 
       let nameCorrectionHtml = '';
       if (name) {
@@ -5107,6 +5145,7 @@ function renderWizardBasics() {
         <div class="wizard-result-row"><span>Driver Number</span><b>${result.driverNumber.value}</b></div>
         <div class="wizard-result-row"><span>Conductor Number</span><b>${result.conductorNumber.value}</b></div>
         ${result.nameNumber ? `<div class="wizard-result-row"><span>Name Number</span><b>${result.nameNumber.value}</b></div>` : ''}
+        ${kuaHtml}
         ${nameCorrectionHtml}
       `;
     } catch (err) {
@@ -5304,10 +5343,10 @@ async function wizardSaveCase() {
     const res = await fetch('/api/dashboard/save', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: wizardState.name, phone: wizardState.phone,
+        name: wizardState.name, phone: wizardState.phone, gender: wizardState.gender,
         day: wizardState.day, month: wizardState.month, year: wizardState.year, system: 'chaldean',
         tabSource: 'new-case-wizard',
-        driverNumber: wizardState.driverNumber, conductorNumber: wizardState.conductorNumber,
+        driverNumber: wizardState.driverNumber, conductorNumber: wizardState.conductorNumber, kuaNumber: wizardState.kuaNumber,
         crystalSuggestion: wizardState.crystalSuggestion, matchScore: wizardState.matchScore,
         correctedNameSuggestion: wizardState.correctedNameSuggestion,
         mobileNumberChecked: wizardState.mobileNumberChecked, mobileAnalysisLabel: wizardState.mobileAnalysisLabel,
@@ -5342,6 +5381,7 @@ document.getElementById('wizardSkipBtn').addEventListener('click', () => {
 });
 document.getElementById('wizardNextBtn').addEventListener('click', () => {
   if (wizardState.currentStep === 0 && !wizardState.day) { alert('Enter and calculate the client\u2019s date of birth first.'); return; }
+  if (wizardState.currentStep === 0 && !wizardState.gender) { alert('Select a gender and click Calculate first \u2014 it\u2019s required for the Kua Number.'); return; }
   if (wizardState.currentStep === WIZARD_STEPS.length - 1) { wizardSaveCase(); return; }
   wizardState.currentStep += 1;
   renderWizardStep();

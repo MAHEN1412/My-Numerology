@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const SavedProfileSchema = new mongoose.Schema({
   name: { type: String, trim: true, maxlength: 120 },
   phone: { type: String, trim: true, maxlength: 20 },
+  gender: { type: String, enum: ['Male', 'Female'] }, // required for Kua Number calculation
   day: { type: Number, min: 1, max: 31 },
   month: { type: Number, min: 1, max: 12 },
   year: { type: Number, min: 1000, max: 9999 },
@@ -19,6 +20,7 @@ const SavedProfileSchema = new mongoose.Schema({
   // Core numbers, stored flat for fast "common numbers" aggregation
   driverNumber: { type: Number },
   conductorNumber: { type: Number },
+  kuaNumber: { type: Number },
   nameNumber: { type: Number },
 
   crystalSuggestion: { type: String, trim: true, maxlength: 200 }, // top recommended crystal, if applicable
