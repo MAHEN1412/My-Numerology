@@ -127,6 +127,16 @@
   .curation-evidence-item{background:var(--navy-2);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:12px;}
   .curation-evidence-item .ce-source{font-weight:600;color:var(--text);margin-bottom:4px;}
   .curation-evidence-item .ce-text{color:var(--text-dim);line-height:1.5;margin-bottom:8px;}
+  .tc-letter-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;}
+  .tc-letter-tile{background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;padding:8px 4px;text-align:center;min-width:44px;}
+  .tc-letter-tile .tc-letter{font-size:16px;font-weight:700;color:var(--text);}
+  .tc-letter-tile .tc-value{font-size:12px;color:var(--indigo);margin-top:2px;}
+  .tc-letter-tile.tc-vowel{border-color:var(--violet);}
+  .tc-equation{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--navy-2);border-radius:12px;padding:16px;margin-bottom:20px;}
+  .tc-equation .tc-eq-part{text-align:center;}
+  .tc-equation .tc-eq-value{font-size:24px;font-weight:800;color:var(--text);}
+  .tc-equation .tc-eq-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;}
+  .tc-equation .tc-eq-op{font-size:20px;color:var(--text-muted);}
   .actor-card:hover{border-color:var(--violet);}
   .actor-card .ac-name{font-size:14px;font-weight:700;color:var(--text);margin:0 0 4px;}
   .actor-card .ac-meta{font-size:11px;color:var(--text-muted);margin:0 0 12px;}
@@ -673,6 +683,7 @@
     <button type="button" class="tab-btn" data-tab="tab7">Name correction Lo shu</button>
     <button type="button" class="tab-btn" data-tab="tab9">Numerology News</button>
     <button type="button" class="tab-btn" data-tab="tab10">Actors Profile</button>
+    <button type="button" class="tab-btn" data-tab="tab11">Total Chaldean</button>
     <a href="/admin.html" target="_blank" rel="noopener" class="tab-btn">Manage Books</a>
   </aside>
 
@@ -769,6 +780,28 @@
     <div style="text-align:center;margin-top:24px;">
       <button type="button" class="ghost" id="actorsShowAllBtn">Show All</button>
     </div>
+  </div>
+</div>
+
+<div id="tab11Content" style="display:none;">
+  <header class="hero" style="padding-top:56px;padding-bottom:32px;">
+    <div class="sacred-lines" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <p class="kicker">Compound Numbers</p>
+      <h1>Total Chaldean</h1>
+      <p class="lead">Enter any name (or nickname, business name, etc.) to see its full Chaldean letter breakdown, vowel/consonant split, and compound number reading. Compound numbers aren\u2019t related to date of birth \u2014 they\u2019re read from names, nicknames, phone numbers, vehicle numbers, and similar.</p>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-bottom:56px;max-width:640px;">
+    <div class="field">
+      <label for="totalChaldeanInput">Name</label>
+      <input type="text" id="totalChaldeanInput" placeholder="e.g. RAMAN">
+    </div>
+    <button type="button" class="calc-btn" id="totalChaldeanBtn">Calculate</button>
+    <div class="field-error" id="totalChaldeanError" role="alert"></div>
+
+    <div id="totalChaldeanResults" style="margin-top:28px;"></div>
   </div>
 </div>
 
@@ -2241,6 +2274,7 @@ document.getElementById('tabNav').addEventListener('click', (e) => {
   document.getElementById('tab7Content').style.display = btn.dataset.tab === 'tab7' ? 'block' : 'none';
   document.getElementById('tab9Content').style.display = btn.dataset.tab === 'tab9' ? 'block' : 'none';
   document.getElementById('tab10Content').style.display = btn.dataset.tab === 'tab10' ? 'block' : 'none';
+  document.getElementById('tab11Content').style.display = btn.dataset.tab === 'tab11' ? 'block' : 'none';
   syncSystemToggles(currentSystem);
   // Carry the DOB/name already entered on Tab 1 over to whichever tab is
   // opened, so the person doesn't have to retype it.
@@ -3730,6 +3764,70 @@ function parseActorLines(text, category, gender) {
 // ===== Crystal Data Curation =====
 let _curationFilter = 'unmapped';
 let _curationStones = [];
+
+// ===== Total Chaldean =====
+document.getElementById('totalChaldeanBtn').addEventListener('click', async () => {
+  const name = document.getElementById('totalChaldeanInput').value.trim();
+  const errorEl = document.getElementById('totalChaldeanError');
+  const resultsEl = document.getElementById('totalChaldeanResults');
+  const btn = document.getElementById('totalChaldeanBtn');
+  errorEl.classList.remove('show');
+
+  if (!name) { errorEl.textContent = 'Enter a name first.'; errorEl.classList.add('show'); return; }
+
+  btn.disabled = true; btn.textContent = 'Calculating\u2026';
+  resultsEl.innerHTML = '<p class="loading-note">Calculating\u2026</p>';
+  try {
+    const res = await fetch('/api/readings/total-chaldean', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errorEl.textContent = data.error || 'Could not calculate.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return; }
+
+    const letterTiles = data.letters.map((l) => `
+      <div class="tc-letter-tile${l.isVowel ? ' tc-vowel' : ''}">
+        <div class="tc-letter">${l.letter}</div>
+        <div class="tc-value">${l.value}</div>
+      </div>
+    `).join('');
+
+    const equationHtml = `
+      <div class="tc-equation">
+        <div class="tc-eq-part"><div class="tc-eq-value">${data.vowelTotal}</div><div class="tc-eq-label">Vowel Total</div></div>
+        <div class="tc-eq-op">+</div>
+        <div class="tc-eq-part"><div class="tc-eq-value">${data.consonantTotal}</div><div class="tc-eq-label">Consonant Total</div></div>
+        <div class="tc-eq-op">=</div>
+        <div class="tc-eq-part"><div class="tc-eq-value">${data.total}</div><div class="tc-eq-label">Total (Compound)</div></div>
+      </div>
+    `;
+
+    let compoundHtml = '';
+    if (data.compound) {
+      compoundHtml = `
+        <div class="report-card">
+          <h4>Compound Number ${data.compound.value} <span style="color:${data.compound.status === '+' ? '#16A34A' : '#DC2626'};">${data.compound.status}</span></h4>
+          <p style="font-size:13px;color:var(--text-dim);">${data.compound.meaning}</p>
+        </div>
+      `;
+    } else {
+      compoundHtml = `<p style="font-size:12px;color:var(--text-muted);">The compound number table covers 10\u201380. This name\u2019s total (${data.total}) falls outside that range, so no reading is shown \u2014 shortened or lengthened spellings will land in different ranges.</p>`;
+    }
+
+    resultsEl.innerHTML = `
+      <p class="report-form-section-label" style="margin-top:0;">Letter Breakdown</p>
+      <div class="tc-letter-row">${letterTiles}</div>
+      ${equationHtml}
+      <p class="report-form-section-label">Compound Number Reading</p>
+      ${compoundHtml}
+      <p style="font-size:11px;color:var(--text-muted);margin-top:16px;">Reduced Name Number (for reference): ${data.reducedNameNumber}</p>
+    `;
+  } catch (err) {
+    errorEl.textContent = 'Could not reach the server.'; errorEl.classList.add('show'); resultsEl.innerHTML = '';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Calculate';
+  }
+});
 
 async function openCrystalCurationModal() {
   document.getElementById('crystalCurationOverlay').style.display = 'flex';

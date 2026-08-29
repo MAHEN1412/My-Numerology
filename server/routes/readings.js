@@ -217,5 +217,51 @@ router.post('/kua-number', async (req, res) => {
   }
 });
 
+// POST /api/readings/total-chaldean
+// Per-letter Chaldean breakdown, vowel/consonant split, and a lookup into
+// the Compound Number table (10-80) for the raw, un-reduced total --
+// distinct from the reduced Name Number, since compound numbers are
+// traditionally read for names, nicknames, phone/vehicle numbers, etc.
+router.post('/total-chaldean', async (req, res) => {
+  try {
+    const { name } = req.body;
+    if (!name || !name.trim()) return res.status(400).json({ error: 'Enter a name to calculate.' });
+
+    const nameResult = calc.calculateNameNumber(name, 'chaldean');
+    const vowelResult = calc.calculateSoulUrgeNumber(name, 'chaldean');
+    const consonantResult = calc.calculatePersonalityNumber(name, 'chaldean');
+
+    const total = nameResult.compound;
+    const vowelTotal = vowelResult.compound;
+    const consonantTotal = consonantResult.compound;
+
+    // Compound table only covers 10-80. If the total falls outside that
+    // range, say so honestly rather than guessing at a value the table
+    // doesn't define.
+    let compound = null;
+    if (total >= 10 && total <= 80) {
+      compound = { value: total, ...calc.COMPOUND_NUMBER_TABLE[total] };
+    }
+
+    const VOWEL_SET = new Set(['A', 'E', 'I', 'O', 'U']);
+    const letters = nameResult.breakdown.map((l) => ({ ...l, isVowel: VOWEL_SET.has(l.letter) }));
+
+    res.json({
+      name,
+      letters,
+      total,
+      vowelTotal,
+      consonantTotal,
+      identityCheck: vowelTotal + consonantTotal === total, // always true; shown as the "equal to" the user asked for
+      reducedNameNumber: nameResult.value,
+      compound,
+      compoundTableRange: { min: 10, max: 80 },
+    });
+  } catch (err) {
+    console.error('Total Chaldean failed:', err.message);
+    res.status(400).json({ error: 'Could not calculate right now.' });
+  }
+});
+
 module.exports = router;
 module.exports.buildResultObject = buildResultObject;
