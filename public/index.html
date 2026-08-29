@@ -132,6 +132,8 @@
   .tc-letter-tile .tc-letter{font-size:16px;font-weight:700;color:var(--text);}
   .tc-letter-tile .tc-value{font-size:12px;color:var(--indigo);margin-top:2px;}
   .tc-letter-tile.tc-vowel{border-color:var(--violet);}
+  .tc-letter-tile.tc-incompatible{opacity:0.55;border-color:var(--danger);background:#FEF2F2;}
+  .tc-letter-tile.tc-incompatible .tc-letter{text-decoration:line-through;text-decoration-color:var(--danger);text-decoration-thickness:2px;}
   .tc-equation{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--navy-2);border-radius:12px;padding:16px;margin-bottom:20px;}
   .tc-equation .tc-eq-part{text-align:center;}
   .tc-equation .tc-eq-value{font-size:24px;font-weight:800;color:var(--text);}
@@ -3840,12 +3842,15 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
     const data = await res.json();
     if (!res.ok) { errorEl.textContent = data.error || 'Could not calculate.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return; }
 
-    const letterTilesHtml = (letters) => letters.map((l) => `
-      <div class="tc-letter-tile${l.isVowel ? ' tc-vowel' : ''}">
+    const letterTilesHtml = (letters, compatibleLetters) => letters.map((l) => {
+      const isIncompatible = compatibleLetters && !compatibleLetters.has(l.letter);
+      return `
+      <div class="tc-letter-tile${l.isVowel ? ' tc-vowel' : ''}${isIncompatible ? ' tc-incompatible' : ''}" ${isIncompatible ? 'title="Not part of your Date/Month/Year/Destiny Number letter groups \u2014 consider replacing for a name correction"' : ''}>
         <div class="tc-letter">${l.letter}</div>
         <div class="tc-value">${l.value}</div>
       </div>
-    `).join('');
+    `;
+    }).join('');
 
     const equationHtml = (section) => `
       <div class="tc-equation">
@@ -3869,9 +3874,24 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
       return `<div class="report-card"><h4>${label}: ${totalValue}</h4><p style="font-size:12px;color:var(--text-muted);">The compound number table covers 10\u201380. This total falls outside that range, so no reading is shown.</p></div>`;
     };
 
+    // Union of every compatible letter across Date/Month/Year/Destiny
+    // Number -- only meaningful when a DOB was actually given. Used to
+    // flag which of the NAME's own letters aren't in any of these
+    // groups, for name-correction purposes.
+    let compatibleLetters = null;
+    if (data.destinyChunked) {
+      compatibleLetters = new Set([
+        ...data.destinyChunked.day.chaldeanLetters,
+        ...data.destinyChunked.month.chaldeanLetters,
+        ...data.destinyChunked.year.chaldeanLetters,
+        ...data.destinyNumber.chaldeanLetters,
+      ]);
+    }
+
     const chaldeanHtml = `
       <p class="report-form-section-label" style="margin-top:0;">Chaldean</p>
-      <div class="tc-letter-row">${letterTilesHtml(data.chaldean.letters)}</div>
+      <div class="tc-letter-row">${letterTilesHtml(data.chaldean.letters, compatibleLetters)}</div>
+      ${compatibleLetters ? '<p style="font-size:11px;color:var(--danger);margin:-8px 0 16px;">Struck-through letters aren\u2019t in your Date/Month/Year/Destiny Number letter groups \u2014 consider replacing them in a name correction.</p>' : ''}
       ${equationHtml(data.chaldean)}
       <p class="report-form-section-label">Compound Number Reading</p>
       ${compoundCard('Vowel Total', data.chaldean.vowelTotal, data.chaldean.vowelCompound)}
@@ -3920,10 +3940,6 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
         <div class="lc-group-row" style="max-width:1100px;">
           <span style="font-size:13px;color:var(--text-dim);margin-right:6px;">Year Total ${data.destinyChunked.year.total} letters:</span>
           ${letterChips(data.destinyChunked.year.chaldeanLetters)}
-        </div>
-        <div class="lc-group-row" style="max-width:1100px;">
-          <span style="font-size:13px;color:var(--text-dim);margin-right:6px;">Birth Number ${data.birthNumber.value} letters:</span>
-          ${letterChips(data.birthNumber.chaldeanLetters)}
         </div>
         <div class="lc-group-row" style="max-width:1100px;margin-bottom:24px;">
           <span style="font-size:13px;color:var(--text-dim);margin-right:6px;">Destiny Number ${data.destinyNumber.value} letters:</span>
