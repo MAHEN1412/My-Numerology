@@ -3802,17 +3802,23 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
       </div>
     `;
 
-    let compoundHtml = '';
-    if (data.compound) {
-      compoundHtml = `
-        <div class="report-card">
-          <h4>Compound Number ${data.compound.value} <span style="color:${data.compound.status === '+' ? '#16A34A' : '#DC2626'};">${data.compound.status}</span></h4>
-          <p style="font-size:13px;color:var(--text-dim);">${data.compound.meaning}</p>
-        </div>
-      `;
-    } else {
-      compoundHtml = `<p style="font-size:12px;color:var(--text-muted);">The compound number table covers 10\u201380. This name\u2019s total (${data.total}) falls outside that range, so no reading is shown \u2014 shortened or lengthened spellings will land in different ranges.</p>`;
-    }
+    const compoundCard = (label, totalValue, compoundData) => {
+      if (compoundData) {
+        return `
+          <div class="report-card">
+            <h4>${label}: Compound Number ${compoundData.value} <span style="color:${compoundData.status === '+' ? '#16A34A' : '#DC2626'};">${compoundData.status}</span></h4>
+            <p style="font-size:13px;color:var(--text-dim);">${compoundData.meaning}</p>
+          </div>
+        `;
+      }
+      return `<div class="report-card"><h4>${label}: ${totalValue}</h4><p style="font-size:12px;color:var(--text-muted);">The compound number table covers 10\u201380. This total falls outside that range, so no reading is shown.</p></div>`;
+    };
+
+    const compoundHtml = `
+      ${compoundCard('Vowel Total', data.vowelTotal, data.vowelCompound)}
+      ${compoundCard('Consonant Total', data.consonantTotal, data.consonantCompound)}
+      ${compoundCard('Grand Total', data.total, data.compound)}
+    `;
 
     resultsEl.innerHTML = `
       <p class="report-form-section-label" style="margin-top:0;">Letter Breakdown</p>

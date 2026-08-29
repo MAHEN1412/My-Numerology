@@ -235,13 +235,14 @@ router.post('/total-chaldean', async (req, res) => {
     const vowelTotal = vowelResult.compound;
     const consonantTotal = consonantResult.compound;
 
-    // Compound table only covers 10-80. If the total falls outside that
+    // Compound table only covers 10-80. If a total falls outside that
     // range, say so honestly rather than guessing at a value the table
-    // doesn't define.
-    let compound = null;
-    if (total >= 10 && total <= 80) {
-      compound = { value: total, ...calc.COMPOUND_NUMBER_TABLE[total] };
-    }
+    // doesn't define. Applied to all three totals, not just the grand
+    // total, since vowel and consonant totals are read the same way.
+    const lookupCompound = (value) => (value >= 10 && value <= 80) ? { value, ...calc.COMPOUND_NUMBER_TABLE[value] } : null;
+    const compound = lookupCompound(total);
+    const vowelCompound = lookupCompound(vowelTotal);
+    const consonantCompound = lookupCompound(consonantTotal);
 
     const VOWEL_SET = new Set(['A', 'E', 'I', 'O', 'U']);
     const letters = nameResult.breakdown.map((l) => ({ ...l, isVowel: VOWEL_SET.has(l.letter) }));
@@ -255,6 +256,8 @@ router.post('/total-chaldean', async (req, res) => {
       identityCheck: vowelTotal + consonantTotal === total, // always true; shown as the "equal to" the user asked for
       reducedNameNumber: nameResult.value,
       compound,
+      vowelCompound,
+      consonantCompound,
       compoundTableRange: { min: 10, max: 80 },
     });
   } catch (err) {
