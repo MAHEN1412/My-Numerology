@@ -140,6 +140,18 @@
   .tc-systems-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:1100px;}
   .tc-system-col{min-width:0;}
   @media (max-width:900px){.tc-systems-grid{grid-template-columns:1fr;}}
+  .lc-group-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+  .lc-chip{padding:6px 12px;border-radius:14px;font-size:13px;font-weight:600;}
+  .lc-chip.lc-ascendant{background:#DCFCE7;color:#166534;}
+  .lc-chip.lc-harmonious{background:#DBEAFE;color:#1E40AF;}
+  .lc-chip.lc-clashing{background:#FEE2E2;color:#991B1B;}
+  .lc-name-letter{display:inline-flex;flex-direction:column;align-items:center;padding:8px 10px;border-radius:10px;margin:0 4px 8px 0;min-width:36px;}
+  .lc-name-letter.lc-ascendant{background:#DCFCE7;}
+  .lc-name-letter.lc-harmonious{background:#DBEAFE;}
+  .lc-name-letter.lc-clashing{background:#FEE2E2;}
+  .lc-name-letter.lc-neutral{background:var(--navy-2);}
+  .lc-name-letter .lc-nl-letter{font-size:16px;font-weight:700;}
+  .lc-name-letter .lc-nl-status{font-size:9px;text-transform:uppercase;color:var(--text-muted);margin-top:2px;}
   .actor-card:hover{border-color:var(--violet);}
   .actor-card .ac-name{font-size:14px;font-weight:700;color:var(--text);margin:0 0 4px;}
   .actor-card .ac-meta{font-size:11px;color:var(--text-muted);margin:0 0 12px;}
@@ -687,6 +699,7 @@
     <button type="button" class="tab-btn" data-tab="tab9">Numerology News</button>
     <button type="button" class="tab-btn" data-tab="tab10">Actors Profile</button>
     <button type="button" class="tab-btn" data-tab="tab11">Total Chaldean</button>
+    <button type="button" class="tab-btn" data-tab="tab12">Letter Compatibility</button>
     <a href="/admin.html" target="_blank" rel="noopener" class="tab-btn">Manage Books</a>
   </aside>
 
@@ -807,6 +820,32 @@
     </div>
 
     <div id="totalChaldeanResults" style="margin-top:28px;"></div>
+  </div>
+</div>
+
+<div id="tab12Content" style="display:none;">
+  <header class="hero" style="padding-top:56px;padding-bottom:32px;">
+    <div class="sacred-lines" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <p class="kicker">Name Change Guidance</p>
+      <h1>Letter Compatibility</h1>
+      <p class="lead">Based on the person's Driver Number (day of birth), see which letters are Ascendant (best match), Harmonious (supportive), or Clashing. Optionally enter a name to check each of its letters against this person's compatibility groups \u2014 useful when considering a name correction.</p>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-bottom:56px;max-width:640px;">
+    <div class="field">
+      <label for="letterCompDobInput">Date of birth</label>
+      <input type="date" id="letterCompDobInput">
+    </div>
+    <div class="field">
+      <label for="letterCompNameInput">Name to check (optional)</label>
+      <input type="text" id="letterCompNameInput" placeholder="e.g. Kim Kardashian">
+    </div>
+    <button type="button" class="calc-btn" id="letterCompBtn">Calculate</button>
+    <div class="field-error" id="letterCompError" role="alert"></div>
+
+    <div id="letterCompResults" style="margin-top:28px;"></div>
   </div>
 </div>
 
@@ -2280,6 +2319,7 @@ document.getElementById('tabNav').addEventListener('click', (e) => {
   document.getElementById('tab9Content').style.display = btn.dataset.tab === 'tab9' ? 'block' : 'none';
   document.getElementById('tab10Content').style.display = btn.dataset.tab === 'tab10' ? 'block' : 'none';
   document.getElementById('tab11Content').style.display = btn.dataset.tab === 'tab11' ? 'block' : 'none';
+  document.getElementById('tab12Content').style.display = btn.dataset.tab === 'tab12' ? 'block' : 'none';
   syncSystemToggles(currentSystem);
   // Carry the DOB/name already entered on Tab 1 over to whichever tab is
   // opened, so the person doesn't have to retype it.
@@ -3843,6 +3883,60 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
         <div class="tc-system-col">${chaldeanHtml}</div>
         <div class="tc-system-col">${pythagoreanHtml}</div>
       </div>
+    `;
+  } catch (err) {
+    errorEl.textContent = 'Could not reach the server.'; errorEl.classList.add('show'); resultsEl.innerHTML = '';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Calculate';
+  }
+});
+
+// ===== Letter Compatibility =====
+document.getElementById('letterCompBtn').addEventListener('click', async () => {
+  const dobVal = document.getElementById('letterCompDobInput').value;
+  const name = document.getElementById('letterCompNameInput').value.trim();
+  const errorEl = document.getElementById('letterCompError');
+  const resultsEl = document.getElementById('letterCompResults');
+  const btn = document.getElementById('letterCompBtn');
+  errorEl.classList.remove('show');
+
+  if (!dobVal) { errorEl.textContent = 'Enter a date of birth first.'; errorEl.classList.add('show'); return; }
+  const day = Number(dobVal.split('-')[2]);
+
+  btn.disabled = true; btn.textContent = 'Calculating\u2026';
+  resultsEl.innerHTML = '<p class="loading-note">Calculating\u2026</p>';
+  try {
+    const res = await fetch('/api/readings/letter-compatibility', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ day, name: name || undefined }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errorEl.textContent = data.error || 'Could not calculate.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return; }
+
+    const chipGroup = (letters, cls) => letters.map((l) => `<span class="lc-chip ${cls}">${l}</span>`).join('');
+
+    let nameHtml = '';
+    if (data.nameAnalysis) {
+      nameHtml = `
+        <p class="report-form-section-label">Letters in "${name}"</p>
+        <div>${data.nameAnalysis.map((l) => `
+          <span class="lc-name-letter lc-${l.status}">
+            <span class="lc-nl-letter">${l.letter}</span>
+            <span class="lc-nl-status">${l.status}</span>
+          </span>
+        `).join('')}</div>
+      `;
+    }
+
+    resultsEl.innerHTML = `
+      <p style="font-size:13px;color:var(--text-dim);margin:0 0 20px;">Driver Number <b>${data.driverNumber}</b> (from day of birth ${data.day})</p>
+      <p class="report-form-section-label" style="margin-top:0;">Ascendant (best match)</p>
+      <div class="lc-group-row">${chipGroup(data.ascendant, 'lc-ascendant')}</div>
+      <p class="report-form-section-label">Harmonious</p>
+      <div class="lc-group-row">${chipGroup(data.harmonious, 'lc-harmonious')}</div>
+      <p class="report-form-section-label">Clashing</p>
+      <div class="lc-group-row">${chipGroup(data.clashing, 'lc-clashing')}</div>
+      ${nameHtml}
     `;
   } catch (err) {
     errorEl.textContent = 'Could not reach the server.'; errorEl.classList.add('show'); resultsEl.innerHTML = '';

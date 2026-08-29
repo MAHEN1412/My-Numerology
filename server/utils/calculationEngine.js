@@ -438,6 +438,32 @@ const COMPOUND_NUMBER_TABLE = {
   80: { status: '\u2212', meaning: 'Emotional & Sympathetic \u2014 religious, emotional and helpful nature; others may benefit more from their help.' },
 };
 
+// Name-Letter / Day-of-Birth Compatibility table. Maps Driver Number
+// (1-9, from the day of birth) to three letter groups: Ascendant
+// (letters that directly match the day-of-birth group), Harmonious
+// (supportive), and Clashing (conflicting). Uses RAW alphabet position
+// (A=1...Z=26, unreduced) -- a distinct system from both Chaldean and
+// Pythagorean letter values used elsewhere in this app. Transcribed
+// exactly from the table provided.
+const LETTER_COMPATIBILITY_TABLE = {
+  1: { days: [1, 10, 19, 28], ascendant: ['A', 'J', 'S'], harmonious: ['B', 'K', 'T', 'I', 'R', 'C', 'L', 'U'], clashing: ['F', 'O', 'X', 'H', 'Q', 'Z', 'D', 'M', 'V', 'G', 'P', 'Y'] },
+  2: { days: [2, 11, 20, 29], ascendant: ['B', 'K', 'T'], harmonious: ['A', 'J', 'S', 'E', 'N', 'W'], clashing: ['D', 'M', 'V', 'G', 'P', 'Y'] },
+  3: { days: [3, 12, 21, 30], ascendant: ['C', 'L', 'U'], harmonious: ['A', 'J', 'S', 'B', 'K', 'T', 'I', 'R', 'D', 'M'], clashing: ['E', 'N', 'W', 'F', 'O', 'X'] },
+  4: { days: [4, 13, 22, 31], ascendant: ['D', 'M', 'V'], harmonious: ['F', 'O', 'X', 'H', 'Q', 'Z'], clashing: ['A', 'J', 'S', 'B', 'K', 'T', 'I', 'R', 'G', 'P', 'Y'] },
+  5: { days: [5, 14, 23], ascendant: ['E', 'N', 'W'], harmonious: ['A', 'J', 'S', 'F', 'O', 'X'], clashing: ['B', 'K', 'T'] },
+  6: { days: [6, 15, 24], ascendant: ['F', 'O', 'X'], harmonious: ['E', 'N', 'W', 'H', 'Q', 'X', 'D', 'M', 'V', 'G', 'P', 'Y'], clashing: ['A', 'J', 'S', 'B', 'K', 'T'] },
+  7: { days: [7, 16, 25], ascendant: ['G', 'P', 'Y'], harmonious: ['I', 'R', 'F', 'O', 'X'], clashing: ['A', 'J', 'S', 'B', 'K', 'T', 'H', 'Q', 'Z', 'D', 'M', 'V'] },
+  8: { days: [8, 17, 26], ascendant: ['H', 'Q', 'Z'], harmonious: ['E', 'N', 'W', 'F', 'O', 'X', 'D', 'M', 'V'], clashing: ['A', 'J', 'S', 'B', 'K', 'T', 'I', 'R', 'G', 'P', 'Y'] },
+  9: { days: [9, 18, 27], ascendant: ['I', 'R'], harmonious: ['A', 'J', 'S', 'B', 'K', 'T', 'C', 'L', 'U', 'G', 'P', 'Y'], clashing: ['E', 'N', 'W', 'D', 'M', 'V'] },
+};
+
+// Raw alphabet position -- A=1 through Z=26, no reduction. A distinct
+// letter-value system from Chaldean/Pythagorean, used specifically for
+// this compatibility table's "Ascendant Letter" values (e.g. K=11).
+function alphabetPosition(letter) {
+  return letter.toUpperCase().charCodeAt(0) - 64;
+}
+
 const KUA_REFERENCE = {
   1: { element: 'Water', group: 'East', favorableDirections: ['North', 'East', 'Southeast', 'South'], summary: 'Associated with wisdom, intuition, and adaptable communication.' },
   2: { element: 'Earth', group: 'West', favorableDirections: ['Southwest', 'West', 'Northwest', 'Northeast'], summary: 'Associated with steadiness, patience, and a nurturing temperament.' },
@@ -458,6 +484,8 @@ module.exports = {
   calculateKuaNumber,
   KUA_REFERENCE,
   COMPOUND_NUMBER_TABLE,
+  LETTER_COMPATIBILITY_TABLE,
+  alphabetPosition,
   calculateNameNumber,
   calculateSoulUrgeNumber,
   calculatePersonalityNumber,

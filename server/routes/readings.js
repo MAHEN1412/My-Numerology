@@ -277,5 +277,47 @@ router.post('/total-chaldean', async (req, res) => {
   }
 });
 
+// POST /api/readings/letter-compatibility
+// Looks up the Ascendant/Harmonious/Clashing letter groups for a Driver
+// Number (from day of birth). If a name is also given, classifies each
+// of its letters into one of those three groups -- directly supporting
+// name-change decisions, which is what this table is traditionally used
+// for.
+router.post('/letter-compatibility', async (req, res) => {
+  try {
+    const { day, name } = req.body;
+    const d = Number(day);
+    if (!d || d < 1 || d > 31) return res.status(400).json({ error: 'A valid day of birth (1-31) is required.' });
+
+    const driverNumber = calc.calculateDriverNumber(d).value;
+    const group = calc.LETTER_COMPATIBILITY_TABLE[driverNumber];
+    if (!group) return res.status(400).json({ error: 'No letter compatibility data for this Driver Number.' });
+
+    let nameAnalysis = null;
+    if (name && name.trim()) {
+      const letters = name.toUpperCase().replace(/[^A-Z]/g, '').split('');
+      nameAnalysis = letters.map((letter) => {
+        let status = 'neutral';
+        if (group.ascendant.includes(letter)) status = 'ascendant';
+        else if (group.harmonious.includes(letter)) status = 'harmonious';
+        else if (group.clashing.includes(letter)) status = 'clashing';
+        return { letter, alphabetPosition: calc.alphabetPosition(letter), status };
+      });
+    }
+
+    res.json({
+      day: d,
+      driverNumber,
+      ascendant: group.ascendant,
+      harmonious: group.harmonious,
+      clashing: group.clashing,
+      nameAnalysis,
+    });
+  } catch (err) {
+    console.error('Letter compatibility failed:', err.message);
+    res.status(400).json({ error: 'Could not calculate right now.' });
+  }
+});
+
 module.exports = router;
 module.exports.buildResultObject = buildResultObject;
