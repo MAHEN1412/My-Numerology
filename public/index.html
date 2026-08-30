@@ -3842,10 +3842,19 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
     const data = await res.json();
     if (!res.ok) { errorEl.textContent = data.error || 'Could not calculate.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return; }
 
-    const letterTilesHtml = (letters, compatibleLetters) => letters.map((l) => {
-      const isIncompatible = compatibleLetters && !compatibleLetters.has(l.letter);
+    let relationships = null;
+    if (data.birthNumber) {
+      const relRes = await fetch('/api/readings/number-relationships', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ number: data.birthNumber.value }),
+      });
+      if (relRes.ok) relationships = await relRes.json();
+    }
+
+    const letterTilesHtml = (letters, avoidValues) => letters.map((l) => {
+      const isIncompatible = avoidValues && avoidValues.has(l.value);
       return `
-      <div class="tc-letter-tile${l.isVowel ? ' tc-vowel' : ''}${isIncompatible ? ' tc-incompatible' : ''}" ${isIncompatible ? 'title="Not part of your Date/Month/Year/Destiny Number letter groups \u2014 consider replacing for a name correction"' : ''}>
+      <div class="tc-letter-tile${l.isVowel ? ' tc-vowel' : ''}${isIncompatible ? ' tc-incompatible' : ''}" ${isIncompatible ? 'title="Chaldean value 2, 4, 7, 8, or 9 \u2014 avoid in a name correction"' : ''}>
         <div class="tc-letter">${l.letter}</div>
         <div class="tc-value">${l.value}</div>
       </div>
@@ -3874,24 +3883,15 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
       return `<div class="report-card"><h4>${label}: ${totalValue}</h4><p style="font-size:12px;color:var(--text-muted);">The compound number table covers 10\u201380. This total falls outside that range, so no reading is shown.</p></div>`;
     };
 
-    // Union of every compatible letter across Date/Month/Year/Destiny
-    // Number -- only meaningful when a DOB was actually given. Used to
-    // flag which of the NAME's own letters aren't in any of these
-    // groups, for name-correction purposes.
-    let compatibleLetters = null;
-    if (data.destinyChunked) {
-      compatibleLetters = new Set([
-        ...data.destinyChunked.day.chaldeanLetters,
-        ...data.destinyChunked.month.chaldeanLetters,
-        ...data.destinyChunked.year.chaldeanLetters,
-        ...data.destinyNumber.chaldeanLetters,
-      ]);
-    }
+    // Per confirmed instruction: in a name correction, avoid letters
+    // whose Chaldean value is 2, 4, 7, 8, or 9 -- a fixed rule, not
+    // derived from the person's specific core number.
+    const AVOID_VALUES = new Set([2, 4, 7, 8, 9]);
 
     const chaldeanHtml = `
       <p class="report-form-section-label" style="margin-top:0;">Chaldean</p>
-      <div class="tc-letter-row">${letterTilesHtml(data.chaldean.letters, compatibleLetters)}</div>
-      ${compatibleLetters ? '<p style="font-size:11px;color:var(--danger);margin:-8px 0 16px;">Struck-through letters aren\u2019t in your Date/Month/Year/Destiny Number letter groups \u2014 consider replacing them in a name correction.</p>' : ''}
+      <div class="tc-letter-row">${letterTilesHtml(data.chaldean.letters, AVOID_VALUES)}</div>
+      <p style="font-size:11px;color:var(--danger);margin:-8px 0 16px;">Struck-through letters have a Chaldean value of 2, 4, 7, 8, or 9 \u2014 avoid these in a name correction.</p>
       ${equationHtml(data.chaldean)}
       <p class="report-form-section-label">Compound Number Reading</p>
       ${compoundCard('Vowel Total', data.chaldean.vowelTotal, data.chaldean.vowelCompound)}
@@ -3918,7 +3918,15 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
           <div class="tc-eq-part"><div class="tc-eq-value">${data.birthNumber.value}</div><div class="tc-eq-label">Birth Number</div></div>
           <div class="tc-eq-part"><div class="tc-eq-value">${data.destinyNumber.value}</div><div class="tc-eq-label">Destiny Number</div></div>
         </div>
-        <p class="report-form-section-label" style="margin-top:0;">Destiny Number Breakdown</p>
+        ${relationships ? `
+          <p class="report-form-section-label" style="margin-top:0;">Number Relationships for Birth Number ${relationships.number}${relationships.planet ? ' (' + relationships.planet + ')' : ''}</p>
+          <div class="tc-equation" style="max-width:1100px;margin-bottom:24px;">
+            <div class="tc-eq-part"><div class="tc-eq-value" style="font-size:18px;color:#16A34A;">${relationships.favorable.join(', ') || '\u2014'}</div><div class="tc-eq-label">Favorable / Lucky</div></div>
+            <div class="tc-eq-part"><div class="tc-eq-value" style="font-size:18px;color:var(--text-muted);">${relationships.neutral.join(', ') || '\u2014'}</div><div class="tc-eq-label">Neutral</div></div>
+            <div class="tc-eq-part"><div class="tc-eq-value" style="font-size:18px;color:#DC2626;text-decoration:line-through;">${relationships.enemy.join(', ') || '\u2014'}</div><div class="tc-eq-label">Enemy (avoid)</div></div>
+          </div>
+        ` : ''}
+        <p class="report-form-section-label">Destiny Number Breakdown</p>
         <div class="tc-equation" style="max-width:1100px;margin-bottom:24px;">
           <div class="tc-eq-part"><div class="tc-eq-value">${data.destinyChunked.day.raw} \u2192 ${data.destinyChunked.day.total}</div><div class="tc-eq-label">Date Total</div></div>
           <div class="tc-eq-op">+</div>

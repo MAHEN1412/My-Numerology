@@ -337,5 +337,29 @@ router.post('/letter-compatibility', async (req, res) => {
   }
 });
 
+// POST /api/readings/number-relationships
+// Given a core number (e.g. Driver/Birth Number), returns which other
+// numbers 1-9 are Friendly (favorable/lucky), Neutral, or Enemy --
+// transcribed from the planetary friendship/enmity table provided, with
+// unlisted relationships treated as Enemy per explicit instruction.
+router.post('/number-relationships', async (req, res) => {
+  try {
+    const { number } = req.body;
+    const n = Number(number);
+    if (!n || n < 1 || n > 9) return res.status(400).json({ error: 'A valid number (1-9) is required.' });
+
+    const rel = calc.NUMBER_RELATIONSHIPS[n];
+    res.json({
+      number: n,
+      planet: rel.planet,
+      favorable: rel.friendly,
+      neutral: rel.neutral,
+      enemy: rel.enemy,
+    });
+  } catch (err) {
+    res.status(400).json({ error: 'Could not look up this number right now.' });
+  }
+});
+
 module.exports = router;
 module.exports.buildResultObject = buildResultObject;

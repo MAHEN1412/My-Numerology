@@ -506,6 +506,33 @@ function alphabetPosition(letter) {
   return letter.toUpperCase().charCodeAt(0) - 64;
 }
 
+// Core Number Relationships (planetary friendship/enmity in numerology).
+// Transcribed exactly as provided. Enemy is derived, not listed directly
+// in the source: any number 1-9 not appearing in a given number's
+// Friendly or Neutral list is treated as Enemy, per explicit instruction
+// -- including Number 8's unlisted Neutral group and Number 9's entry,
+// which the source didn't provide at all.
+const NUMBER_RELATIONSHIPS_RAW = {
+  1: { planet: 'Sun', friendly: [2, 3, 5, 9], neutral: [4, 7] },
+  2: { planet: 'Moon', friendly: [1, 5], neutral: [3, 6, 7] },
+  3: { planet: 'Jupiter', friendly: [1, 2, 9], neutral: [4, 7, 8] },
+  4: { planet: 'Rahu/Uranus', friendly: [1, 5, 6, 7], neutral: [3, 8] },
+  5: { planet: 'Mercury', friendly: [1, 2, 3, 6], neutral: [4, 7, 8, 9] },
+  6: { planet: 'Venus', friendly: [1, 4, 5, 7], neutral: [2, 8, 9] },
+  7: { planet: 'Ketu', friendly: [1, 3, 4, 5, 6], neutral: [2, 8, 9] },
+  8: { planet: 'Saturn', friendly: [4, 5, 6], neutral: [] }, // source gave no Neutral list for 8
+  9: { planet: null, friendly: [], neutral: [] }, // source had no entry for 9 at all
+};
+
+const NUMBER_RELATIONSHIPS = Object.fromEntries(
+  Object.entries(NUMBER_RELATIONSHIPS_RAW).map(([num, data]) => {
+    const n = Number(num);
+    const allOthers = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((x) => x !== n);
+    const enemy = allOthers.filter((x) => !data.friendly.includes(x) && !data.neutral.includes(x));
+    return [n, { planet: data.planet, friendly: data.friendly, neutral: data.neutral, enemy }];
+  })
+);
+
 const KUA_REFERENCE = {
   1: { element: 'Water', group: 'East', favorableDirections: ['North', 'East', 'Southeast', 'South'], summary: 'Associated with wisdom, intuition, and adaptable communication.' },
   2: { element: 'Earth', group: 'West', favorableDirections: ['Southwest', 'West', 'Northwest', 'Northeast'], summary: 'Associated with steadiness, patience, and a nurturing temperament.' },
@@ -529,6 +556,7 @@ module.exports = {
   LETTER_COMPATIBILITY_TABLE,
   alphabetPosition,
   lettersForNumber,
+  NUMBER_RELATIONSHIPS,
   calculateDestinyNumberChunked,
   calculateNameNumber,
   calculateSoulUrgeNumber,
