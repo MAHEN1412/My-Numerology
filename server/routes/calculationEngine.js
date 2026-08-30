@@ -331,7 +331,7 @@ const LOSHU_LAYOUT = [[4, 9, 2], [3, 5, 7], [8, 1, 6]];
  * specific extension is wanted.
  */
 function generateLoShuGrid(day, month, year, options = {}) {
-  const { includeDriverConductor = true, nameNumberValue = null } = options;
+  const { includeDriverConductor = true, nameNumberValue = null, nameLetterValues = null } = options;
   const digits = `${day}${month}${year}`.split('').map(Number).filter((d) => d !== 0);
 
   if (includeDriverConductor) {
@@ -339,7 +339,14 @@ function generateLoShuGrid(day, month, year, options = {}) {
     digits.push(calculateConductorNumber(day, month, year).value);
   }
 
-  if (nameNumberValue !== null && nameNumberValue !== undefined) {
+  if (nameLetterValues !== null && nameLetterValues !== undefined) {
+    // Each letter's own Chaldean value contributes directly -- e.g. a
+    // name with three letters valued 5 (like H, E, N) genuinely adds
+    // three 5s to the grid, not just the digits of the final summed
+    // total. This is what actually lets a name change fill a missing
+    // number.
+    nameLetterValues.forEach((v) => { if (v >= 1 && v <= 9) digits.push(v); });
+  } else if (nameNumberValue !== null && nameNumberValue !== undefined) {
     String(nameNumberValue).split('').map(Number).forEach((d) => digits.push(d));
   }
 
