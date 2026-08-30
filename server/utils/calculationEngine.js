@@ -533,6 +533,28 @@ const NUMBER_RELATIONSHIPS = Object.fromEntries(
   })
 );
 
+// Number Relationships v2 -- a separate, corrected table supplied later
+// (complete for all 9 numbers, including self-references where the
+// source included them). Some numbers were asterisked as appearing in
+// multiple lists in the source; resolved per explicit confirmation that
+// Enemy always wins over Friendly (e.g. row 4 and row 8's 4*/8*
+// conflicts). Row 3's '7*' was a Friendly-vs-Neutral conflict specifically
+// (not covered by the confirmed Enemy-wins rule) -- resolved by extending
+// the same "more cautious classification wins" principle, treating it as
+// Neutral rather than Friendly; flagged to the user as this app's own
+// extension, not something explicitly stated in the source.
+const NUMBER_RELATIONSHIPS_V2 = {
+  1: { friendly: [1, 2, 3, 5, 6, 9], enemy: [8], neutral: [4, 7] },
+  2: { friendly: [1, 2, 3, 5], enemy: [8, 4, 9], neutral: [7, 6] },
+  3: { friendly: [1, 2, 3, 5], enemy: [6], neutral: [4, 8, 7, 9] },
+  4: { friendly: [1, 5, 7, 6], enemy: [2, 9, 4, 8], neutral: [3] },
+  5: { friendly: [1, 2, 3, 5, 6], enemy: [], neutral: [4, 7, 8, 9] },
+  6: { friendly: [1, 4, 5, 6, 7], enemy: [3], neutral: [2, 8, 9] },
+  7: { friendly: [1, 3, 5, 4, 6], enemy: [], neutral: [8, 2, 7, 9] },
+  8: { friendly: [5, 3, 6, 7], enemy: [1, 2, 4, 8], neutral: [9] },
+  9: { friendly: [1, 3, 5], enemy: [4, 2], neutral: [9, 7, 6, 8] },
+};
+
 const KUA_REFERENCE = {
   1: { element: 'Water', group: 'East', favorableDirections: ['North', 'East', 'Southeast', 'South'], summary: 'Associated with wisdom, intuition, and adaptable communication.' },
   2: { element: 'Earth', group: 'West', favorableDirections: ['Southwest', 'West', 'Northwest', 'Northeast'], summary: 'Associated with steadiness, patience, and a nurturing temperament.' },
@@ -557,6 +579,7 @@ module.exports = {
   alphabetPosition,
   lettersForNumber,
   NUMBER_RELATIONSHIPS,
+  NUMBER_RELATIONSHIPS_V2,
   calculateDestinyNumberChunked,
   calculateNameNumber,
   calculateSoulUrgeNumber,

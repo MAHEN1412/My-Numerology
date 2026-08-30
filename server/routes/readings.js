@@ -361,5 +361,29 @@ router.post('/number-relationships', async (req, res) => {
   }
 });
 
+// POST /api/readings/number-relationships-v2
+// Given Driver and Conductor numbers, returns their Friendly/Enemy/Neutral
+// lists SEPARATELY (per explicit confirmation -- not merged), using the
+// corrected v2 table (asterisk conflicts resolved: Enemy wins over
+// Friendly, and the same "more cautious wins" principle extended to
+// Friendly-vs-Neutral conflicts).
+router.post('/number-relationships-v2', async (req, res) => {
+  try {
+    const { driverNumber, conductorNumber } = req.body;
+    const d = Number(driverNumber), c = Number(conductorNumber);
+    if (!d || d < 1 || d > 9 || !c || c < 1 || c > 9) return res.status(400).json({ error: 'Valid Driver and Conductor numbers (1-9) are required.' });
+
+    const driverRel = calc.NUMBER_RELATIONSHIPS_V2[d];
+    const conductorRel = calc.NUMBER_RELATIONSHIPS_V2[c];
+
+    res.json({
+      driver: { number: d, friendly: driverRel.friendly, enemy: driverRel.enemy, neutral: driverRel.neutral },
+      conductor: { number: c, friendly: conductorRel.friendly, enemy: conductorRel.enemy, neutral: conductorRel.neutral },
+    });
+  } catch (err) {
+    res.status(400).json({ error: 'Could not look up these numbers right now.' });
+  }
+});
+
 module.exports = router;
 module.exports.buildResultObject = buildResultObject;
