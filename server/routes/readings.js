@@ -283,12 +283,13 @@ router.post('/total-chaldean', async (req, res) => {
       reducedNameNumber: pyNameResult.value,
     };
 
-    // Lo Shu grid, using the same digits (DOB + Driver + Conductor) as
-    // the grid used elsewhere in this app -- only when a valid DOB was
-    // given.
+    // Lo Shu grid, using DOB + Driver + Conductor + the name's Chaldean
+    // Name Number digits -- previously this call omitted the name
+    // entirely, meaning the grid never actually changed when the name
+    // did, which defeats the purpose of comparing a corrected name here.
     let loShuGrid = null, missingCenterSuggestion = null;
     if (isValidCalendarDate(d, m, y)) {
-      const counts = calc.generateLoShuGrid(d, m, y);
+      const counts = calc.generateLoShuGrid(d, m, y, { nameNumberValue: chaldean.total });
       loShuGrid = {
         layout: calc.LOSHU_LAYOUT,
         counts,
