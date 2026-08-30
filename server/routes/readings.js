@@ -283,11 +283,35 @@ router.post('/total-chaldean', async (req, res) => {
       reducedNameNumber: pyNameResult.value,
     };
 
+    // Lo Shu grid, using the same digits (DOB + Driver + Conductor) as
+    // the grid used elsewhere in this app -- only when a valid DOB was
+    // given.
+    let loShuGrid = null, missingCenterSuggestion = null;
+    if (isValidCalendarDate(d, m, y)) {
+      const counts = calc.generateLoShuGrid(d, m, y);
+      loShuGrid = {
+        layout: calc.LOSHU_LAYOUT,
+        counts,
+        present: calc.getPresentNumbers(counts),
+        missing: calc.getMissingNumbers(counts),
+        repeated: calc.getRepeatedNumbers(counts),
+      };
+      if (counts[5] === 0) {
+        // Center box (5) is empty -- suggest the Chaldean value-5
+        // letters (E, H, N, X) as candidates to add to the name. All
+        // four share the same value, so there's no single "best" one;
+        // showing all as options rather than picking one arbitrarily.
+        missingCenterSuggestion = { missingNumber: 5, candidateLetters: calc.lettersForNumber(5, 'chaldean') };
+      }
+    }
+
     res.json({
       name, chaldean, pythagorean, compoundTableRange: { min: 10, max: 80 },
       birthNumber: birthNumber ? { value: birthNumber.value, steps: birthNumber.steps, chaldeanLetters: calc.lettersForNumber(birthNumber.value, 'chaldean') } : null,
       destinyNumber: destinyNumber ? { value: destinyNumber.value, steps: destinyNumber.steps, chaldeanLetters: calc.lettersForNumber(destinyNumber.value, 'chaldean') } : null,
       destinyChunked,
+      loShuGrid,
+      missingCenterSuggestion,
     });
   } catch (err) {
     console.error('Total Chaldean failed:', err.message);

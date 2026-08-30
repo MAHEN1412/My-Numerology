@@ -3940,6 +3940,18 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
           <div class="tc-eq-part"><div class="tc-eq-value">${data.destinyNumber.value}</div><div class="tc-eq-label">Destiny Number</div></div>
         </div>
         ${relationshipsHtml}
+        ${data.loShuGrid ? `
+          <p class="report-form-section-label" style="margin-top:0;">Lo Shu Grid (DOB + Driver + Conductor)</p>
+          <div id="tcLoShuGridContainer" style="margin-bottom:16px;">
+            <div class="loshu-grid" id="loshuGridTotalChaldean" style="margin:0;"></div>
+          </div>
+          ${data.missingCenterSuggestion ? `
+            <div class="report-card" style="margin-bottom:24px;">
+              <h4>Center box (5) is empty</h4>
+              <p style="font-size:13px;color:var(--text-dim);">Consider adding one of these letters to the name to introduce a 5: <b>${data.missingCenterSuggestion.candidateLetters.join(', ')}</b>. All four share the same Chaldean value, so there\u2019s no single best choice \u2014 pick whichever fits naturally into the name.</p>
+            </div>
+          ` : '<p style="font-size:12px;color:var(--text-muted);margin-bottom:24px;">Center box (5) is filled \u2014 no name change suggested for this.</p>'}
+        ` : ''}
         <p class="report-form-section-label">Destiny Number Breakdown</p>
         <div class="tc-equation" style="max-width:1100px;margin-bottom:24px;">
           <div class="tc-eq-part"><div class="tc-eq-value">${data.destinyChunked.day.raw} \u2192 ${data.destinyChunked.day.total}</div><div class="tc-eq-label">Date Total</div></div>
@@ -3977,6 +3989,10 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
         <div class="tc-system-col">${pythagoreanHtml}</div>
       </div>
     `;
+
+    if (data.loShuGrid) {
+      renderCompactLoShuGrid(data.loShuGrid, 'TotalChaldean');
+    }
   } catch (err) {
     errorEl.textContent = 'Could not reach the server.'; errorEl.classList.add('show'); resultsEl.innerHTML = '';
   } finally {
