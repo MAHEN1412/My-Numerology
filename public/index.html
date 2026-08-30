@@ -828,6 +828,21 @@
     </div>
 
     <div id="totalChaldeanResults" style="margin-top:28px;"></div>
+
+    <div id="totalChaldeanSaveWrap" style="display:none;text-align:center;padding:16px 0;">
+      <button type="button" class="btn-ghost" id="totalChaldeanSaveBtn">Save to Case</button>
+    </div>
+
+    <div id="totalChaldeanCorrectionWrap" style="display:none;max-width:640px;margin-top:32px;padding-top:24px;border-top:1px solid var(--border);">
+      <p class="report-form-section-label" style="margin-top:0;">Try a Corrected Name</p>
+      <p style="font-size:12px;color:var(--text-dim);margin:0 0 12px;">Test a candidate spelling and compare its Compound Number. The Lo Shu grid is based on date of birth (Day + Month + Year + Driver + Conductor) only, so it stays the same regardless of the name tried here.</p>
+      <div class="field">
+        <label for="totalChaldeanCorrectionInput">Corrected name</label>
+        <input type="text" id="totalChaldeanCorrectionInput" placeholder="e.g. VAASUDEV">
+      </div>
+      <button type="button" class="calc-btn" id="totalChaldeanCorrectionBtn">Check This Name</button>
+      <div id="totalChaldeanCorrectionResults" style="margin-top:20px;"></div>
+    </div>
   </div>
 </div>
 
@@ -3819,19 +3834,14 @@ let _curationFilter = 'unmapped';
 let _curationStones = [];
 
 // ===== Total Chaldean =====
-document.getElementById('totalChaldeanBtn').addEventListener('click', async () => {
-  const name = document.getElementById('totalChaldeanInput').value.trim();
-  const errorEl = document.getElementById('totalChaldeanError');
-  const resultsEl = document.getElementById('totalChaldeanResults');
-  const btn = document.getElementById('totalChaldeanBtn');
+async function runTotalChaldeanCalculation(name, dobVal, resultsEl, errorEl, btn, gridSuffix) {
   errorEl.classList.remove('show');
 
-  if (!name) { errorEl.textContent = 'Enter a name first.'; errorEl.classList.add('show'); return; }
+  if (!name) { errorEl.textContent = 'Enter a name first.'; errorEl.classList.add('show'); return null; }
 
   btn.disabled = true; btn.textContent = 'Calculating\u2026';
   resultsEl.innerHTML = '<p class="loading-note">Calculating\u2026</p>';
   try {
-    const dobVal = document.getElementById('totalChaldeanDobInput').value;
     const body = { name };
     if (dobVal) {
       const [y, m, d] = dobVal.split('-').map(Number);
@@ -3842,7 +3852,7 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
       body: JSON.stringify(body),
     });
     const data = await res.json();
-    if (!res.ok) { errorEl.textContent = data.error || 'Could not calculate.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return; }
+    if (!res.ok) { errorEl.textContent = data.error || 'Could not calculate.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return null; }
 
     let relationships = null;
     if (data.birthNumber && data.destinyNumber) {
@@ -3909,6 +3919,17 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
       relationshipsHtml = relRow('Driver', relationships.driver) + relRow('Conductor', relationships.conductor);
     }
 
+    const overallBanner = data.chaldean.compound ? `
+      <div style="background:${data.chaldean.compound.status === '+' ? '#F0FDF4' : '#FEF2F2'};border:2px solid ${data.chaldean.compound.status === '+' ? '#16A34A' : '#DC2626'};border-radius:12px;padding:16px 20px;margin-bottom:24px;max-width:1100px;">
+        <p style="font-size:16px;font-weight:700;margin:0 0 4px;color:${data.chaldean.compound.status === '+' ? '#166534' : '#991B1B'};">
+          ${data.chaldean.compound.status === '+' ? '\u2713 Positive Compound Number (' + data.chaldean.compound.value + ')' : '\u26a0 Negative Compound Number (' + data.chaldean.compound.value + ')'}
+        </p>
+        <p style="font-size:13px;color:var(--text-dim);margin:0;">
+          ${data.chaldean.compound.status === '+' ? 'This name\u2019s overall Compound Number reads positively \u2014 generally considered favorable as-is.' : 'This name\u2019s overall Compound Number reads negatively \u2014 consider a further correction and re-checking the total.'}
+        </p>
+      </div>
+    ` : '';
+
     const chaldeanHtml = `
       <p class="report-form-section-label" style="margin-top:0;">Chaldean</p>
       <div class="tc-letter-row">${letterTilesHtml(data.chaldean.letters, enemySet, neutralSet)}</div>
@@ -3943,7 +3964,7 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
         ${data.loShuGrid ? `
           <p class="report-form-section-label" style="margin-top:0;">Lo Shu Grid (DOB + Driver + Conductor)</p>
           <div id="tcLoShuGridContainer" style="margin-bottom:16px;">
-            <div class="loshu-grid" id="loshuGridTotalChaldean" style="margin:0;"></div>
+            <div class="loshu-grid" id="loshuGrid${gridSuffix}" style="margin:0;"></div>
           </div>
           ${data.missingCenterSuggestion ? `
             <div class="report-card" style="margin-bottom:24px;">
@@ -3983,6 +4004,7 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
     }
 
     resultsEl.innerHTML = `
+      ${overallBanner}
       ${birthDestinyHtml}
       <div class="tc-systems-grid">
         <div class="tc-system-col">${chaldeanHtml}</div>
@@ -3991,13 +4013,65 @@ document.getElementById('totalChaldeanBtn').addEventListener('click', async () =
     `;
 
     if (data.loShuGrid) {
-      renderCompactLoShuGrid(data.loShuGrid, 'TotalChaldean');
+      renderCompactLoShuGrid(data.loShuGrid, gridSuffix);
     }
+    return { data, name, dobVal };
   } catch (err) {
     errorEl.textContent = 'Could not reach the server.'; errorEl.classList.add('show'); resultsEl.innerHTML = '';
+    return null;
   } finally {
     btn.disabled = false; btn.textContent = 'Calculate';
   }
+}
+
+let _lastTotalChaldeanResult = null;
+
+document.getElementById('totalChaldeanBtn').addEventListener('click', async () => {
+  const name = document.getElementById('totalChaldeanInput').value.trim();
+  const dobVal = document.getElementById('totalChaldeanDobInput').value;
+  const result = await runTotalChaldeanCalculation(
+    name, dobVal,
+    document.getElementById('totalChaldeanResults'),
+    document.getElementById('totalChaldeanError'),
+    document.getElementById('totalChaldeanBtn'),
+    'TotalChaldean'
+  );
+  if (result) {
+    _lastTotalChaldeanResult = result;
+    document.getElementById('totalChaldeanSaveWrap').style.display = 'block';
+    document.getElementById('totalChaldeanCorrectionWrap').style.display = 'block';
+  }
+});
+
+document.getElementById('totalChaldeanCorrectionBtn').addEventListener('click', async () => {
+  const correctedName = document.getElementById('totalChaldeanCorrectionInput').value.trim();
+  const dobVal = document.getElementById('totalChaldeanDobInput').value;
+  await runTotalChaldeanCalculation(
+    correctedName, dobVal,
+    document.getElementById('totalChaldeanCorrectionResults'),
+    document.getElementById('totalChaldeanError'),
+    document.getElementById('totalChaldeanCorrectionBtn'),
+    'TotalChaldeanCorrection'
+  );
+});
+
+document.getElementById('totalChaldeanSaveBtn').addEventListener('click', (e) => {
+  if (!_lastTotalChaldeanResult) return;
+  const { data, name, dobVal } = _lastTotalChaldeanResult;
+  const payload = { name, tabSource: 'total-chaldean' };
+  if (dobVal) {
+    const [y, m, d] = dobVal.split('-').map(Number);
+    Object.assign(payload, { day: d, month: m, year: y });
+  }
+  if (data.birthNumber) payload.driverNumber = data.birthNumber.value;
+  if (data.destinyNumber) payload.conductorNumber = data.destinyNumber.value;
+
+  const summaryParts = [`Compound Number ${data.chaldean.total}${data.chaldean.compound ? ' (' + data.chaldean.compound.status + ')' : ''}`];
+  if (data.chaldean.compound) summaryParts.push(data.chaldean.compound.meaning);
+  if (data.loShuGrid && data.loShuGrid.missing.length > 0) summaryParts.push(`Lo Shu missing: ${data.loShuGrid.missing.join(', ')}`);
+  payload.autoSummary = summaryParts.join(' \u00b7 ');
+
+  saveToDashboard(payload, e.target);
 });
 
 // ===== Letter Compatibility =====
