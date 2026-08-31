@@ -699,11 +699,9 @@
     <button type="button" class="tab-btn" data-tab="tab4">Business Name</button>
     <button type="button" class="tab-btn" data-tab="tab5">Number Compatibility</button>
     <button type="button" class="tab-btn" data-tab="tab6">Relationship Match</button>
-    <button type="button" class="tab-btn" data-tab="tab7">Name correction Lo shu</button>
     <button type="button" class="tab-btn" data-tab="tab9">Numerology News</button>
     <button type="button" class="tab-btn" data-tab="tab10">Actors Profile</button>
     <button type="button" class="tab-btn" data-tab="tab11">Total Chaldean</button>
-    <button type="button" class="tab-btn" data-tab="tab12">Letter Compatibility</button>
     <a href="/admin.html" target="_blank" rel="noopener" class="tab-btn">Manage Books</a>
   </aside>
 
@@ -843,32 +841,6 @@
       <button type="button" class="calc-btn" id="totalChaldeanCorrectionBtn">Check This Name</button>
       <div id="totalChaldeanCorrectionResults" style="margin-top:20px;"></div>
     </div>
-  </div>
-</div>
-
-<div id="tab12Content" style="display:none;">
-  <header class="hero" style="padding-top:56px;padding-bottom:32px;">
-    <div class="sacred-lines" aria-hidden="true"></div>
-    <div class="hero-inner">
-      <p class="kicker">Name Change Guidance</p>
-      <h1>Letter Compatibility</h1>
-      <p class="lead">Based on the person's Driver Number (day of birth), see which letters are Ascendant (best match), Harmonious (supportive), or Clashing. Optionally enter a name to check each of its letters against this person's compatibility groups \u2014 useful when considering a name correction.</p>
-    </div>
-  </header>
-
-  <div class="wrap" style="padding-bottom:56px;max-width:640px;">
-    <div class="field">
-      <label for="letterCompDobInput">Date of birth</label>
-      <input type="date" id="letterCompDobInput">
-    </div>
-    <div class="field">
-      <label for="letterCompNameInput">Name to check (optional)</label>
-      <input type="text" id="letterCompNameInput" placeholder="e.g. Kim Kardashian">
-    </div>
-    <button type="button" class="calc-btn" id="letterCompBtn">Calculate</button>
-    <div class="field-error" id="letterCompError" role="alert"></div>
-
-    <div id="letterCompResults" style="margin-top:28px;"></div>
   </div>
 </div>
 
@@ -1418,274 +1390,7 @@
   </div>
 </div>
 
-<div id="tab7Content" style="display:none;">
-  <header class="hero" style="padding-top:56px;padding-bottom:56px;">
-    <div class="sacred-lines" aria-hidden="true"></div>
-    <div class="hero-inner">
-      <p class="kicker">Compare name variants</p>
-      <h1>Name correction Lo shu</h1>
-      <p class="lead">Calculate a name, then try another &mdash; each one opens as its own tab right here, so you can switch back and forth without losing either.</p>
-    </div>
-  </header>
 
-  <div class="wrap" style="padding-bottom:56px;">
-    <div class="tab7-layout">
-      <div class="card">
-        <h2 style="font-size:18px;margin-bottom:16px;">Discover your numerology</h2>
-        <p style="font-size:13px;color:var(--text-dim);margin:0 0 20px;">Enter a date of birth and name to see the Lo Shu grid. Change the name and calculate again to add another tab here for comparison.</p>
-        <div class="field">
-          <label for="dobInput7">Date of birth</label>
-          <input type="date" id="dobInput7">
-        </div>
-        <div class="field-error" id="dobError7" role="alert"></div>
-        <div class="field">
-          <label for="nameInput7">Full name <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
-          <input type="text" id="nameInput7" placeholder="As it appears on your birth certificate">
-        </div>
-        <div class="field-error" id="nameError7" role="alert"></div>
-        <div class="field">
-          <label>Name numerology system</label>
-          <div class="system-toggle" id="systemToggle7">
-            <button type="button" data-system="chaldean" class="active">Chaldean</button>
-            <button type="button" data-system="pythagorean">Pythagorean</button>
-          </div>
-        </div>
-        <button class="calc-btn" id="calcBtn7">Calculate my numbers</button>
-      </div>
-
-      <div>
-        <div id="subTabsBar7" class="subtabs-bar" style="display:none;"></div>
-        <div id="tab7Empty" style="color:var(--text-dim);font-size:14px;padding:60px 24px;text-align:center;border:1px dashed var(--border-strong);border-radius:12px;">Enter your details and calculate to see your Lo Shu grid here.</div>
-        <div id="tab7GridDisplay" style="display:none;"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="wrap" style="padding-bottom:56px;display:none;" id="tab7DetailWrap">
-    <p style="font-size:13px;color:var(--text-dim);margin:0 0 20px;">Full profile for the selected tab above:</p>
-<main id="resultsRoot7">
-  <div class="wrap">
-
-    <section class="block" id="resultsAnchor7">
-      <p class="eyebrow">Your numerology profile</p>
-      <div class="primary-cards">
-        <button class="primary-card" id="driverCard7" aria-expanded="false" aria-controls="driverPanel">
-          <div class="pc-label">Driver Number</div>
-          <div class="pc-value" id="driverValue7">&nbsp;</div>
-          <div class="pc-alt">Mulank &bull; Psychic Number &bull; Birth Number</div>
-          <div class="pc-hint">Tap to see the calculation</div>
-        </button>
-        <button class="primary-card" id="conductorCard7" aria-expanded="false" aria-controls="conductorPanel">
-          <div class="pc-label">Conductor Number</div>
-          <div class="pc-value" id="conductorValue7">&nbsp;</div>
-          <div class="pc-alt">Bhagyank &bull; Life Path Number &bull; Destiny Number</div>
-          <div class="pc-hint">Tap to see the calculation</div>
-        </button>
-        <button class="primary-card" id="loshuCard7">
-          <div class="pc-label">Lo Shu Grid</div>
-          <div class="pc-value" style="font-size:20px;" id="loshuMini7"></div>
-          <div class="pc-alt">Your birth-date number map</div>
-          <div class="pc-hint">Tap to view the grid</div>
-        </button>
-      </div>
-      <div class="calc-panel" id="driverPanel7"><div class="calc-panel-inner" id="driverSteps7"></div></div>
-      <div class="calc-panel" id="conductorPanel7"><div class="calc-panel-inner" id="conductorSteps7"></div></div>
-    </section>
-
-    <section class="block" id="driverProfileSection7">
-      <p class="eyebrow">Your Driver Number</p>
-      <div class="profile-card">
-        <div class="ph-num" id="dpNum7"></div>
-        <div class="ph-name" id="dpName7"></div>
-        <p class="ph-meaning" id="dpMeaning7"></p>
-        <h4>Personality</h4><p id="dpPersonality7"></p>
-        <h4>Strengths</h4><ul id="dpStrengths7"></ul>
-        <h4>Challenges</h4><ul id="dpChallenges7"></ul>
-        <h4>Career tendencies</h4><ul id="dpCareer7"></ul>
-        <h4>Relationships</h4><p id="dpRelationships7"></p>
-        <div class="lucky-row" id="dpPlanetRow7" style="display:none;">
-          <div class="lucky-item">Chaldean planetary ruler: <b id="dpPlanet7"></b></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="block" id="conductorProfileSection7">
-      <p class="eyebrow">Your Conductor Number</p>
-      <div class="profile-card">
-        <div class="ph-num" id="cpNum7"></div>
-        <div class="ph-name" id="cpName7"></div>
-        <p class="ph-meaning" id="cpMeaning7"></p>
-        <h4>Personality</h4><p id="cpPersonality7"></p>
-        <h4>Strengths</h4><ul id="cpStrengths7"></ul>
-        <h4>Challenges</h4><ul id="cpChallenges7"></ul>
-        <h4>Career tendencies</h4><ul id="cpCareer7"></ul>
-        <h4>Relationships</h4><p id="cpRelationships7"></p>
-        <div class="lucky-row" id="cpPlanetRow7" style="display:none;">
-          <div class="lucky-item">Chaldean planetary ruler: <b id="cpPlanet7"></b></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="block" id="loshuSection7">
-      <p class="eyebrow">Lo Shu grid analysis</p>
-      <div class="loshu-wrap">
-        <div>
-          <div class="loshu-grid" id="loshuGrid7" role="group" aria-label="Lo Shu grid, click a number to learn more"></div>
-          <div class="loshu-legend">
-            <span><i class="swatch" style="background:var(--gold)"></i>Present</span>
-            <span><i class="swatch" style="background:var(--danger)"></i>Repeated</span>
-            <span><i class="swatch" style="background:var(--text-muted)"></i>Missing</span>
-          </div>
-          <div id="loshuInfo7" role="status"></div>
-        </div>
-        <div class="loshu-summary">
-          <div class="sumline"><div class="k">Numbers present</div><div class="taglist" id="presentTags7"></div></div>
-          <div class="sumline"><div class="k">Numbers missing</div><div class="taglist" id="missingTags7"></div></div>
-          <div class="sumline"><div class="k">Repeated numbers</div><div class="taglist" id="repeatTags7"></div></div>
-        </div>
-      </div>
-      <div style="margin-top:28px;">
-        <div class="sumline"><div class="k">What your missing and repeated numbers suggest</div></div>
-        <div id="interpList7" style="margin-top:10px;font-size:14px;color:var(--text-dim);"></div>
-      </div>
-    </section>
-
-    <details class="block section-accordion" id="videoSection7"><summary class="section-accordion-summary">Explore more about your numbers</summary><div class="section-accordion-body">
-      <div id="videoContainer7"></div>
-
-      <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
-        <p style="font-weight:500;font-size:14px;margin:0 0 4px;color:var(--text);">Videos about your exact combination</p>
-        <p style="font-size:12px;color:var(--text-dim);margin:0 0 14px;">Only videos mentioning BOTH your Driver and Conductor numbers together, not just one.</p>
-        <div id="combinationVideoTable7"></div>
-      </div>
-    </div></details>
-
-    <details class="block section-accordion" id="nameNumerologySection7" style="display:none;"><summary class="section-accordion-summary">Name numerology</summary><div class="section-accordion-body">
-      <div class="profile-grid">
-        <div class="profile-card">
-          <div class="ph-num" id="nnChaldeanVal7"></div>
-          <div class="ph-name">Chaldean name number</div>
-          <p class="ph-meaning" id="nnChaldeanMeaning7"></p>
-        </div>
-        <div class="profile-card">
-          <div class="ph-num" id="nnPythagoreanVal7"></div>
-          <div class="ph-name">Pythagorean name number</div>
-          <p class="ph-meaning" id="nnPythagoreanMeaning7"></p>
-        </div>
-      </div>
-      <div class="numgrid five" style="margin-top:16px;">
-        <div class="numcard"><div class="label">Soul Urge</div><div class="value" id="nnSoulUrge7"></div></div>
-        <div class="numcard"><div class="label">Personality</div><div class="value" id="nnPersonality7"></div></div>
-        <div class="numcard"><div class="label">Expression</div><div class="value" id="nnExpression7"></div></div>
-      </div>
-      <details class="calc" style="margin-top:16px;">
-        <summary>Show name calculation steps</summary>
-        <div class="steps" id="nnSteps7"></div>
-        <div class="letterrow" id="nnLetterBreakdown7"></div>
-      </details>
-      <div style="margin-top:16px;">
-        <div class="sumline"><div class="k">Karmic lesson numbers</div></div>
-        <p id="nnKarmicText7" style="font-size:14px;color:var(--text-dim);margin-top:8px;"></p>
-      </div>
-
-      <div class="combo-card" style="margin-top:24px;">
-        <h3>Name correction &mdash; try other spellings</h3>
-        <p style="font-size:13px;color:var(--text-dim);margin:6px 0 16px;">Your Driver and Conductor numbers, and your Lo Shu grid, stay fixed &mdash; they come from your birth date only. What changes with the name below are your Name Number, Soul Urge, Personality, Favorable Numbers, Colors, and Crystal Compatibility. Try a spelling, then click "Use this name" on the one you like to see your whole profile update.</p>
-        <div class="field">
-          <label for="nameCorrectionInput7">Name spellings to compare <span style="color:var(--text-muted);font-weight:400;">(comma-separated, up to 10)</span></label>
-          <input type="text" id="nameCorrectionInput7" placeholder="e.g. Mahender Potluri, Mahendar Potluri">
-        </div>
-        <div class="field-error" id="nameCorrectionError7" role="alert"></div>
-        <button class="calc-btn" id="nameCorrectionBtn7">Compare names</button>
-        <div id="nameCorrectionResults7" style="margin-top:16px;"></div>
-
-        <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);">
-          <p style="font-size:13px;color:var(--text-dim);margin:0 0 12px;">Or let us try small variations of your name automatically &mdash; each suggestion adds or doubles just one letter, so it stays close to your real name. You be the judge of which ones still sound right.</p>
-          <button class="btn-ghost" id="nameSuggestBtn7" style="width:100%;">Suggest variations of my name</button>
-          <div id="nameSuggestResults7" style="margin-top:16px;"></div>
-        </div>
-      </div>
-    </div></details>
-
-    <details class="block section-accordion" id="missingNumbersSection7"><summary class="section-accordion-summary">Missing numbers</summary><div class="section-accordion-body">
-      <div id="missingNumbersContainer7" class="interp-grid"></div>
-    </div></details>
-
-    <details class="block section-accordion" id="repeatedNumbersSection7"><summary class="section-accordion-summary">Repeated numbers</summary><div class="section-accordion-body">
-      <div id="repeatedNumbersContainer7" class="interp-grid"></div>
-    </div></details>
-
-    <details class="block section-accordion" id="planesSection7"><summary class="section-accordion-summary">Planes</summary><div class="section-accordion-body">
-      <div id="planesContainer7" class="ref-grid"></div>
-    </div></details>
-
-    <details class="block section-accordion" id="arrowsSection7"><summary class="section-accordion-summary">Arrows</summary><div class="section-accordion-body">
-      <div id="arrowsContainer7" class="ref-grid"></div>
-    </div></details>
-
-    <details class="block section-accordion" id="combinedInterpretationSection7"><summary class="section-accordion-summary">Combined interpretation</summary><div class="section-accordion-body">
-      <div class="combo-card">
-        <h3>Overall profile</h3>
-        <p id="ciOverallProfile7"></p>
-        <h3 style="margin-top:16px;">Strengths</h3>
-        <div class="taglist" id="ciStrengths7"></div>
-        <h3 style="margin-top:16px;">Traditional guidance</h3>
-        <p id="ciGuidance7"></p>
-      </div>
-    </div></details>
-
-    <details class="block section-accordion" id="numbersColorsSection7"><summary class="section-accordion-summary">Numbers &amp; colors</summary><div class="section-accordion-body">
-
-      <h3 style="font-size:16px;margin-bottom:8px;">Favorable numbers</h3>
-      <div id="favorableNumbersContainer7" style="margin-bottom:20px;"></div>
-
-      <h3 style="font-size:16px;margin-bottom:8px;">Challenging numbers</h3>
-      <div id="challengingNumbersContainer7" style="margin-bottom:20px;"></div>
-
-      <h3 style="font-size:16px;margin-bottom:8px;">Supportive combinations</h3>
-      <div class="taglist" id="supportiveCombosContainer7" style="margin-bottom:24px;"></div>
-
-      <h3 style="font-size:16px;margin-bottom:12px;">Colors by number</h3>
-      <div id="colorsByNumberContainer7" style="margin-bottom:24px;"></div>
-
-      <div class="combo-card">
-        <h3>My colors</h3>
-        <p style="font-size:12px;color:var(--text-dim);margin:4px 0 16px;">Numerology is a traditional belief system; color associations here are for personal interest, not medical, financial, or guaranteed-outcome claims.</p>
-        <div class="sumline"><div class="k">Best colors</div></div>
-        <div id="myColorsBest7" style="margin:10px 0 16px;"></div>
-        <div class="sumline"><div class="k">Use moderately</div></div>
-        <div id="myColorsModerate7" style="margin:10px 0 16px;"></div>
-        <div class="sumline"><div class="k">Personal palette</div></div>
-        <div id="myColorsPalette7" style="margin-top:10px;"></div>
-      </div>
-    </div></details>
-
-    <details class="block section-accordion" id="numberLibrarySection7"><summary class="section-accordion-summary">Meaning of every number, 1&ndash;9</summary><div class="section-accordion-body">
-      <div class="interp-grid" id="interpGrid7"></div>
-    </div></details>
-
-
-    <details class="block section-accordion" id="referenceSection7"><summary class="section-accordion-summary">Reference library</summary><div class="section-accordion-body">
-      <p style="font-size:13px;color:var(--text-dim);margin:0 0 16px;">Open, freely-licensed background reading on your numbers, sourced from Wikipedia (CC BY-SA 4.0).</p>
-      <div id="referenceContainer7"></div>
-    </div></details>
-
-    <details class="block section-accordion" id="bookInsightsSection7"><summary class="section-accordion-summary">Book insights &mdash; 360&deg; case analysis</summary><div class="section-accordion-body">
-      <p style="font-size:13px;color:var(--text-dim);margin:0 0 16px;">What your uploaded books actually say about your numbers, with page citations. Each book's perspective is shown separately &mdash; nothing here is invented or merged into a single &ldquo;answer.&rdquo;</p>
-      <div id="bookInsightsContainer7"></div>
-    </div></details>
-
-    <details class="block section-accordion" id="sourcesSection7"><summary class="section-accordion-summary">Sources &amp; references</summary><div class="section-accordion-body">
-      <p style="font-size:13px;color:var(--text-dim);margin:0 0 16px;">Where the interpretation content on this page comes from.</p>
-      <div id="sourcesContainer7" class="ref-grid"></div>
-    </div></details>
-
-    <p class="disclaimer">Numerology is a traditional belief system and is provided for educational, cultural and entertainment purposes. Interpretations should not be treated as scientific, medical, legal or financial advice.</p>
-  </div>
-</main>
-
-  </div>
-</div>
 
 
 
@@ -1824,15 +1529,8 @@ const dobError = document.getElementById('dobError');
 const calcBtn = document.getElementById('calcBtn');
 const resultsRoot = document.getElementById('resultsRoot');
 
-// Elements for the "Lo Shu Numerology (2)" comparison tab (Tab 7) --
-// fully independent from Tab 1 above.
-const dobInput7 = document.getElementById('dobInput7');
-const dobError7 = document.getElementById('dobError7');
-const calcBtn7 = document.getElementById('calcBtn7');
-
 const todayStr = new Date().toISOString().split('T')[0];
 dobInput.setAttribute('max', todayStr);
-dobInput7.setAttribute('max', todayStr);
 
 function showError(msg) {
   dobError.textContent = msg;
@@ -1843,16 +1541,6 @@ function clearError() {
   dobError.textContent = '';
 }
 dobInput.addEventListener('input', clearError);
-
-function showError7(msg) {
-  dobError7.textContent = msg;
-  dobError7.classList.add('show');
-}
-function clearError7() {
-  dobError7.classList.remove('show');
-  dobError7.textContent = '';
-}
-dobInput7.addEventListener('input', clearError7);
 
 function animateReveal(el, delay) {
   el.style.animationDelay = delay + 'ms';
@@ -2292,12 +1980,10 @@ function setupCardToggles(ns) {
   });
 }
 setupCardToggles('');
-setupCardToggles('7');
 
 let currentReading = null;
 
 let currentSystem = 'chaldean';
-let currentSystem7 = 'chaldean'; // independent state for the Lo Shu comparison tab
 function syncSystemToggles(activeSystem) {
   document.querySelectorAll('#systemToggle button, #systemToggle3 button, #systemToggle4 button').forEach((b) => b.classList.toggle('active', b.dataset.system === activeSystem));
 }
@@ -2320,13 +2006,6 @@ document.getElementById('systemToggle4').addEventListener('click', (e) => {
   syncSystemToggles(currentSystem);
 });
 
-document.getElementById('systemToggle7').addEventListener('click', (e) => {
-  const btn = e.target.closest('button[data-system]');
-  if (!btn) return;
-  currentSystem7 = btn.dataset.system;
-  document.querySelectorAll('#systemToggle7 button').forEach((b) => b.classList.toggle('active', b.dataset.system === currentSystem7));
-});
-
 document.getElementById('tabNav').addEventListener('click', (e) => {
   const btn = e.target.closest('button[data-tab]');
   if (!btn) return;
@@ -2338,11 +2017,9 @@ document.getElementById('tabNav').addEventListener('click', (e) => {
   document.getElementById('tab4Content').style.display = btn.dataset.tab === 'tab4' ? 'block' : 'none';
   document.getElementById('tab5Content').style.display = btn.dataset.tab === 'tab5' ? 'block' : 'none';
   document.getElementById('tab6Content').style.display = btn.dataset.tab === 'tab6' ? 'block' : 'none';
-  document.getElementById('tab7Content').style.display = btn.dataset.tab === 'tab7' ? 'block' : 'none';
   document.getElementById('tab9Content').style.display = btn.dataset.tab === 'tab9' ? 'block' : 'none';
   document.getElementById('tab10Content').style.display = btn.dataset.tab === 'tab10' ? 'block' : 'none';
   document.getElementById('tab11Content').style.display = btn.dataset.tab === 'tab11' ? 'block' : 'none';
-  document.getElementById('tab12Content').style.display = btn.dataset.tab === 'tab12' ? 'block' : 'none';
   syncSystemToggles(currentSystem);
   // Carry the DOB/name already entered on Tab 1 over to whichever tab is
   // opened, so the person doesn't have to retype it.
@@ -2371,9 +2048,6 @@ document.getElementById('tabNav').addEventListener('click', (e) => {
     const relAName = document.getElementById('relAName');
     if (!relADob.value && dobInput.value) relADob.value = dobInput.value;
     if (!relAName.value && document.getElementById('nameInput').value) relAName.value = document.getElementById('nameInput').value;
-  }
-  if (btn.dataset.tab === 'tab7') {
-    if (!dobInput7.value && dobInput.value) dobInput7.value = dobInput.value;
   }
   if (btn.dataset.tab === 'tab0') {
     checkDashboardLogin();
@@ -2427,149 +2101,6 @@ async function calculate() {
     calcBtn.textContent = 'Calculate my numbers';
   }
 }
-
-// --- Tab 7: Lo Shu Numerology comparison, with dynamic local sub-tabs ---
-// Each calculation with a new name/DOB combo opens as its own sub-tab
-// within this page only -- the main tab bar above is never touched.
-let tab7Profiles = [];
-let tab7ActiveIndex = -1;
-const TAB7_LOSHU_LAYOUT = [[4, 9, 2], [3, 5, 7], [8, 1, 6]];
-
-function renderTab7Grid(loShuGrid) {
-  const grid = document.createElement('div');
-  grid.className = 'loshu-grid';
-  TAB7_LOSHU_LAYOUT.flat().forEach((digit) => {
-    const count = loShuGrid.counts[digit];
-    const cell = document.createElement('div');
-    cell.className = 'loshu-cell' + (count === 0 ? ' missing' : count > 1 ? ' repeated' : '');
-    if (count === 0) {
-      cell.textContent = digit;
-    } else {
-      const digitsWrap = document.createElement('div');
-      digitsWrap.className = 'digits';
-      for (let i = 0; i < count; i++) {
-        const d = document.createElement('span');
-        d.className = 'd';
-        d.textContent = digit;
-        digitsWrap.appendChild(d);
-      }
-      cell.appendChild(digitsWrap);
-    }
-    grid.appendChild(cell);
-  });
-  return grid;
-}
-
-function renderTab7SubTabs() {
-  const bar = document.getElementById('subTabsBar7');
-  bar.innerHTML = '';
-  if (tab7Profiles.length === 0) { bar.style.display = 'none'; return; }
-  bar.style.display = 'flex';
-  tab7Profiles.forEach((p, i) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'subtab-btn' + (i === tab7ActiveIndex ? ' active' : '');
-    const label = document.createElement('span');
-    label.textContent = p.label;
-    btn.appendChild(label);
-    if (tab7Profiles.length > 1) {
-      const x = document.createElement('span');
-      x.className = 'close-x';
-      x.textContent = '\u2715';
-      x.addEventListener('click', (e) => {
-        e.stopPropagation();
-        tab7Profiles.splice(i, 1);
-        if (tab7ActiveIndex >= tab7Profiles.length) tab7ActiveIndex = tab7Profiles.length - 1;
-        renderTab7SubTabs();
-        showTab7Active();
-      });
-      btn.appendChild(x);
-    }
-    btn.addEventListener('click', () => {
-      tab7ActiveIndex = i;
-      renderTab7SubTabs();
-      showTab7Active();
-    });
-    bar.appendChild(btn);
-  });
-}
-
-function showTab7Active() {
-  const displayEl = document.getElementById('tab7GridDisplay');
-  const emptyEl = document.getElementById('tab7Empty');
-  const detailWrap = document.getElementById('tab7DetailWrap');
-  const profile = tab7Profiles[tab7ActiveIndex];
-  if (!profile) {
-    displayEl.style.display = 'none';
-    emptyEl.style.display = 'block';
-    detailWrap.style.display = 'none';
-    return;
-  }
-  emptyEl.style.display = 'none';
-  displayEl.style.display = 'block';
-  displayEl.innerHTML = '';
-  const heading = document.createElement('p');
-  heading.style.cssText = 'font-size:13px;color:var(--text-dim);margin-bottom:12px;';
-  heading.textContent = `Driver ${profile.result.driverNumber.value} \u00b7 Conductor ${profile.result.conductorNumber.value}` +
-    (profile.result.nameNumber ? ` \u00b7 Name Number ${profile.result.nameNumber.value}` : '');
-  displayEl.appendChild(heading);
-  displayEl.appendChild(renderTab7Grid(profile.result.loShuGrid));
-
-  // Full profile sections below -- reuses the exact same tested render
-  // functions Tab 1 uses, just targeting the '7'-suffixed elements.
-  detailWrap.style.display = 'block';
-  renderResults(profile.result, '7');
-}
-
-calcBtn7.addEventListener('click', async () => {
-  clearError7();
-  const raw = dobInput7.value;
-  if (!raw) { showError7('Please enter a valid date of birth.'); return; }
-  const [y, m, d] = raw.split('-').map(Number);
-
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const dobDate = new Date(y, m - 1, d);
-  if (dobDate.getTime() > today.getTime()) { showError7('Date of birth cannot be in the future.'); return; }
-
-  const nameVal = document.getElementById('nameInput7').value.trim();
-  const nameErrorEl = document.getElementById('nameError7');
-  nameErrorEl.classList.remove('show');
-  if (nameVal && !/^[a-zA-Z\s'-]+$/.test(nameVal)) {
-    nameErrorEl.textContent = 'Enter a name using letters only, or leave it blank.';
-    nameErrorEl.classList.add('show');
-    return;
-  }
-
-  calcBtn7.disabled = true;
-  calcBtn7.textContent = 'Calculating\u2026';
-
-  try {
-    const res = await fetch('/api/readings', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: nameVal || undefined, day: d, month: m, year: y, system: currentSystem7 }),
-    });
-    const data = await res.json();
-    if (!res.ok) { showError7(data.error || 'Please enter a valid date of birth.'); return; }
-
-    // Recalculating the exact same name+DOB updates that tab instead of adding a duplicate
-    const existingIndex = tab7Profiles.findIndex((p) => p.day === d && p.month === m && p.year === y && p.name === (nameVal || ''));
-    if (existingIndex !== -1) {
-      tab7Profiles[existingIndex].result = data.result;
-      tab7ActiveIndex = existingIndex;
-    } else {
-      const label = nameVal || `Profile ${tab7Profiles.length + 1}`;
-      tab7Profiles.push({ day: d, month: m, year: y, name: nameVal || '', label, result: data.result });
-      tab7ActiveIndex = tab7Profiles.length - 1;
-    }
-    renderTab7SubTabs();
-    showTab7Active();
-  } catch (err) {
-    showError7('Could not reach the server. Please try again.');
-  } finally {
-    calcBtn7.disabled = false;
-    calcBtn7.textContent = 'Calculate my numbers';
-  }
-});
 
 calcBtn.addEventListener('click', calculate);
 
@@ -3872,6 +3403,7 @@ async function runTotalChaldeanCalculation(name, dobVal, resultsEl, errorEl, btn
       <div class="tc-letter-tile${l.isVowel ? ' tc-vowel' : ''}${cls}" ${title}>
         <div class="tc-letter">${l.letter}</div>
         <div class="tc-value">${l.value}</div>
+        <div class="tc-vc-label">${l.isVowel ? 'Vowel' : 'Consonant'}</div>
       </div>
     `;
     }).join('');
@@ -4072,59 +3604,6 @@ document.getElementById('totalChaldeanSaveBtn').addEventListener('click', (e) =>
   payload.autoSummary = summaryParts.join(' \u00b7 ');
 
   saveToDashboard(payload, e.target);
-});
-
-// ===== Letter Compatibility =====
-document.getElementById('letterCompBtn').addEventListener('click', async () => {
-  const dobVal = document.getElementById('letterCompDobInput').value;
-  const name = document.getElementById('letterCompNameInput').value.trim();
-  const errorEl = document.getElementById('letterCompError');
-  const resultsEl = document.getElementById('letterCompResults');
-  const btn = document.getElementById('letterCompBtn');
-  errorEl.classList.remove('show');
-
-  if (!dobVal) { errorEl.textContent = 'Enter a date of birth first.'; errorEl.classList.add('show'); return; }
-  const day = Number(dobVal.split('-')[2]);
-
-  btn.disabled = true; btn.textContent = 'Calculating\u2026';
-  resultsEl.innerHTML = '<p class="loading-note">Calculating\u2026</p>';
-  try {
-    const res = await fetch('/api/readings/letter-compatibility', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ day, name: name || undefined }),
-    });
-    const data = await res.json();
-    if (!res.ok) { errorEl.textContent = data.error || 'Could not calculate.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return; }
-
-    const chipGroup = (letters, cls) => letters.map((l) => `<span class="lc-chip ${cls}">${l}</span>`).join('');
-
-    let nameHtml = '';
-    if (data.nameAnalysis) {
-      nameHtml = `
-        <p class="report-form-section-label">Letters in "${name}"</p>
-        <div>${data.nameAnalysis.map((l) => `
-          <span class="lc-name-letter lc-${l.status}">
-            <span class="lc-nl-letter">${l.letter}</span>
-            <span class="lc-nl-status">${l.status}</span>
-          </span>
-        `).join('')}</div>
-      `;
-    }
-
-    resultsEl.innerHTML = `
-      <p style="font-size:13px;color:var(--text-dim);margin:0 0 20px;">Driver Number <b>${data.driverNumber}</b> (from day of birth ${data.day})</p>
-      <div class="tc-equation" style="max-width:1100px;">
-        <div class="tc-eq-part"><div class="tc-eq-value" style="font-size:16px;letter-spacing:2px;">${data.ascendant.join('')}</div><div class="tc-eq-label">Ascendant (best match)</div></div>
-        <div class="tc-eq-part"><div class="tc-eq-value" style="font-size:16px;letter-spacing:2px;">${data.harmonious.join('')}</div><div class="tc-eq-label">Harmonious</div></div>
-        <div class="tc-eq-part"><div class="tc-eq-value" style="font-size:16px;letter-spacing:2px;">${data.clashing.join('')}</div><div class="tc-eq-label">Clashing</div></div>
-      </div>
-      ${nameHtml}
-    `;
-  } catch (err) {
-    errorEl.textContent = 'Could not reach the server.'; errorEl.classList.add('show'); resultsEl.innerHTML = '';
-  } finally {
-    btn.disabled = false; btn.textContent = 'Calculate';
-  }
 });
 
 async function openCrystalCurationModal() {
