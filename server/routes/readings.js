@@ -409,5 +409,41 @@ router.post('/number-relationships-v2', async (req, res) => {
   }
 });
 
+// POST /api/readings/lucky-number
+// Combines Driver Number, Destiny Number (aka "Life Path"), and Name
+// Number, plus each of their Friendly numbers (from NUMBER_RELATIONSHIPS_V2),
+// into a single deduplicated Luck Number list.
+router.post('/lucky-number', async (req, res) => {
+  try {
+    const { name, day, month, year } = req.body;
+    if (!name || !name.trim()) return res.status(400).json({ error: 'Enter a name to calculate.' });
+    const d = Number(day), m = Number(month), y = Number(year);
+    if (!isValidCalendarDate(d, m, y)) return res.status(400).json({ error: 'Enter a valid date of birth.' });
+
+    const driverNumber = calc.calculateDriverNumber(d).value;
+    const destinyNumber = calc.calculateConductorNumber(d, m, y).value; // "Life Path"
+    const nameNumber = calc.calculateNameNumber(name, 'chaldean').value;
+
+    const friendlyOf = (n) => calc.NUMBER_RELATIONSHIPS_V2[n] ? calc.NUMBER_RELATIONSHIPS_V2[n].friendly : [];
+
+    const luckyNumbers = [...new Set([
+      driverNumber, destinyNumber, nameNumber,
+      ...friendlyOf(driverNumber), ...friendlyOf(destinyNumber), ...friendlyOf(nameNumber),
+    ])].sort((a, b) => a - b);
+
+    res.json({
+      name, day: d, month: m, year: y,
+      luckyNumbers,
+      destinyNumber,
+      mainPlanetNumber: driverNumber, // "Main Planet" -- the Driver Number, which traditionally determines a person's ruling planet
+      lifePath: destinyNumber,
+      nameNumber,
+    });
+  } catch (err) {
+    console.error('Lucky Number failed:', err.message);
+    res.status(400).json({ error: 'Could not calculate right now.' });
+  }
+});
+
 module.exports = router;
 module.exports.buildResultObject = buildResultObject;

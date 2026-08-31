@@ -702,6 +702,7 @@
     <button type="button" class="tab-btn" data-tab="tab9">Numerology News</button>
     <button type="button" class="tab-btn" data-tab="tab10">Actors Profile</button>
     <button type="button" class="tab-btn" data-tab="tab11">Numerology Name Calculator</button>
+    <button type="button" class="tab-btn" data-tab="tab13">Lucky Number Finder</button>
     <a href="/admin.html" target="_blank" rel="noopener" class="tab-btn">Manage Books</a>
   </aside>
 
@@ -841,6 +842,32 @@
       <button type="button" class="calc-btn" id="totalChaldeanCorrectionBtn">Check This Name</button>
       <div id="totalChaldeanCorrectionResults" style="margin-top:20px;"></div>
     </div>
+  </div>
+</div>
+
+<div id="tab13Content" style="display:none;">
+  <header class="hero" style="padding-top:56px;padding-bottom:32px;">
+    <div class="sacred-lines" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <p class="kicker">Numerology</p>
+      <h1>Lucky Number Finder</h1>
+      <p class="lead">Enter a name and date of birth to see the combined Luck Numbers, drawn from the Driver Number, Life Path (Destiny Number), and Name Number, along with each of their Friendly numbers.</p>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-bottom:56px;max-width:640px;">
+    <div class="field">
+      <label for="luckyNumberNameInput">Name</label>
+      <input type="text" id="luckyNumberNameInput" placeholder="e.g. RAMAN">
+    </div>
+    <div class="field">
+      <label for="luckyNumberDobInput">Date of birth</label>
+      <input type="date" id="luckyNumberDobInput">
+    </div>
+    <button type="button" class="calc-btn" id="luckyNumberBtn">Calculate</button>
+    <div class="field-error" id="luckyNumberError" role="alert"></div>
+
+    <div id="luckyNumberResults" style="margin-top:28px;"></div>
   </div>
 </div>
 
@@ -2020,6 +2047,7 @@ document.getElementById('tabNav').addEventListener('click', (e) => {
   document.getElementById('tab9Content').style.display = btn.dataset.tab === 'tab9' ? 'block' : 'none';
   document.getElementById('tab10Content').style.display = btn.dataset.tab === 'tab10' ? 'block' : 'none';
   document.getElementById('tab11Content').style.display = btn.dataset.tab === 'tab11' ? 'block' : 'none';
+  document.getElementById('tab13Content').style.display = btn.dataset.tab === 'tab13' ? 'block' : 'none';
   syncSystemToggles(currentSystem);
   // Carry the DOB/name already entered on Tab 1 over to whichever tab is
   // opened, so the person doesn't have to retype it.
@@ -3604,6 +3632,57 @@ document.getElementById('totalChaldeanSaveBtn').addEventListener('click', (e) =>
   payload.autoSummary = summaryParts.join(' \u00b7 ');
 
   saveToDashboard(payload, e.target);
+});
+
+// ===== Lucky Number Finder =====
+document.getElementById('luckyNumberBtn').addEventListener('click', async () => {
+  const name = document.getElementById('luckyNumberNameInput').value.trim();
+  const dobVal = document.getElementById('luckyNumberDobInput').value;
+  const errorEl = document.getElementById('luckyNumberError');
+  const resultsEl = document.getElementById('luckyNumberResults');
+  const btn = document.getElementById('luckyNumberBtn');
+  errorEl.classList.remove('show');
+
+  if (!name) { errorEl.textContent = 'Enter a name first.'; errorEl.classList.add('show'); return; }
+  if (!dobVal) { errorEl.textContent = 'Enter a date of birth first.'; errorEl.classList.add('show'); return; }
+  const [y, m, d] = dobVal.split('-').map(Number);
+
+  btn.disabled = true; btn.textContent = 'Calculating\u2026';
+  resultsEl.innerHTML = '<p class="loading-note">Calculating\u2026</p>';
+  try {
+    const res = await fetch('/api/readings/lucky-number', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, day: d, month: m, year: y }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errorEl.textContent = data.error || 'Could not calculate.'; errorEl.classList.add('show'); resultsEl.innerHTML = ''; return; }
+
+    const luckyChips = data.luckyNumbers.map((n) => `<span class="lc-chip lc-harmonious" style="font-size:16px;">${n}</span>`).join('');
+
+    resultsEl.innerHTML = `
+      <p class="report-form-section-label" style="margin-top:0;">Luck Number</p>
+      <div class="lc-group-row">${luckyChips}</div>
+
+      <table style="width:100%;border-collapse:collapse;margin-top:24px;">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border-strong);">
+            <th style="text-align:left;padding:8px 12px;font-size:13px;color:var(--text-muted);">Numerology</th>
+            <th style="text-align:left;padding:8px 12px;font-size:13px;color:var(--text-muted);">Numbers</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 12px;">Destiny Number</td><td style="padding:10px 12px;font-weight:700;">${data.destinyNumber}</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 12px;">Main Planet</td><td style="padding:10px 12px;font-weight:700;">${data.mainPlanetNumber}</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 12px;">Life Path</td><td style="padding:10px 12px;font-weight:700;">${data.lifePath}</td></tr>
+          <tr><td style="padding:10px 12px;">Name Number</td><td style="padding:10px 12px;font-weight:700;">${data.nameNumber}</td></tr>
+        </tbody>
+      </table>
+    `;
+  } catch (err) {
+    errorEl.textContent = 'Could not reach the server.'; errorEl.classList.add('show'); resultsEl.innerHTML = '';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Calculate';
+  }
 });
 
 async function openCrystalCurationModal() {
