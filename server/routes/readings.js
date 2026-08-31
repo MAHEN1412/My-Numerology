@@ -426,10 +426,14 @@ router.post('/lucky-number', async (req, res) => {
 
     const friendlyOf = (n) => calc.NUMBER_RELATIONSHIPS_V2[n] ? calc.NUMBER_RELATIONSHIPS_V2[n].friendly : [];
 
-    const luckyNumbers = [...new Set([
-      driverNumber, destinyNumber, nameNumber,
-      ...friendlyOf(driverNumber), ...friendlyOf(destinyNumber), ...friendlyOf(nameNumber),
-    ])].sort((a, b) => a - b);
+    // Intersection (not union) of Driver/Destiny/Name Number's Friendly
+    // lists, per confirmed narrowing -- a union tends to cover most of
+    // 1-9 since each core number's own Friendly list already has 4-5
+    // entries, making it unhelpfully broad as a "lucky number" list.
+    const driverFriendly = friendlyOf(driverNumber);
+    const destinyFriendly = friendlyOf(destinyNumber);
+    const nameFriendly = friendlyOf(nameNumber);
+    const luckyNumbers = driverFriendly.filter((n) => destinyFriendly.includes(n) && nameFriendly.includes(n)).sort((a, b) => a - b);
 
     res.json({
       name, day: d, month: m, year: y,
