@@ -2090,6 +2090,16 @@ document.getElementById('tabNav').addEventListener('click', (e) => {
   window.scrollTo(0, 0);
 });
 
+// Deep-link support: /index.html?tab=tab1 auto-selects that tab on load,
+// used by the icons landing page to jump directly into a specific tool.
+(function () {
+  const requestedTab = new URLSearchParams(window.location.search).get('tab');
+  if (requestedTab) {
+    const targetBtn = document.querySelector('.tab-btn[data-tab="' + requestedTab + '"]');
+    if (targetBtn) targetBtn.click();
+  }
+})();
+
 async function calculate() {
   clearError();
   const raw = dobInput.value;
