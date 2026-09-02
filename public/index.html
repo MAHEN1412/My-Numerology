@@ -502,6 +502,8 @@
   .topbar-menu-danger{color:var(--danger);}
   .topbar-menu-divider{height:1px;background:var(--border);margin:6px 2px;}
   .app-shell{display:grid;grid-template-columns:248px 1fr;min-height:calc(100vh - 72px);}
+  .app-shell.home-active{grid-template-columns:1fr;}
+  .app-shell.home-active #tabNav{display:none;}
   @media (max-width:900px){.app-shell{grid-template-columns:1fr;}.sidebar-nav{position:static;flex-direction:row;flex-wrap:wrap;padding:16px;}.sidebar-brand{display:none;}.topbar-search{width:180px;}}
   .sidebar-nav{display:flex;flex-direction:column;gap:2px;padding:22px 12px;background:var(--surface);border-right:1px solid var(--border);position:sticky;top:72px;height:calc(100vh - 72px);overflow-y:auto;width:248px;}
   .sidebar-brand{padding:0 12px 20px;margin-bottom:8px;border-bottom:1px solid var(--border);}
@@ -693,7 +695,7 @@
   </div>
 </header>
 
-<div class="app-shell">
+<div class="app-shell home-active" id="appShell">
   <div class="sidebar-nav-backdrop" id="sidebarBackdrop"></div>
   <aside class="sidebar-nav" id="tabNav">
     <div class="sidebar-navtitle">WORKSPACE</div>
@@ -715,8 +717,15 @@
   <div class="main-content">
 
 <div id="tabHomeContent">
-  <div class="wrap" style="padding-top:48px;padding-bottom:56px;">
-    <h1 style="font-size:22px;text-align:center;margin-bottom:40px;">Numerology Tools</h1>
+  <header class="hero" style="padding-top:56px;padding-bottom:32px;">
+    <div class="sacred-lines" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <h1>Explore Our Numerology Tools</h1>
+      <p class="lead">Discover powerful numerology calculators and tools designed to help you explore numbers, names, compatibility, relationships, and other aspects of numerological guidance&mdash;all in one place.</p>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-bottom:56px;">
     <div id="homeIconGrid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:32px 24px;max-width:1200px;margin:0 auto;"></div>
   </div>
 </div>
@@ -2123,6 +2132,7 @@ document.getElementById('tabNav').addEventListener('click', (e) => {
   const btn = e.target.closest('button[data-tab]');
   if (!btn) return;
   document.querySelectorAll('.tab-btn').forEach((b) => b.classList.toggle('active', b === btn));
+  document.getElementById('appShell').classList.toggle('home-active', btn.dataset.tab === 'tabHome');
   document.getElementById('tabHomeContent').style.display = btn.dataset.tab === 'tabHome' ? 'block' : 'none';
   document.getElementById('tab0Content').style.display = btn.dataset.tab === 'tab0' ? 'block' : 'none';
   document.getElementById('tab1Content').style.display = btn.dataset.tab === 'tab1' ? 'block' : 'none';
