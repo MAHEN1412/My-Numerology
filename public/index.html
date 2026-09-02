@@ -145,6 +145,11 @@
   .tc-system-col{min-width:0;}
   @media (max-width:900px){.tc-systems-grid{grid-template-columns:1fr;}}
   .lc-group-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+  .home-item{display:flex;flex-direction:column;align-items:center;text-decoration:none;cursor:pointer;background:none;border:none;font-family:inherit;}
+  .home-item .home-badge{width:100px;height:100px;transition:transform 0.15s ease;}
+  .home-item:hover .home-badge{transform:scale(1.06);}
+  .home-item:active .home-badge{transform:scale(0.97);}
+  .home-item span{margin-top:12px;font-size:13px;line-height:1.35;text-align:center;max-width:140px;color:var(--text);}
   .lc-chip{padding:6px 12px;border-radius:14px;font-size:13px;font-weight:600;}
   .lc-chip.lc-ascendant{background:#DCFCE7;color:#166534;}
   .lc-chip.lc-harmonious{background:#DBEAFE;color:#1E40AF;}
@@ -692,7 +697,8 @@
   <div class="sidebar-nav-backdrop" id="sidebarBackdrop"></div>
   <aside class="sidebar-nav" id="tabNav">
     <div class="sidebar-navtitle">WORKSPACE</div>
-    <button type="button" class="tab-btn active" data-tab="tab0">Dashboard</button>
+    <button type="button" class="tab-btn active" data-tab="tabHome">Home</button>
+    <button type="button" class="tab-btn" data-tab="tab0">Dashboard</button>
     <button type="button" class="tab-btn" data-tab="tab1">Lo Shu Grid Calculator</button>
     <button type="button" class="tab-btn" data-tab="tab2">Mobile Number Compatibility</button>
     <button type="button" class="tab-btn" data-tab="tab3">Crystal Compatibility Calculator</button>
@@ -708,7 +714,14 @@
 
   <div class="main-content">
 
-<div id="tab0Content">
+<div id="tabHomeContent">
+  <div class="wrap" style="padding-top:48px;padding-bottom:56px;">
+    <h1 style="font-size:22px;text-align:center;margin-bottom:40px;">Numerology Tools</h1>
+    <div id="homeIconGrid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:32px 24px;max-width:1200px;margin:0 auto;"></div>
+  </div>
+</div>
+
+<div id="tab0Content" style="display:none;">
   <div class="wrap" style="padding-bottom:56px;padding-top:28px;">
     <div id="dashboardContent">
       <div class="dashboard-layout">
@@ -2033,10 +2046,84 @@ document.getElementById('systemToggle4').addEventListener('click', (e) => {
   syncSystemToggles(currentSystem);
 });
 
+// ===== Home tab: icon grid =====
+(function () {
+  function badgeSVG(icon) {
+    return `
+    <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="60" cy="60" r="58" fill="#5B1E75"/>
+      <g stroke="#FFC800" stroke-width="1.5">
+        <line x1="60" y1="2"  x2="60" y2="18"/>
+        <line x1="60" y1="102" x2="60" y2="118"/>
+        <line x1="2"  y1="60" x2="18" y2="60"/>
+        <line x1="102" y1="60" x2="118" y2="60"/>
+        <line x1="19.7" y1="19.7" x2="31.6" y2="31.6"/>
+        <line x1="88.4" y1="88.4" x2="100.3" y2="100.3"/>
+        <line x1="19.7" y1="100.3" x2="31.6" y2="88.4"/>
+        <line x1="88.4" y1="31.6" x2="100.3" y2="19.7"/>
+      </g>
+      <circle cx="60" cy="60" r="38" fill="#5B1E75" stroke="#FFC800" stroke-width="1.5"/>
+      ${icon}
+    </svg>`;
+  }
+
+  const G = '#FFC800', P = '#5B1E75';
+  const HOME_ICONS = {
+    dashboard: `<g fill="${G}"><rect x="42" y="44" width="12" height="9" rx="3"/><rect x="60" y="44" width="16" height="9" rx="4.5"/><rect x="42" y="59" width="12" height="9" rx="4.5"/><rect x="60" y="59" width="16" height="9" rx="4.5"/><rect x="48" y="74" width="10" height="7" rx="3.5"/></g>`,
+    loshu: `<g><rect x="42" y="42" width="12" height="12" fill="none" stroke="${G}" stroke-width="1.4"/><rect x="54" y="42" width="12" height="12" fill="${G}"/><rect x="66" y="42" width="12" height="12" fill="none" stroke="${G}" stroke-width="1.4"/><rect x="42" y="54" width="12" height="12" fill="none" stroke="${G}" stroke-width="1.4"/><rect x="54" y="54" width="12" height="12" fill="${G}"/><rect x="66" y="54" width="12" height="12" fill="none" stroke="${G}" stroke-width="1.4"/><rect x="42" y="66" width="12" height="12" fill="${G}"/><rect x="54" y="66" width="12" height="12" fill="none" stroke="${G}" stroke-width="1.4"/><rect x="66" y="66" width="12" height="12" fill="${G}"/><text x="48" y="51" font-size="8" fill="${G}" text-anchor="middle" font-weight="700">4</text><text x="60" y="51" font-size="8" fill="${P}" text-anchor="middle" font-weight="700">9</text><text x="72" y="51" font-size="8" fill="${G}" text-anchor="middle" font-weight="700">2</text><text x="48" y="63" font-size="8" fill="${G}" text-anchor="middle" font-weight="700">3</text><text x="60" y="63" font-size="8" fill="${P}" text-anchor="middle" font-weight="700">5</text><text x="72" y="63" font-size="8" fill="${G}" text-anchor="middle" font-weight="700">7</text><text x="48" y="75" font-size="8" fill="${P}" text-anchor="middle" font-weight="700">8</text><text x="60" y="75" font-size="8" fill="${G}" text-anchor="middle" font-weight="700">1</text><text x="72" y="75" font-size="8" fill="${P}" text-anchor="middle" font-weight="700">6</text></g>`,
+    mobile: `<g fill="none" stroke="${G}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="49" y="38" width="22" height="38" rx="4"/><line x1="56" y1="44" x2="64" y2="44"/></g><circle cx="71" cy="72" r="8" fill="${G}"/><path d="M67 72l2.7 2.7L76 68" stroke="${P}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
+    crystal: `<g fill="${G}"><polygon points="60,40 66,52 60,64 54,52"/><polygon points="48,50 55,56 51,76 42,64"/><polygon points="72,50 65,56 69,76 78,64"/></g><g stroke="${G}" stroke-width="1.4" stroke-linecap="round"><line x1="60" y1="34" x2="60" y2="38"/><line x1="51" y1="36" x2="53" y2="40"/><line x1="69" y1="36" x2="67" y2="40"/><line x1="45" y1="43" x2="49" y2="45"/><line x1="75" y1="43" x2="71" y2="45"/></g>`,
+    business: `<g fill="none" stroke="${G}" stroke-width="2.2" stroke-linejoin="round"><path d="M46 78V50l14-10 14 10v28"/><line x1="46" y1="78" x2="74" y2="78"/><rect x="51" y="53" width="6" height="6"/><rect x="63" y="53" width="6" height="6"/><rect x="57" y="68" width="6" height="10"/></g>`,
+    numbercompat: `<g fill="none" stroke="${G}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M48 76V56l12-10 12 10v20"/><line x1="43" y1="76" x2="77" y2="76"/><line x1="54" y1="60" x2="58" y2="60"/><line x1="62" y1="60" x2="66" y2="60"/></g><circle cx="60" cy="47" r="6" fill="none" stroke="${G}" stroke-width="1.6"/><text x="60" y="50" font-size="7" fill="${G}" text-anchor="middle" font-weight="700">10</text>`,
+    relationship: `<path d="M60 71c-9-6-16-11-16-19a9 9 0 0 1 16-6 9 9 0 0 1 16 6c0 8-7 13-16 19z" fill="${G}"/><g fill="none" stroke="${G}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M40 50l8-4 10 3"/><path d="M40 71l8 4 10-3"/></g>`,
+    namecalc: `<g fill="none" stroke="${G}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M52 44l8 8 8-8"/><circle cx="60" cy="55" r="2.2" fill="${G}" stroke="none"/><rect x="46" y="56" width="28" height="22" rx="3"/><line x1="52" y1="74" x2="60" y2="74"/></g><text x="60" y="70" font-size="8" fill="${G}" text-anchor="middle" font-weight="800">NAME</text>`,
+    luckynumber: `<path d="M60 40c3-4 9-3 10 2 5-2 9 3 6 7 5 1 5 8 0 9 3 4-1 9-6 7-1 5-9 6-10 2-1 4-9 3-10-2-5 2-9-3-6-7-5-1-5-8 0-9-3-4 1-9 6-7 1-5 9-6 10-2z" fill="${G}"/><text x="60" y="65" font-size="16" fill="${P}" text-anchor="middle" font-weight="800">3</text>`,
+    news: `<g fill="none" stroke="${G}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M43 58v6l5 1"/><path d="M43 58l25-10v26l-25-10z"/><line x1="76" y1="53" x2="82" y2="51"/><line x1="78" y1="60" x2="84" y2="60"/><line x1="76" y1="67" x2="82" y2="69"/></g>`,
+    celebrity: `<polygon points="60,38 65,54 82,54 68,64 73,80 60,70 47,80 52,64 38,54 55,54" fill="${G}"/><g fill="${P}"><rect x="52" y="59" width="16" height="9" rx="1.5"/><line x1="55" y1="55" x2="55" y2="59" stroke="${P}" stroke-width="1.4"/><line x1="60" y1="55" x2="60" y2="59" stroke="${P}" stroke-width="1.4"/><line x1="65" y1="55" x2="65" y2="59" stroke="${P}" stroke-width="1.4"/></g>`,
+    books: `<g fill="${G}"><polygon points="60,40 74,47 60,54 46,47"/><polygon points="46,53 60,60 74,53 74,58 60,65 46,58"/><polygon points="46,61 60,68 74,61 74,66 60,73 46,66"/><polygon points="46,69 60,76 74,69 74,74 60,81 46,74"/></g>`,
+  };
+
+  const HOME_TOOLS = [
+    { icon: 'dashboard',    title: 'Dashboard',                             tab: 'tab0' },
+    { icon: 'loshu',        title: 'Lo Shu Grid Calculator',                tab: 'tab1' },
+    { icon: 'mobile',       title: 'Mobile Number Compatibility',           tab: 'tab2' },
+    { icon: 'crystal',      title: 'Crystal Compatibility Calculator',      tab: 'tab3' },
+    { icon: 'business',     title: 'Business Name Compatibility',          tab: 'tab4' },
+    { icon: 'numbercompat', title: 'Number Compatibility Calculator',       tab: 'tab5' },
+    { icon: 'relationship', title: 'Relationship Compatibility Calculator', tab: 'tab6' },
+    { icon: 'namecalc',     title: 'Numerology Name Calculator',            tab: 'tab11' },
+    { icon: 'luckynumber',  title: 'Lucky Number Finder',                   tab: 'tab13' },
+    { icon: 'news',         title: 'Numerology News',                       tab: 'tab9' },
+    { icon: 'celebrity',    title: 'Celebrity Birthdays',                   tab: 'tab10' },
+  ];
+
+  const grid = document.getElementById('homeIconGrid');
+  HOME_TOOLS.forEach((t) => {
+    const btnEl = document.createElement('button');
+    btnEl.type = 'button';
+    btnEl.className = 'home-item';
+    btnEl.innerHTML = `<div class="home-badge">${badgeSVG(HOME_ICONS[t.icon])}</div><span>${t.title}</span>`;
+    btnEl.addEventListener('click', () => {
+      const target = document.querySelector('.tab-btn[data-tab="' + t.tab + '"]');
+      if (target) target.click();
+    });
+    grid.appendChild(btnEl);
+  });
+  // Manage Books opens in a new tab (external link), added separately
+  const booksLink = document.createElement('a');
+  booksLink.className = 'home-item';
+  booksLink.href = '/admin.html';
+  booksLink.target = '_blank';
+  booksLink.rel = 'noopener';
+  booksLink.innerHTML = `<div class="home-badge">${badgeSVG(HOME_ICONS.books)}</div><span>Manage Books</span>`;
+  grid.appendChild(booksLink);
+})();
+
 document.getElementById('tabNav').addEventListener('click', (e) => {
   const btn = e.target.closest('button[data-tab]');
   if (!btn) return;
   document.querySelectorAll('.tab-btn').forEach((b) => b.classList.toggle('active', b === btn));
+  document.getElementById('tabHomeContent').style.display = btn.dataset.tab === 'tabHome' ? 'block' : 'none';
   document.getElementById('tab0Content').style.display = btn.dataset.tab === 'tab0' ? 'block' : 'none';
   document.getElementById('tab1Content').style.display = btn.dataset.tab === 'tab1' ? 'block' : 'none';
   document.getElementById('tab2Content').style.display = btn.dataset.tab === 'tab2' ? 'block' : 'none';
