@@ -372,6 +372,17 @@
   .loshu-cell:hover{background:var(--surface-2);}
   .loshu-cell .digits{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;max-width:76px;}
   .loshu-cell .d{font-size:20px;font-weight:700;color:var(--gold);font-family:'Inter',system-ui,-apple-system,sans-serif;}
+  .loshu-cell .d.src-dob{color:#2563EB;}
+  .loshu-cell .d.src-driver{color:#16A34A;}
+  .loshu-cell .d.src-conductor{color:#EA580C;}
+  .loshu-cell .d.src-name{color:#9333EA;}
+  .loshu-source-legend{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:14px;font-size:12px;color:var(--text-dim);}
+  .loshu-legend-item{display:flex;align-items:center;gap:5px;}
+  .loshu-legend-dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .loshu-legend-dot.src-dob{background:#2563EB;}
+  .loshu-legend-dot.src-driver{background:#16A34A;}
+  .loshu-legend-dot.src-conductor{background:#EA580C;}
+  .loshu-legend-dot.src-name{background:#9333EA;}
   .loshu-cell.repeated .d{animation:pulse 2s ease-in-out infinite;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.55;}}
   .loshu-cell.missing{color:var(--text-muted);font-size:20px;font-family:'JetBrains Mono',monospace;}
@@ -1663,6 +1674,7 @@ function renderLoShu(loShuGrid, numberKnowledgeBase, ns = '') {
   const layout = loShuGrid.layout.flat();
   const grid = document.getElementById('loshuGrid' + ns);
   grid.innerHTML = '';
+  const sources = loShuGrid.sources || null;
   layout.forEach(digit => {
     const count = loShuGrid.counts[digit];
     const cell = document.createElement('button');
@@ -1674,7 +1686,15 @@ function renderLoShu(loShuGrid, numberKnowledgeBase, ns = '') {
     } else {
       const wrap = document.createElement('div');
       wrap.className = 'digits';
-      for (let i = 0; i < count; i++) { const d = document.createElement('span'); d.className = 'd'; d.textContent = digit; wrap.appendChild(d); }
+      const digitSources = sources ? sources[digit] : null;
+      for (let i = 0; i < count; i++) {
+        const d = document.createElement('span');
+        const src = digitSources ? digitSources[i] : null;
+        d.className = 'd' + (src ? ' src-' + src : '');
+        if (src) d.title = ({ dob: 'From date of birth', driver: 'From Driver Number', conductor: 'From Conductor Number', name: 'From Name Number' })[src] || '';
+        d.textContent = digit;
+        wrap.appendChild(d);
+      }
       cell.appendChild(wrap);
     }
     cell.addEventListener('click', () => {
@@ -1685,6 +1705,26 @@ function renderLoShu(loShuGrid, numberKnowledgeBase, ns = '') {
     });
     grid.appendChild(cell);
   });
+
+  // Legend for the source colors, only shown when source data is available
+  const legendId = 'loshuSourceLegend' + ns;
+  let legend = document.getElementById(legendId);
+  if (sources) {
+    if (!legend) {
+      legend = document.createElement('div');
+      legend.id = legendId;
+      legend.className = 'loshu-source-legend';
+      grid.insertAdjacentElement('afterend', legend);
+    }
+    legend.innerHTML = `
+      <span class="loshu-legend-item"><span class="loshu-legend-dot src-dob"></span>Date of birth</span>
+      <span class="loshu-legend-item"><span class="loshu-legend-dot src-driver"></span>Driver Number</span>
+      <span class="loshu-legend-item"><span class="loshu-legend-dot src-conductor"></span>Conductor Number</span>
+      <span class="loshu-legend-item"><span class="loshu-legend-dot src-name"></span>Name Number</span>
+    `;
+  } else if (legend) {
+    legend.remove();
+  }
 
   function fmtTag(id, nums, cls) {
     const el = document.getElementById(id); el.innerHTML = '';

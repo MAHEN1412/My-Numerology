@@ -54,9 +54,13 @@ function buildResultObject({ name, day, month, year, system }) {
   const loshuCounts = calc.generateLoShuGrid(day, month, year, {
     nameNumberValue: nameNumber ? nameNumber.value : null,
   });
+  const loshuSources = calc.generateLoShuGridWithSources(day, month, year, {
+    nameNumberValue: nameNumber ? nameNumber.value : null,
+  });
   const loshu = {
     layout: calc.LOSHU_LAYOUT,
     counts: loshuCounts,
+    sources: loshuSources,
     present: calc.getPresentNumbers(loshuCounts),
     missing: calc.getMissingNumbers(loshuCounts),
     repeated: calc.getRepeatedNumbers(loshuCounts),

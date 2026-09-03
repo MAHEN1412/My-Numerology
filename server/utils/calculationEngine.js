@@ -356,6 +356,32 @@ function generateLoShuGrid(day, month, year, options = {}) {
   return counts;
 }
 
+// Like generateLoShuGrid, but returns each digit instance tagged with its
+// source (dob / driver / conductor / name), so the grid can be
+// color-coded by where each number came from.
+function generateLoShuGridWithSources(day, month, year, options = {}) {
+  const { includeDriverConductor = true, nameNumberValue = null, nameLetterValues = null } = options;
+  const tagged = []; // [{ value, source }]
+
+  `${day}${month}${year}`.split('').map(Number).filter((d) => d !== 0).forEach((v) => tagged.push({ value: v, source: 'dob' }));
+
+  if (includeDriverConductor) {
+    tagged.push({ value: calculateDriverNumber(day).value, source: 'driver' });
+    tagged.push({ value: calculateConductorNumber(day, month, year).value, source: 'conductor' });
+  }
+
+  if (nameLetterValues !== null && nameLetterValues !== undefined) {
+    nameLetterValues.forEach((v) => { if (v >= 1 && v <= 9) tagged.push({ value: v, source: 'name' }); });
+  } else if (nameNumberValue !== null && nameNumberValue !== undefined) {
+    String(nameNumberValue).split('').map(Number).forEach((v) => tagged.push({ value: v, source: 'name' }));
+  }
+
+  const bySlot = {};
+  for (let i = 1; i <= 9; i++) bySlot[i] = [];
+  tagged.forEach(({ value, source }) => bySlot[value].push(source));
+  return bySlot; // { 1: ['dob','dob'], 2: [], ... }
+}
+
 function getPresentNumbers(counts) { return Object.keys(counts).filter((k) => counts[k] > 0).map(Number).sort((a, b) => a - b); }
 function getMissingNumbers(counts) { return Object.keys(counts).filter((k) => counts[k] === 0).map(Number).sort((a, b) => a - b); }
 function getRepeatedNumbers(counts) { return Object.keys(counts).filter((k) => counts[k] > 1).map(Number).sort((a, b) => a - b); }
@@ -594,6 +620,7 @@ module.exports = {
   calculateKarmicNumbers,
   calculatePyramidNumber,
   generateLoShuGrid,
+  generateLoShuGridWithSources,
   getPresentNumbers,
   getMissingNumbers,
   getRepeatedNumbers,
