@@ -293,9 +293,11 @@ router.post('/total-chaldean', async (req, res) => {
     let loShuGrid = null, missingCenterSuggestion = null;
     if (isValidCalendarDate(d, m, y)) {
       const counts = calc.generateLoShuGrid(d, m, y, { nameNumberValue: chaldean.reducedNameNumber });
+      const sources = calc.generateLoShuGridWithSources(d, m, y, { nameNumberValue: chaldean.reducedNameNumber });
       loShuGrid = {
         layout: calc.LOSHU_LAYOUT,
         counts,
+        sources,
         present: calc.getPresentNumbers(counts),
         missing: calc.getMissingNumbers(counts),
         repeated: calc.getRepeatedNumbers(counts),

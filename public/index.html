@@ -1654,6 +1654,7 @@ function renderCompactLoShuGrid(loShuGrid, ns) {
   const grid = document.getElementById('loshuGrid' + ns);
   if (!grid) return;
   grid.innerHTML = '';
+  const sources = loShuGrid.sources || null;
   loShuGrid.layout.flat().forEach((digit) => {
     const count = loShuGrid.counts[digit];
     const cell = document.createElement('div');
@@ -1663,11 +1664,38 @@ function renderCompactLoShuGrid(loShuGrid, ns) {
     } else {
       const wrap = document.createElement('div');
       wrap.className = 'digits';
-      for (let i = 0; i < count; i++) { const d = document.createElement('span'); d.className = 'd'; d.textContent = digit; wrap.appendChild(d); }
+      const digitSources = sources ? sources[digit] : null;
+      for (let i = 0; i < count; i++) {
+        const d = document.createElement('span');
+        const src = digitSources ? digitSources[i] : null;
+        d.className = 'd' + (src ? ' src-' + src : '');
+        if (src) d.title = ({ dob: 'From date of birth', driver: 'From Driver Number', conductor: 'From Conductor Number', name: 'From Name Number' })[src] || '';
+        d.textContent = digit;
+        wrap.appendChild(d);
+      }
       cell.appendChild(wrap);
     }
     grid.appendChild(cell);
   });
+
+  const legendId = 'loshuSourceLegend' + ns;
+  let legend = document.getElementById(legendId);
+  if (sources) {
+    if (!legend) {
+      legend = document.createElement('div');
+      legend.id = legendId;
+      legend.className = 'loshu-source-legend';
+      grid.insertAdjacentElement('afterend', legend);
+    }
+    legend.innerHTML = `
+      <span class="loshu-legend-item"><span class="loshu-legend-dot src-dob"></span>Date of birth</span>
+      <span class="loshu-legend-item"><span class="loshu-legend-dot src-driver"></span>Driver Number</span>
+      <span class="loshu-legend-item"><span class="loshu-legend-dot src-conductor"></span>Conductor Number</span>
+      <span class="loshu-legend-item"><span class="loshu-legend-dot src-name"></span>Name Number</span>
+    `;
+  } else if (legend) {
+    legend.remove();
+  }
 }
 
 function renderLoShu(loShuGrid, numberKnowledgeBase, ns = '') {
