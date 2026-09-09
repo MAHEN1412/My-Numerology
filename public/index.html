@@ -2642,11 +2642,35 @@ function renderYantraGrid(yantra) {
   `;
 }
 
-function buildSingleNumberProfileHtml(profile, otherNum, roleLabel) {
+function buildSingleNumberProfileHtml(profile, otherNum, role) {
   if (!profile) return '';
   const s = profile.sections || {};
   const relText = profile.relationships ? profile.relationships[otherNum] : null;
   const relImg = profile.images && profile.images.relationships ? profile.images.relationships[otherNum] : null;
+
+  // This app calls the same underlying digit different things depending
+  // on which role it's playing: Driver Number = Psychic Number (Mulank),
+  // Conductor Number = Destiny Number (Bhagyank) -- see the "Mulank *
+  // Psychic Number * Birth Number" / "Bhagyank * Life Path Number *
+  // Destiny Number" subtitles on the driver/conductor cards up top.
+  // The book's own data keeps separate write-ups for "as a psychic
+  // number" vs "as a destiny number" for every digit; showing BOTH
+  // inside one card (e.g. Destiny-Number content inside the Driver
+  // card) mixed two different roles together and was confusing. Now
+  // each card only shows the write-up for the role it actually is.
+  const roleLabel = role === 'driver' ? 'Driver Number (Psychic Number)'
+    : role === 'conductor' ? 'Conductor Number (Destiny Number)'
+    : role === 'both' ? 'Driver &amp; Conductor Number (Psychic + Destiny Number)'
+    : '';
+  let roleSpecificHtml = '';
+  if ((role === 'driver' || role === 'both') && s.psychicNumber) {
+    roleSpecificHtml += `<div class="k" style="margin-top:14px;">As a Psychic Number (Driver)</div>${npList(s.psychicNumber)}`;
+  }
+  if ((role === 'conductor' || role === 'both') && s.destinyNumber) {
+    roleSpecificHtml += `<div class="k" style="margin-top:14px;">As a Destiny Number (Conductor)</div>${npList(s.destinyNumber)}`;
+    if (s.destinyMen) roleSpecificHtml += `<div class="k" style="margin-top:10px;">For men</div>${npList(s.destinyMen)}`;
+    if (s.destinyWomen) roleSpecificHtml += `<div class="k" style="margin-top:10px;">For women</div>${npList(s.destinyWomen)}`;
+  }
 
   return `
     <div class="insight-topic">
@@ -2657,11 +2681,7 @@ function buildSingleNumberProfileHtml(profile, otherNum, roleLabel) {
       </div>
       <div class="insight-evidence-body expanded">
         ${npList(profile.introduction)}
-        ${s.psychicNumber ? `<div class="k" style="margin-top:14px;">Psychic number ${profile.number}</div>${npList(s.psychicNumber)}` : ''}
-        ${s.destinyNumber ? `<div class="k" style="margin-top:14px;">Destiny number ${profile.number}</div>${npList(s.destinyNumber)}` : ''}
-        ${s.destinyMen ? `<div class="k" style="margin-top:10px;">For men</div>${npList(s.destinyMen)}` : ''}
-        ${s.destinyWomen ? `<div class="k" style="margin-top:10px;">For women</div>${npList(s.destinyWomen)}` : ''}
-        ${s.nameNumber ? `<div class="k" style="margin-top:14px;">Name number ${profile.number}</div>${npList(s.nameNumber)}` : ''}
+        ${roleSpecificHtml}
         ${s.precautions ? `<div class="k" style="margin-top:14px;">Precautions</div>${npList(s.precautions)}` : ''}
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:14px;">
@@ -2758,14 +2778,17 @@ async function loadNumberProfile(driver, conductor, day, ns = '') {
     // the renderer for some reason, the other number (and the compound
     // entry) still show instead of the whole section going blank.
     try {
-      html += buildSingleNumberProfileHtml(profileByNum[driver], conductor, 'Driver number');
+      // When Driver and Conductor are the same digit, this one card is
+      // BOTH roles at once -- show the Psychic-Number and Destiny-Number
+      // write-ups together ('both') rather than only the Driver half.
+      html += buildSingleNumberProfileHtml(profileByNum[driver], conductor, conductor === driver ? 'both' : 'driver');
     } catch (err) {
       console.error('Failed to render driver number profile:', err);
       html += `<p class="insight-none">Could not display the Driver number profile.</p>`;
     }
     if (conductor !== driver) {
       try {
-        html += buildSingleNumberProfileHtml(profileByNum[conductor], driver, 'Conductor number');
+        html += buildSingleNumberProfileHtml(profileByNum[conductor], driver, 'conductor');
       } catch (err) {
         console.error('Failed to render conductor number profile:', err);
         html += `<p class="insight-none">Could not display the Conductor number profile.</p>`;
