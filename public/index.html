@@ -2686,8 +2686,13 @@ function buildSingleNumberProfileHtml(profile, otherNum, roleLabel) {
               <p style="font-size:12px;color:var(--text-muted);">${s.mantra.repetitions || ''}</p>
             </div>
           ` : ''}
-          ${s.yantra ? `<div style="flex:1;min-width:180px;">${renderYantraGrid(s.yantra)}</div>` : ''}
         </div>
+
+        ${s.yantra ? `
+          <div style="margin-top:16px;overflow-x:auto;">
+            ${renderYantraGrid(s.yantra)}
+          </div>
+        ` : ''}
 
         ${otherNum && relText ? `
           <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);">
