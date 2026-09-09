@@ -51,6 +51,7 @@ const relationshipRouter = require('./routes/relationship');
 const dashboardRouter = require('./routes/dashboard');
 const actorsRouter = require('./routes/actors');
 const newsRouter = require('./routes/news');
+const numberProfileRouter = require('./routes/numberProfile');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -111,10 +112,15 @@ app.use('/api/relationship', relationshipRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/actors', actorsRouter);
 app.use('/api/news', newsRouter);
+app.use('/api/number-profile', numberProfileRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, dbState: mongoose.connection.readyState });
 });
+
+// Static images for the "Full number profile" reference data (deity and
+// relationship illustrations extracted alongside server/knowledge/bookData).
+app.use('/book-data-images', express.static(path.join(__dirname, 'knowledge', 'bookData', 'images')));
 
 // Serve the frontend
 app.use(express.static(path.join(__dirname, '..', 'public')));

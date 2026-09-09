@@ -62,6 +62,16 @@ const SOURCES = {
     sourceType: 'external_practitioner_reference',
     note: 'Cited to show this app\u2019s compatible-number table is consistent with a named practitioner\u2019s independently published table, not copied from it.',
   },
+  harishJohari: {
+    title: 'Numerology With Tantra, Ayurveda, and Astrology: A Key to Human Behavior',
+    author: 'Harish Johari',
+    year: 1990,
+    url: 'https://www.innertraditions.com/books/numerology',
+    publisher: 'Destiny Books, Rochester, Vermont',
+    license: '\u00a9 Harish Johari / Destiny Books \u2014 not public domain. Reproduced here, condensed, at this application owner\u2019s discretion for this product; not a claim of open licensing.',
+    sourceType: 'copyrighted_book_reference',
+    note: 'The "Full number profile" section on the details page presents condensed content drawn directly from this book (psychic/destiny meanings, deity, mantra, yantra, and relationship notes for each number), credited here by title, author, and publisher.',
+  },
 };
 
 /**
