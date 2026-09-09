@@ -1,0 +1,242 @@
+{
+  "title": "The Compound Numbers",
+  "source": {
+    "book": "Numerology With Tantra, Ayurveda, and Astrology: A Key to Human Behavior",
+    "author": "Harish Johari",
+    "publisher": "Destiny Books, Rochester, Vermont"
+  },
+  "note": [
+    "Applies to the psychic numbers of people born on dates 10-31 of any month — two-digit birthdates carry a compound-number flavor layered on top of their reduced single-digit psychic number, because the two planetary energies in the date combine much like a planetary conjunction.",
+    "Numbers 11, 13, and 22 are treated as special/master numbers and are covered within the number-2 (11) and number-4 (13, 22) chapters rather than here — see number-2.json section 'elevenBirthday' and number-4.json section 'specialBirthdays'.",
+    "Each entry below names which two single-digit planetary energies combine to form the compound number, and what changes for people born on that date compared to others who share the same reduced psychic number but were born on a single-digit date (1-9)."
+  ],
+  "compoundNumbers": {
+    "10": {
+      "combination": "1 (Sun) and 0 (infinity / Anant Tattva)",
+      "reducesTo": 1,
+      "points": [
+        "The qualities of 1 dominate, since 10 belongs to the series of 1 — bestows honor, faith, self-confidence, and name and fame (good or bad) that fluctuates according to karmic law.",
+        "One is fortunate, 0 is unfortunate; the unfortunate 0 brings struggle, which in turn gives self-confidence and right understanding, making these natives shine.",
+        "Zero creates hidden enemies, but 1 gives the alertness to recognize them.",
+        "A number of success achieved only after hard struggle.",
+        "The only solution to these obstacles is to remain introspective and awake; dependence on others causes problems."
+      ]
+    },
+    "12": {
+      "combination": "1 (Sun) and 2 (Moon) — a pair of opposites",
+      "reducesTo": 3,
+      "points": [
+        "Since 1 and 2 don't make an ideal couple, people born on the 12th carry an underlying anxiety from this differing relationship, even though psychic-3 natives are otherwise fortunate in getting help, cooperation, and success.",
+        "Psychic 3s are famous for saying yes to everything, but only do what's within their means — 12s suffer most from this pattern, torn between 1's stable/determined nature and 2's changeability, so they aren't always sure they mean it when they say yes, and can quietly reverse themselves soon after.",
+        "Tend to decide things at the last moment, with nothing ever fully certain — may change their minds even after starting a job and leave it uncompleted; achieve success in the latter part of life but leave behind many started-with-enthusiasm, unfinished jobs and projects.",
+        "Change plans quickly and often, so friends/relatives are never sure of their whereabouts.",
+        "Enjoy happy, healthy, prosperous personal lives; take good care of themselves, enjoy cooking and feasts, have good taste, and are philosophic and religious.",
+        "Combine 1's strength with 2's gentleness; believe in synthesizing and are unconventional, ready to adapt to all kinds of circumstances."
+      ]
+    },
+    "14": {
+      "combination": "1 (Sun) and 4 (Rahu) — two opposites attracted to each other",
+      "reducesTo": 5,
+      "points": [
+        "A number of risk, fear, underestimation, and wrong assessment of the future.",
+        "Rahu (a half-planet) is an enemy of the Sun and, associating with it, tries to cause affliction — partially eclipsing the Sun and creating obstacles; 14s suffer more inner conflict and more frequent life changes than other psychic-5s.",
+        "Rahu takes risks willingly and the Sun isn't afraid of risk either, so 14s risk more than other 5s — and since 5s are natural gamblers, 14s take bigger risks (gambling and otherwise) that can bring financial loss and other problems.",
+        "A number 1 is normally gifted at correctly assessing the future, but combined with 4 in number 14 this creates the opposite — frequent incorrect assessments of the future; advised to remain cautious with associates/colleagues and stay calm to reach their goals.",
+        "Mercury's influence (ruling psychic 5) makes them fluid and mercurial — they genuinely enjoy living the way they do: helpful, wise, quick to respond, restless but jovial (though less jovial than those born on the 23rd), and they benefit from gambling and risk-taking.",
+        "Because of Rahu's influence, advised to be especially cautious in thunderstorms, hurricanes, or any natural calamity."
+      ]
+    },
+    "15": {
+      "combination": "1 (Sun) and 5 (Mercury) — both connected with intellect and ready wit",
+      "reducesTo": 6,
+      "points": [
+        "Both ruling planets love modernism, material success, and popularity, and are friendly with each other.",
+        "Definitely like luxuries and material prosperity; interested in literature, fine arts, and music.",
+        "Since 15 reduces to psychic 6, it is ruled by Venus — love of a luxurious, free, uncommitted life and of sensual pleasure dominates a 15's outlook.",
+        "The Sun brings them popularity; Mercury makes them move around and travel; Venus brings them to cozy, expensive, luxurious places.",
+        "Because of the Sun they obtain cooperation and help; because of Mercury they're surrounded by more recreation and festive occasions than other psychic-6 natives.",
+        "Tender, emotional, attractive, and stay younger-looking than their age. Men with this number become interested in Tantra, magic, and witchcraft to gain power to enjoy/explore their sensual nature; women become interested in the same subjects to get over their sensual nature.",
+        "Get more cooperation and help from the opposite sex; love flowers and fragrances, care for jewelry, have a keen sense of dress; pleasant personalities and charming manners."
+      ]
+    },
+    "16": {
+      "combination": "1 (Sun) and 6 (Venus) — two opposites",
+      "reducesTo": 7,
+      "points": [
+        "Venus is benefic but is also a teacher of demons (the malefics); the Sun is malefic but belongs to the group of Jupiter, teacher of the Gods — so the Sun and Venus belong to opposite camps, natural enemies, which creates problems for those born on the 16th.",
+        "Number 7 (their reduced psychic number) is ruled by Ketu, a malefic half-planet that blinds the power of discrimination — 16s therefore have difficulty discriminating, which causes uncertainty and anxiety.",
+        "The Sun gives them idealism; Venus makes them hedonistic — the combination makes 16s idealistic outwardly but lovers of enjoyment inwardly; they become dreamers who live in their own dream worlds.",
+        "Ketu's influence makes them disinterested in worldly desires/ambitions — if spiritually inclined, they gain self-knowledge and psychic ability and can become ascetics; if drawn to Venus's influence instead, they turn toward the healing arts and occultism; if neither, they may join conspirator groups.",
+        "Always anxious and afraid of losing their present status; rise and fall many times, suffer from their defeats, but keep going their own way.",
+        "Should watch against accidents and mishaps in their lives."
+      ]
+    },
+    "17": {
+      "combination": "1 (Sun) and the half-planet 7 (Ketu)",
+      "reducesTo": 8,
+      "points": [
+        "Since 17 reduces to psychic 8, it is ruled by Saturn — a number of struggle, obstacles, and difficulties.",
+        "The Sun and Ketu are enemies, which gives 17s inner conflict — but this conflict brings real understanding and makes them more aware, considerate, loving, and spiritual; they develop resistance and overcome obstacles without losing heart, becoming peaceful and giving peace to those around them.",
+        "Although 8 is normally ruled by malicious Saturn, 17-natives become benefic and do something for suffering humanity that brings them name and fame, even after death.",
+        "Saturnine difficulties/delays don't leave them, but they aren't crushed by them and make their own distinctive mark on history; Saturn makes them successful in the latter part of life, and people consider them fortunate — they suffer in personal/family life but acquire wealth, prosperity, and respect.",
+        "If they develop faith in God and adopt spiritual disciplines, providence helps them and their problems can miraculously disappear.",
+        "Advised to be careful in selecting friends and in seeking help from friends, relatives, and colleagues. Have courage and are bold."
+      ]
+    },
+    "18": {
+      "combination": "1 (Sun) and 8 (Saturn), ruled overall by 9 (Mars)",
+      "reducesTo": 9,
+      "points": [
+        "People born on the 18th face strong opposition, inner conflict, and obstacles in life.",
+        "Because 9 (their reduced number) is ruled by Mars, they're tough fighters who survive difficult circumstances and grow used to meeting challenges and facing adversity caused by grudges/enmity within their own family and relatives.",
+        "Devoid of peace in personal life and family circles; their martial nature creates bad feeling with kith and kin and doesn't favor good marital relationships.",
+        "Earn money through unfair means at times and don't care much for society's ethical norms; are financially benefited by wars, revolutions, and social upheavals.",
+        "Suffer from tension, instability, and restlessness; can become vicious, keep bad company, and be rough or sometimes cruel.",
+        "If made to follow a disciplined life, they prosper and rise to high positions; learning the lesson of ahimsa (non-violence) lets them make their mark on history.",
+        "Advised to avoid disputes with family members and friends. Materialists who acquire special skills to earn money; become financially well-off after 40 and are rewarded for their efforts later in life."
+      ]
+    },
+    "19": {
+      "combination": "1 (Sun) and 9 (Mars), ruled overall by 1 (Sun)",
+      "reducesTo": 1,
+      "points": [
+        "Lucky psychic-1 people. The Sun and Mars are friends, and the Sun is also exalted in Aries, a sign ruled by Mars.",
+        "Full of enthusiasm, happiness, and inspiration; achieve success in every field of life; full of life force and honored by friends and colleagues.",
+        "The Sun's influence gives them wisdom; Mars's influence lets them confront odd situations and meet challenges — hard work and persistence make them successful.",
+        "This combination, and Mars's influence, also makes them obstinate and short-tempered, creating problems in married life.",
+        "Have all the qualities of number-1 people; more fortunate than those born on the 10th, though less fortunate than those born on the 28th.",
+        "Generally enjoy high status, honor, success, and material prosperity; helpful, cooperative, and generous."
+      ]
+    },
+    "20": {
+      "combination": "2 (Moon) and 0 — a number of impatience",
+      "reducesTo": 2,
+      "points": [
+        "Number-2 people are generally impatient, nervous, dependent, and quick-changing; 0 adds responsibility, which tires these 2s further.",
+        "Tender and emotional like other 2s, but more cooperative, loving, and caring.",
+        "Don't get properly rewarded for their effort and loving care; experience unnecessary delays with their projects and suffer from anxiety and disgust.",
+        "Married life is not very successful, and they tend to neglect family members and relatives.",
+        "For peace of mind and success, they are advised to develop interests in the spiritual field."
+      ]
+    },
+    "21": {
+      "combination": "2 (Moon) and 1 (Sun) — a different balance of 2 and 1 than in number 12",
+      "reducesTo": 3,
+      "points": [
+        "Twenty-one belongs to the series of 20, so it is more strongly influenced by 2 than 12 is, even though 21 is ultimately ruled by Jupiter (as psychic number 3).",
+        "The 2 provides gentleness; the 1 provides the potential to become successful in life.",
+        "More social than other psychic-3 natives — popular in all circles and with the opposite sex, mixing more freely and able to overcome difficulties to establish themselves in service or business.",
+        "With the number 2 they can work as arbitrators and diplomats; with the number 1 they're able to succeed and rise — in this combination, the 1 helps the 2.",
+        "If they develop a little patience, they can become fortunate and make steady progress."
+      ]
+    },
+    "23": {
+      "combination": "2 (Moon) and 3 (Jupiter) — supposed to be a number of success",
+      "reducesTo": 5,
+      "points": [
+        "People born on the 23rd are psychic-5s ruled by Mercury — intelligent, hardworking, well informed, and generally interested in learning about everything.",
+        "Good chances of success in their professions and become popular; benefited by members of the opposite sex and helped by officers and other people in authority.",
+        "A little moody and short-tempered, and love to take risks, but are liked by people and achieve success in their lives.",
+        "Live in prosperity, promote new ideas, achieve name and fame, rise in their communities, and are known for their jovial nature."
+      ]
+    },
+    "24": {
+      "combination": "2 (Moon) and 4 (Rahu) — two opposites",
+      "reducesTo": 6,
+      "points": [
+        "Considered a lucky number because 2 and 4 make 6, and 6 (ruled by Venus) is a lucky number — this particular 6 is extra lucky because 2 and 4 are in a harmonious relationship.",
+        "Twenty-four-natives carry all the qualities of psychic number 6, but differ from those born on the 15th or 6th: 4 is a number of difficulty and change, and 2 is a number of change, so those born on the 24th experience very frequent life changes.",
+        "The influence of 2 makes them helping and sincere; the influence of 4 makes them strong and persistent.",
+        "Secretive and able to keep others' secrets; benefited by the opposite sex, yet also suffer failures from betrayal.",
+        "Gentle and helpful; if their destiny and name numbers are in harmony with their psychic number, they can enjoy ordinary, stable family lives."
+      ]
+    },
+    "25": {
+      "combination": "2 (Moon) and 5 (Mercury) — a strange, not especially good combination",
+      "reducesTo": 7,
+      "points": [
+        "The Moon is neutral toward Mercury, but Mercury holds enmity toward the Moon — this strange relationship creates a self-condemning nature.",
+        "Twenty-five reduces to 7 (ruled by Ketu) — though it's a number that brings luck to others, psychic-7 natives themselves suffer a good deal in their early years.",
+        "The numbers 2 and 5 give a fluctuating nature, compounded by Ketu's ambiguity.",
+        "People born on the 25th are more dreamy, imaginative, artistic, moody, and philosophic than other psychic 7s; they try to understand nature's mysteries and develop their own methodologies, sometimes founding religious institutions.",
+        "Gain experience and understanding through their failures and ultimately settle down, slowly and gradually obtaining secure positions with the help of friends, relatives, and colleagues.",
+        "Have philosophic outlooks and are generally proud of artistic talents/successes achieved after great struggle.",
+        "Not lucky in love affairs, but obtain financial gain through marriage. Advised to avoid risky ventures."
+      ]
+    },
+    "26": {
+      "combination": "2 (Moon) and 6 (Venus)",
+      "reducesTo": 8,
+      "points": [
+        "Gives these individuals a tendency to depend on members of the opposite sex — both 2 and 6 are numbers dependent on others.",
+        "Twenty-six-natives are psychic-8s ruled by Saturn, considered materialists and fatalists; face many difficulties and much opposition, especially in their early years.",
+        "Both 2 and 6 give strong attraction to the opposite sex, and this attraction is the main cause of problems and misfortune in these 8s' lives.",
+        "Advised to be careful in selecting a life partner — marriage to a number-8 person born on the 17th or 8th is better than marriage to other numbers.",
+        "Hedonists before marriage, but after marrying they settle down, become sincere, and give up earlier relationships. If they marry numbers other than 1, 3, 6, or 8, they suffer and eventually turn away from family life; if they select 1s, 3s, or 6s, they can achieve good fortune and a happy marriage.",
+        "Excel and acquire top positions in the latter part of life; hardworking and stubborn. The men can be revengeful and cruel toward those they hold enmity with."
+      ]
+    },
+    "27": {
+      "combination": "2 (Moon) and 7 (Ketu) — two strong opposites",
+      "reducesTo": 9,
+      "points": [
+        "Provides 27s with initiative and inexhaustible energy.",
+        "Both 2 and 7 are dependent numbers by nature; if those born on the 27th can develop independence and free will, they can perform all jobs successfully, since both numbers are good at making plans that benefit business and family matters.",
+        "Since 2 and 7 total 9, the number is ultimately ruled by Mars, making 27s powerful, commanding, and authoritative — they carry out every project in a well-planned way and achieve success.",
+        "Loving people, devoted to their families or the organizations they belong to; both 2 and 7 are emotional and intuitive numbers.",
+        "If they develop stability, they can become very successful in the material field."
+      ]
+    },
+    "28": {
+      "combination": "2 (Moon) and 8 (Saturn) — a number of struggle",
+      "reducesTo": 1,
+      "points": [
+        "People born on this date face many obstacles and much opposition — but since 2 plus 8 totals 1, the number is ultimately ruled by the lucky Sun, which brings success once they've conquered these struggles.",
+        "Gain more experience and are gentler and less authoritative, commanding, and demanding than other number-1s; more able to serve, and gain more cooperation and help, widening their circle of friends.",
+        "Psychic numbers 2 and 8 are both servants, both obstinate, and both good, tough fighters — the 2-and-8 combination in 28 makes these people even more vulnerable yet more successful as fighters.",
+        "Lead the battle advocating justice for the downtrodden and often become good politicians and political heroes, leaving their mark on history.",
+        "The influence of 2 makes them philosophical; the influence of 8 makes them interested in material progress and modernization — they develop unique ways of combining material and spiritual progress and are holistic in their attitudes."
+      ]
+    },
+    "29": {
+      "combination": "2 (Moon) and 9 (Mars) — supposed to bring basic insecurity and uncertainty",
+      "reducesTo": 2,
+      "points": [
+        "Since 2 and 9 total 11, which reduces to 2, twenty-nine is a 2 and is influenced more strongly by the Moon.",
+        "On the material plane, those born on the 29th achieve success and rise to high positions — but their personal life, especially their married life, is not satisfactory.",
+        "The changing nature that number 2 brings, and the sentimentality that number 9 brings, dominate their lives.",
+        "With a good destiny number and a harmonious name number, a 29 can select the right partners in business and life and make progress with their help; without that harmony, they can get involved in the wrong things and lead a less ethical/moral life.",
+        "Though they achieve high positions in their field of work, they often feel insecure and lonely; Mars's influence makes them restless and doubting.",
+        "Men born on this date should be very conscious in selecting life partners, since women can be a main cause of problems/sorrow in their lives; women born on this date should fast on Mondays or Thursdays if seeking a nice, harmonious husband, and should try to understand their partner's feelings rather than dwelling only on their own emotional highs and lows.",
+        "In general, psychic natives born on the 29th are loving and warm-hearted, able to attract people with high aesthetic sensibility, and favored by people in authority.",
+        "Advised to avoid irritation and short-temperedness, follow spiritual discipline, develop true faith in God, and try to build a family environment. Men of this number should become friendlier and more tolerant with family, and should not postpone marriage — late marriage brings unhappiness and mental problems."
+      ]
+    },
+    "30": {
+      "combination": "3 (Jupiter) and 0",
+      "reducesTo": 3,
+      "points": [
+        "Psychic-3 natives born on this date are somewhat less fortunate than other psychic-3s because of the association with zero — not unlucky exactly, but the 0 slows their progress and reduces their circle of friends.",
+        "Because 3s are hardworking, 30s still live comfortably and make enough money without excessive hard work.",
+        "Social and universal helpers like other 3s, but their lives are more influenced by the opposite sex.",
+        "Constantly engaged in work and earn from more than one source; sometimes start so many projects at once that many are left incomplete — the influence of 0 makes them waste energy and leave jobs undone.",
+        "Ruled by Jupiter, those born on the 30th are thinkers who use more mental energy than other 3s; because they struggle a great deal in their early years, they develop their own distinctive philosophy and way of seeing things.",
+        "Not bound by the religion they were born into and grow more tolerant of other religions/philosophies over time; being critical by nature, they poke fun at all religions including their own, and advocate universal love and brotherhood — though in personal life they still follow the traditions they were born into.",
+        "If their destiny and name numbers are harmonious, they get help/cooperation and excel; benefited by social institutions and organizations that can use their creative energy and talents. Advised not to be selfish, and to join institutions/organizations that work for the welfare of mankind."
+      ]
+    },
+    "31": {
+      "combination": "3 (Jupiter) and 1 (Sun)",
+      "reducesTo": 4,
+      "points": [
+        "Both 3 and 1 are individually good numbers, but their combination is not very beneficial for those born on the 31st, because 3+1 totals 4, ruled by Rahu, a malefic half-planet famous for creating trouble, uncertainty, and sudden (good and bad) unexpected change.",
+        "People born on the 31st feel uncertain and lonely, and are misunderstood by friends and colleagues.",
+        "Because they lack a friendly, inspiring environment, they tend to isolate themselves, become less social and less popular, and sometimes join revolutionary groups that use violence.",
+        "Become obstinate, secretive, and commanding — impose their ideas on others; the presence of 3 makes them a little selfish, and the presence of 1 makes them authoritative, giving them qualities of leadership.",
+        "Although psychic 3s and psychic 1s are typically hardworking, social extroverts, those born on the 31st are shy and less social, yet still hard workers — they have to struggle a lot before becoming known in society.",
+        "Love modern ideas and rebel against old values; lovers of justice who don't always use just means to achieve it; love to oppose popular ideas and argue in favor of unpopular ones. If interested in politics, they gravitate to the opposition."
+      ]
+    }
+  },
+  "summary": "By understanding the significance of the compound numbers from 11 to 31, the numerologist can see more vividly the character of psychic natives born on any date of any month. The purpose of numerology is to provide general information about human beings who, though alike in physical makeup, differ in how they see the world — their complicated behaviors can be understood through their astrological configurations and the relationships between their psychic, destiny, and name numbers. Numerology educates people about their strengths and weaknesses, advises them on avoiding habits that create problems, and guides them out of the darkness that comes from not understanding the planets' effects on their lives — offering remedies through colors and gemstones, and guidance on general mental/physical health, likely ailments, and ways to avoid disease."
+}
