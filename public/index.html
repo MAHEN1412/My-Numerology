@@ -2618,11 +2618,16 @@ function npRow(label, value) {
 
 function renderYantraGrid(yantra) {
   if (!yantra || !yantra.grid) return '';
-  const rows = yantra.grid.map((row) => `<div class="loshu-grid" style="grid-template-columns:repeat(${row.length},1fr);margin-bottom:0;">${row.map((cell) => `<div class="loshu-cell"><div class="digits"><span class="d">${cell}</span></div></div>`).join('')}</div>`).join('');
+  // Single 3x3 grid (reusing the same .loshu-grid/.loshu-cell classes the
+  // Lo Shu grid already uses, which are sized for exactly a 3x3 layout) --
+  // previously this built one .loshu-grid PER ROW, which each got the
+  // class's own grid-template-rows:repeat(3,88px) and rendered as three
+  // stacked 3-row grids with two empty gray rows apiece.
+  const cells = yantra.grid.flat().map((cell) => `<div class="loshu-cell"><div class="digits"><span class="d">${cell}</span></div></div>`).join('');
   return `
     <div style="margin-top:10px;">
       <div class="k" style="margin-bottom:6px;">${yantra.description || 'Yantra'}</div>
-      ${rows}
+      <div class="loshu-grid">${cells}</div>
     </div>
   `;
 }
@@ -2686,7 +2691,7 @@ function buildSingleNumberProfileHtml(profile, otherNum, roleLabel) {
 
         ${otherNum && relText ? `
           <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);">
-            <div class="k">This number's take on number ${otherNum}</div>
+            <div class="k">${Number(otherNum) === Number(profile.number) ? `Number ${profile.number} paired with itself (Driver and Conductor both ${profile.number})` : `This number's take on number ${otherNum}`}</div>
             <div style="display:flex;gap:14px;align-items:flex-start;margin-top:8px;">
               ${relImg ? `<img src="${relImg}" alt="Number ${profile.number} and ${otherNum} relationship" style="max-width:120px;border-radius:8px;flex-shrink:0;" loading="lazy">` : ''}
               <p style="font-size:13px;color:var(--text-dim);margin:0;">${relText}</p>
@@ -2728,7 +2733,12 @@ async function loadNumberProfile(driver, conductor, day, ns = '') {
         Source: <em>Numerology With Tantra, Ayurveda, and Astrology: A Key to Human Behavior</em> by Harish Johari, Destiny Books.
       </p>
     `;
-    html += buildSingleNumberProfileHtml(profileByNum[driver], driver === conductor ? null : conductor, 'Driver number');
+    // Pass conductor as the "other number" even when driver === conductor:
+    // the book's relationships object includes a genuine same-number entry
+    // (e.g. relationships["1"] on number-1.json, covering the 1-and-1
+    // case), so a matching Driver and Conductor should still show it
+    // rather than silently hiding it.
+    html += buildSingleNumberProfileHtml(profileByNum[driver], conductor, 'Driver number');
     if (conductor !== driver) {
       html += buildSingleNumberProfileHtml(profileByNum[conductor], driver, 'Conductor number');
     }
