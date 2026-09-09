@@ -2599,11 +2599,21 @@ const numberProfileCache = {}; // num -> profile, shared across ns so we don't r
 
 async function fetchNumberProfile(num) {
   if (numberProfileCache[num]) return numberProfileCache[num];
-  const res = await fetch(`/api/number-profile/${num}`);
-  if (!res.ok) return null;
-  const data = await res.json();
-  numberProfileCache[num] = data.profile;
-  return data.profile;
+  // Deliberately swallow failures here (network error, non-JSON response,
+  // etc.) and return null rather than letting them propagate: one bad
+  // number (e.g. a master number 11/22/33, which this book data doesn't
+  // cover) shouldn't take down the whole section. Logged to the console
+  // so a real failure is still diagnosable.
+  try {
+    const res = await fetch(`/api/number-profile/${num}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    numberProfileCache[num] = data.profile;
+    return data.profile;
+  } catch (err) {
+    console.error(`Failed to fetch number profile ${num}:`, err);
+    return null;
+  }
 }
 
 function npList(items) {
@@ -2743,28 +2753,47 @@ async function loadNumberProfile(driver, conductor, day, ns = '') {
     // (e.g. relationships["1"] on number-1.json, covering the 1-and-1
     // case), so a matching Driver and Conductor should still show it
     // rather than silently hiding it.
-    html += buildSingleNumberProfileHtml(profileByNum[driver], conductor, 'Driver number');
+    //
+    // Each build call is wrapped separately: if one number's data trips up
+    // the renderer for some reason, the other number (and the compound
+    // entry) still show instead of the whole section going blank.
+    try {
+      html += buildSingleNumberProfileHtml(profileByNum[driver], conductor, 'Driver number');
+    } catch (err) {
+      console.error('Failed to render driver number profile:', err);
+      html += `<p class="insight-none">Could not display the Driver number profile.</p>`;
+    }
     if (conductor !== driver) {
-      html += buildSingleNumberProfileHtml(profileByNum[conductor], driver, 'Conductor number');
+      try {
+        html += buildSingleNumberProfileHtml(profileByNum[conductor], driver, 'Conductor number');
+      } catch (err) {
+        console.error('Failed to render conductor number profile:', err);
+        html += `<p class="insight-none">Could not display the Conductor number profile.</p>`;
+      }
     }
 
     if (compoundEntry) {
-      html += `
-        <div class="insight-topic">
-          <div class="insight-topic-header" style="cursor:default;">
-            <h3 style="margin:0;">Compound number ${compoundEntry.day} &mdash; born on the ${compoundEntry.day}${(['11','12','13'].includes(String(compoundEntry.day % 100)) ? 'th' : ({1:'st',2:'nd',3:'rd'}[compoundEntry.day % 10] || 'th'))}</h3>
+      try {
+        html += `
+          <div class="insight-topic">
+            <div class="insight-topic-header" style="cursor:default;">
+              <h3 style="margin:0;">Compound number ${compoundEntry.day} &mdash; born on the ${compoundEntry.day}${(['11','12','13'].includes(String(compoundEntry.day % 100)) ? 'th' : ({1:'st',2:'nd',3:'rd'}[compoundEntry.day % 10] || 'th'))}</h3>
+            </div>
+            <div class="insight-evidence-body expanded">
+              <p style="font-size:12px;color:var(--text-dim);margin:0 0 10px;">Combination: ${compoundEntry.combination}</p>
+              ${npList(compoundEntry.points)}
+            </div>
           </div>
-          <div class="insight-evidence-body expanded">
-            <p style="font-size:12px;color:var(--text-dim);margin:0 0 10px;">Combination: ${compoundEntry.combination}</p>
-            ${npList(compoundEntry.points)}
-          </div>
-        </div>
-      `;
+        `;
+      } catch (err) {
+        console.error('Failed to render compound number entry:', err);
+      }
     }
 
     container.innerHTML = html;
   } catch (err) {
-    container.innerHTML = '<p class="video-warning">Number profile is temporarily unavailable.</p>';
+    console.error('Number profile load failed:', err);
+    container.innerHTML = '<p class="video-warning">Number profile is temporarily unavailable. (See browser console for details.)</p>';
   }
 }
 
