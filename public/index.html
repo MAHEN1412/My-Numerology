@@ -2617,8 +2617,17 @@ async function fetchNumberProfile(num) {
 }
 
 function npList(items) {
-  if (!items || items.length === 0) return '';
-  return `<ul class="np-list">${items.map((i) => `<li>${i}</li>`).join('')}</ul>`;
+  if (!items) return '';
+  // Most of these book-data fields are arrays of bullet points, but at
+  // least one (number-2.json's weakPeriods/strongPeriods) is a single
+  // plain sentence instead -- an extraction inconsistency between
+  // numbers, not something to assume is fixed everywhere. Wrap a bare
+  // string as a one-item list instead of crashing on items.map (strings
+  // don't have .map), which is exactly what took down the whole
+  // Conductor-number card for anyone whose Conductor is 2.
+  const arr = Array.isArray(items) ? items : [items];
+  if (arr.length === 0) return '';
+  return `<ul class="np-list">${arr.map((i) => `<li>${i}</li>`).join('')}</ul>`;
 }
 
 function npRow(label, value) {
@@ -2688,7 +2697,7 @@ function buildSingleNumberProfileHtml(profile, otherNum, role) {
           ${npRow('Good dates', s.goodDates)}
           ${npRow('Good days', s.goodDays)}
           ${npRow('Favorable colors', s.favorableColors)}
-          ${npRow('Precious stones', (s.preciousStones || []).join(', '))}
+          ${npRow('Precious stones', Array.isArray(s.preciousStones) ? s.preciousStones.join(', ') : (s.preciousStones || ''))}
           ${npRow('Meditation', s.meditation)}
           ${npRow('Fasting', s.fasting)}
           ${npRow('Friendship', s.friendship)}
