@@ -3038,10 +3038,59 @@ function renderYantraGrid(yantra) {
   `;
 }
 
-function buildSingleNumberProfileHtml(profile, otherNum, role) {
+// Telugu labels for the fixed field names around the Harish Johari book
+// content (the paragraphs themselves come from each number's own
+// translations.te block in bookData/number-N.json -- this map only
+// covers the static English chrome around them, e.g. "Good dates").
+const NUMBER_PROFILE_LABELS_TE = {
+  'As a Psychic Number (Driver)': 'సైకిక్ నంబర్‌గా (డ్రైవర్)',
+  'As a Destiny Number (Conductor)': 'డెస్టినీ నంబర్‌గా (కండక్టర్)',
+  'For men': 'పురుషుల కోసం',
+  'For women': 'స్త్రీల కోసం',
+  'Precautions': 'జాగ్రత్తలు',
+  'Good dates': 'మంచి తేదీలు',
+  'Good days': 'మంచి రోజులు',
+  'Favorable colors': 'అనుకూల రంగులు',
+  'Precious stones': 'రత్నాలు',
+  'Meditation': 'ధ్యానం',
+  'Fasting': 'ఉపవాసం',
+  'Friendship': 'స్నేహం',
+  'Good years in life': 'జీవితంలో మంచి సంవత్సరాలు',
+  'Special note': 'ప్రత్యేక గమనిక',
+  'Health & diseases': 'ఆరోగ్యం & వ్యాధులు',
+  'Romance': 'శృంగారం',
+  'Weak periods': 'బలహీన కాలాలు',
+  'Strong periods': 'బలమైన కాలాలు',
+  'Deity': 'దేవత',
+  'Mantra': 'మంత్రం',
+};
+function npLabel(label, lang) {
+  return (lang === 'te' && NUMBER_PROFILE_LABELS_TE[label]) || label;
+}
+
+// Merges a number's Telugu translation (profile.translations.te, when
+// present) over its English fields. Any field the translation doesn't
+// cover -- and any number that has no translations.te block at all yet,
+// since only some numbers are translated so far -- simply falls back to
+// the original English, so this is always safe to call.
+function getNumberProfileView(profile, lang) {
+  if (lang !== 'te' || !profile || !profile.translations || !profile.translations.te) return profile;
+  const te = profile.translations.te;
+  const view = { ...profile };
+  if (te.rulerTe) view.ruler = te.rulerTe;
+  if (te.introduction) view.introduction = te.introduction;
+  view.sections = { ...profile.sections, ...(te.sections || {}) };
+  if (te.sections && te.sections.mantra) view.sections.mantra = { ...profile.sections.mantra, ...te.sections.mantra };
+  if (te.sections && te.sections.yantra) view.sections.yantra = { ...profile.sections.yantra, ...te.sections.yantra };
+  if (te.relationships) view.relationships = { ...profile.relationships, ...te.relationships };
+  return view;
+}
+
+function buildSingleNumberProfileHtml(profile, otherNum, role, lang = 'en') {
   if (!profile) return '';
-  const s = profile.sections || {};
-  const relText = profile.relationships ? profile.relationships[otherNum] : null;
+  const view = getNumberProfileView(profile, lang);
+  const s = view.sections || {};
+  const relText = view.relationships ? view.relationships[otherNum] : null;
   const relImg = profile.images && profile.images.relationships ? profile.images.relationships[otherNum] : null;
 
   // This app calls the same underlying digit different things depending
@@ -3060,54 +3109,54 @@ function buildSingleNumberProfileHtml(profile, otherNum, role) {
     : '';
   let roleSpecificHtml = '';
   if ((role === 'driver' || role === 'both') && s.psychicNumber) {
-    roleSpecificHtml += `<div class="k" style="margin-top:14px;">As a Psychic Number (Driver)</div>${npList(s.psychicNumber)}`;
+    roleSpecificHtml += `<div class="k" style="margin-top:14px;">${npLabel('As a Psychic Number (Driver)', lang)}</div>${npList(s.psychicNumber)}`;
   }
   if ((role === 'conductor' || role === 'both') && s.destinyNumber) {
-    roleSpecificHtml += `<div class="k" style="margin-top:14px;">As a Destiny Number (Conductor)</div>${npList(s.destinyNumber)}`;
-    if (s.destinyMen) roleSpecificHtml += `<div class="k" style="margin-top:10px;">For men</div>${npList(s.destinyMen)}`;
-    if (s.destinyWomen) roleSpecificHtml += `<div class="k" style="margin-top:10px;">For women</div>${npList(s.destinyWomen)}`;
+    roleSpecificHtml += `<div class="k" style="margin-top:14px;">${npLabel('As a Destiny Number (Conductor)', lang)}</div>${npList(s.destinyNumber)}`;
+    if (s.destinyMen) roleSpecificHtml += `<div class="k" style="margin-top:10px;">${npLabel('For men', lang)}</div>${npList(s.destinyMen)}`;
+    if (s.destinyWomen) roleSpecificHtml += `<div class="k" style="margin-top:10px;">${npLabel('For women', lang)}</div>${npList(s.destinyWomen)}`;
   }
 
   return `
     <div class="insight-topic">
       <div class="insight-topic-header" style="cursor:default;">
         <div>
-          <h3 style="margin:0;">Number ${profile.number}${roleLabel ? ` &mdash; ${roleLabel}` : ''} <span style="font-weight:400;font-size:13px;color:var(--text-dim);">(ruled by ${profile.ruler || 'unknown'})</span></h3>
+          <h3 style="margin:0;">Number ${profile.number}${roleLabel ? ` &mdash; ${roleLabel}` : ''} <span style="font-weight:400;font-size:13px;color:var(--text-dim);">(ruled by ${view.ruler || 'unknown'})</span></h3>
         </div>
       </div>
       <div class="insight-evidence-body expanded">
-        ${npList(profile.introduction)}
+        ${npList(view.introduction)}
         ${roleSpecificHtml}
-        ${s.precautions ? `<div class="k" style="margin-top:14px;">Precautions</div>${npList(s.precautions)}` : ''}
+        ${s.precautions ? `<div class="k" style="margin-top:14px;">${npLabel('Precautions', lang)}</div>${npList(s.precautions)}` : ''}
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:14px;">
-          ${npRow('Good dates', s.goodDates)}
-          ${npRow('Good days', s.goodDays)}
-          ${npRow('Favorable colors', s.favorableColors)}
-          ${npRow('Precious stones', Array.isArray(s.preciousStones) ? s.preciousStones.join(', ') : (s.preciousStones || ''))}
-          ${npRow('Meditation', s.meditation)}
-          ${npRow('Fasting', s.fasting)}
-          ${npRow('Friendship', s.friendship)}
-          ${npRow('Good years in life', s.goodYearsInLife)}
-          ${npRow('Special note', s.specialNote)}
+          ${npRow(npLabel('Good dates', lang), s.goodDates)}
+          ${npRow(npLabel('Good days', lang), s.goodDays)}
+          ${npRow(npLabel('Favorable colors', lang), s.favorableColors)}
+          ${npRow(npLabel('Precious stones', lang), Array.isArray(s.preciousStones) ? s.preciousStones.join(', ') : (s.preciousStones || ''))}
+          ${npRow(npLabel('Meditation', lang), s.meditation)}
+          ${npRow(npLabel('Fasting', lang), s.fasting)}
+          ${npRow(npLabel('Friendship', lang), s.friendship)}
+          ${npRow(npLabel('Good years in life', lang), s.goodYearsInLife)}
+          ${npRow(npLabel('Special note', lang), s.specialNote)}
         </div>
 
-        ${s.healthAndDiseases ? `<div class="k" style="margin-top:14px;">Health &amp; diseases</div>${npList(s.healthAndDiseases)}` : ''}
-        ${s.romance ? `<div class="k" style="margin-top:14px;">Romance</div>${npList(s.romance)}` : ''}
-        ${s.weakPeriods ? `<div class="k" style="margin-top:14px;">Weak periods</div>${npList(s.weakPeriods)}` : ''}
-        ${s.strongPeriods ? `<div class="k" style="margin-top:14px;">Strong periods</div>${npList(s.strongPeriods)}` : ''}
+        ${s.healthAndDiseases ? `<div class="k" style="margin-top:14px;">${npLabel('Health & diseases', lang)}</div>${npList(s.healthAndDiseases)}` : ''}
+        ${s.romance ? `<div class="k" style="margin-top:14px;">${npLabel('Romance', lang)}</div>${npList(s.romance)}` : ''}
+        ${s.weakPeriods ? `<div class="k" style="margin-top:14px;">${npLabel('Weak periods', lang)}</div>${npList(s.weakPeriods)}` : ''}
+        ${s.strongPeriods ? `<div class="k" style="margin-top:14px;">${npLabel('Strong periods', lang)}</div>${npList(s.strongPeriods)}` : ''}
 
         <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:16px;align-items:flex-start;">
           ${s.deity ? `
             <div style="flex:1;min-width:200px;">
-              <div class="k">Deity</div>
+              <div class="k">${npLabel('Deity', lang)}</div>
               ${profile.images && profile.images.deity ? `<img src="${profile.images.deity}" alt="Deity for number ${profile.number}" style="max-width:160px;border-radius:8px;margin:8px 0;display:block;" loading="lazy">` : ''}
               <p style="font-size:13px;color:var(--text-dim);">${s.deity}</p>
             </div>
           ` : ''}
           ${s.mantra ? `
             <div style="flex:1;min-width:200px;">
-              <div class="k">Mantra</div>
+              <div class="k">${npLabel('Mantra', lang)}</div>
               <p style="font-size:14px;font-style:italic;margin:8px 0 4px;">${s.mantra.text}</p>
               <p style="font-size:12px;color:var(--text-muted);">${s.mantra.repetitions || ''}</p>
             </div>
@@ -3132,6 +3181,83 @@ function buildSingleNumberProfileHtml(profile, otherNum, role) {
       </div>
     </div>
   `;
+}
+
+// Caches the last fetched data per container namespace (ns: '' for the
+// main tab, 'Drawer' for the case drawer) so the English/Telugu toggle
+// can re-render instantly without re-fetching, and so it always reflects
+// whichever profiles are actually on screen right now.
+const numberProfileState = {};
+const numberProfileLang = {};
+
+function setNumberProfileLang(ns, lang) {
+  numberProfileLang[ns] = lang;
+  renderNumberProfileHtml(ns);
+}
+
+function renderNumberProfileHtml(ns) {
+  const container = document.getElementById('numberProfileContainer' + ns);
+  const state = numberProfileState[ns];
+  if (!container || !state) return;
+  const { driver, conductor, profileByNum, compoundEntry } = state;
+  const lang = numberProfileLang[ns] || 'en';
+
+  const btn = (val, text) => `<button type="button" class="ghost" onclick="setNumberProfileLang('${ns}', '${val}')" style="font-size:12px;padding:6px 12px;${lang === val ? 'background:var(--gold);color:var(--navy);border-color:var(--gold);' : ''}">${text}</button>`;
+  let html = `
+    <p style="font-size:12px;color:var(--text-muted);margin:0 0 12px;">
+      Source: <em>Numerology With Tantra, Ayurveda, and Astrology: A Key to Human Behavior</em> by Harish Johari, Destiny Books.
+    </p>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      ${btn('en', 'English')}
+      ${btn('te', 'తెలుగు')}
+    </div>
+  `;
+  // Pass conductor as the "other number" even when driver === conductor:
+  // the book's relationships object includes a genuine same-number entry
+  // (e.g. relationships["1"] on number-1.json, covering the 1-and-1
+  // case), so a matching Driver and Conductor should still show it
+  // rather than silently hiding it.
+  //
+  // Each build call is wrapped separately: if one number's data trips up
+  // the renderer for some reason, the other number (and the compound
+  // entry) still show instead of the whole section going blank.
+  try {
+    // When Driver and Conductor are the same digit, this one card is
+    // BOTH roles at once -- show the Psychic-Number and Destiny-Number
+    // write-ups together ('both') rather than only the Driver half.
+    html += buildSingleNumberProfileHtml(profileByNum[driver], conductor, conductor === driver ? 'both' : 'driver', lang);
+  } catch (err) {
+    console.error('Failed to render driver number profile:', err);
+    html += `<p class="insight-none">Could not display the Driver number profile.</p>`;
+  }
+  if (conductor !== driver) {
+    try {
+      html += buildSingleNumberProfileHtml(profileByNum[conductor], driver, 'conductor', lang);
+    } catch (err) {
+      console.error('Failed to render conductor number profile:', err);
+      html += `<p class="insight-none">Could not display the Conductor number profile.</p>`;
+    }
+  }
+
+  if (compoundEntry) {
+    try {
+      html += `
+        <div class="insight-topic">
+          <div class="insight-topic-header" style="cursor:default;">
+            <h3 style="margin:0;">Compound number ${compoundEntry.day} &mdash; born on the ${compoundEntry.day}${(['11','12','13'].includes(String(compoundEntry.day % 100)) ? 'th' : ({1:'st',2:'nd',3:'rd'}[compoundEntry.day % 10] || 'th'))}</h3>
+          </div>
+          <div class="insight-evidence-body expanded">
+            <p style="font-size:12px;color:var(--text-dim);margin:0 0 10px;">Combination: ${compoundEntry.combination}</p>
+            ${npList(compoundEntry.points)}
+          </div>
+        </div>
+      `;
+    } catch (err) {
+      console.error('Failed to render compound number entry:', err);
+    }
+  }
+
+  container.innerHTML = html;
 }
 
 async function loadNumberProfile(driver, conductor, day, ns = '') {
@@ -3159,57 +3285,9 @@ async function loadNumberProfile(driver, conductor, day, ns = '') {
       return;
     }
 
-    let html = `
-      <p style="font-size:12px;color:var(--text-muted);margin:0 0 16px;">
-        Source: <em>Numerology With Tantra, Ayurveda, and Astrology: A Key to Human Behavior</em> by Harish Johari, Destiny Books.
-      </p>
-    `;
-    // Pass conductor as the "other number" even when driver === conductor:
-    // the book's relationships object includes a genuine same-number entry
-    // (e.g. relationships["1"] on number-1.json, covering the 1-and-1
-    // case), so a matching Driver and Conductor should still show it
-    // rather than silently hiding it.
-    //
-    // Each build call is wrapped separately: if one number's data trips up
-    // the renderer for some reason, the other number (and the compound
-    // entry) still show instead of the whole section going blank.
-    try {
-      // When Driver and Conductor are the same digit, this one card is
-      // BOTH roles at once -- show the Psychic-Number and Destiny-Number
-      // write-ups together ('both') rather than only the Driver half.
-      html += buildSingleNumberProfileHtml(profileByNum[driver], conductor, conductor === driver ? 'both' : 'driver');
-    } catch (err) {
-      console.error('Failed to render driver number profile:', err);
-      html += `<p class="insight-none">Could not display the Driver number profile.</p>`;
-    }
-    if (conductor !== driver) {
-      try {
-        html += buildSingleNumberProfileHtml(profileByNum[conductor], driver, 'conductor');
-      } catch (err) {
-        console.error('Failed to render conductor number profile:', err);
-        html += `<p class="insight-none">Could not display the Conductor number profile.</p>`;
-      }
-    }
-
-    if (compoundEntry) {
-      try {
-        html += `
-          <div class="insight-topic">
-            <div class="insight-topic-header" style="cursor:default;">
-              <h3 style="margin:0;">Compound number ${compoundEntry.day} &mdash; born on the ${compoundEntry.day}${(['11','12','13'].includes(String(compoundEntry.day % 100)) ? 'th' : ({1:'st',2:'nd',3:'rd'}[compoundEntry.day % 10] || 'th'))}</h3>
-            </div>
-            <div class="insight-evidence-body expanded">
-              <p style="font-size:12px;color:var(--text-dim);margin:0 0 10px;">Combination: ${compoundEntry.combination}</p>
-              ${npList(compoundEntry.points)}
-            </div>
-          </div>
-        `;
-      } catch (err) {
-        console.error('Failed to render compound number entry:', err);
-      }
-    }
-
-    container.innerHTML = html;
+    numberProfileState[ns] = { driver, conductor, profileByNum, compoundEntry };
+    if (!numberProfileLang[ns]) numberProfileLang[ns] = 'en';
+    renderNumberProfileHtml(ns);
   } catch (err) {
     console.error('Number profile load failed:', err);
     container.innerHTML = '<p class="video-warning">Number profile is temporarily unavailable. (See browser console for details.)</p>';
