@@ -72,6 +72,17 @@ const SOURCES = {
     sourceType: 'copyrighted_book_reference',
     note: 'The "Full number profile" section on the details page presents condensed content drawn directly from this book (psychic/destiny meanings, deity, mantra, yantra, and relationship notes for each number), credited here by title, author, and publisher.',
   },
+  marinaCostelloe: {
+    title: 'The Complete Guide to Crystal Astrology: 360 Crystals and Sabian Symbols for Personal Health, Astrology and Numerology',
+    author: 'Marina Costelloe',
+    year: 2007,
+    url: 'https://www.findhornpress.com',
+    publisher: 'Earthdancer GmbH (an imprint of Findhorn Press), Forres, Scotland',
+    isbn: '978-1-84409-103-4',
+    license: '© Marina Costelloe / Earthdancer-Findhorn Press — not public domain. Reproduced here, condensed, at this application owner’s discretion for this product; not a claim of open licensing.',
+    sourceType: 'copyrighted_book_reference',
+    note: 'The "Crystal Astrology" section on the details page presents this book’s 360 zodiac-degree entries (Sabian Symbol, Crystal Element, Expression, Message, Sun Focus, and Affirmation for each degree), credited here by title, author, and publisher. Two further credits appear inside the book itself and are noted here for completeness: the Sabian Symbol key words are reprinted, with permission, from The Sabian Symbols in Astrology by Dr. Marc Edmund Jones (Aurora Press, ISBN 978-0-943358-40-6); the Healing Body Point for each degree is reprinted, with permission, from A Handbook of Medical Astrology by Jane Ridder-Patrick (CrabApple Press, ISBN 978-0-9551989-0-8).',
+  },
 };
 
 /**

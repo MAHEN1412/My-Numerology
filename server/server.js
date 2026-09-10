@@ -52,6 +52,7 @@ const dashboardRouter = require('./routes/dashboard');
 const actorsRouter = require('./routes/actors');
 const newsRouter = require('./routes/news');
 const numberProfileRouter = require('./routes/numberProfile');
+const crystalAstrologyRouter = require('./routes/crystalAstrology');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -113,6 +114,7 @@ app.use('/api/dashboard', dashboardRouter);
 app.use('/api/actors', actorsRouter);
 app.use('/api/news', newsRouter);
 app.use('/api/number-profile', numberProfileRouter);
+app.use('/api/crystal-astrology', crystalAstrologyRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, dbState: mongoose.connection.readyState });
@@ -121,6 +123,10 @@ app.get('/api/health', (req, res) => {
 // Static images for the "Full number profile" reference data (deity and
 // relationship illustrations extracted alongside server/knowledge/bookData).
 app.use('/book-data-images', express.static(path.join(__dirname, 'knowledge', 'bookData', 'images')));
+
+// Static crystal photos for the "Crystal Astrology" reference data
+// (extracted alongside server/knowledge/crystalAstrology).
+app.use('/crystal-astrology-images', express.static(path.join(__dirname, 'knowledge', 'crystalAstrology', 'images')));
 
 // Serve the frontend
 app.use(express.static(path.join(__dirname, '..', 'public')));

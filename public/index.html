@@ -1485,7 +1485,7 @@
       <div class="field"><label for="caseEditName">Name</label><input type="text" id="caseEditName"></div>
       <div class="field"><label for="caseEditPhone">Phone</label><input type="text" id="caseEditPhone"></div>
       <div class="field"><label for="caseEditDob">Date of birth</label><input type="date" id="caseEditDob"></div>
-      <div class="field"><label for="caseEditCrystal">Crystal suggestion</label><input type="text" id="caseEditCrystal"></div>
+      <div class="field"><label for="caseEditCrystal">Crystal &amp; Gem Stones Suggestion</label><input type="text" id="caseEditCrystal"></div>
       <div id="caseEditResult"></div>
     </div>
     <div class="wizard-footer">
@@ -2634,6 +2634,74 @@ function npList(items) {
 function npRow(label, value) {
   if (!value) return '';
   return `<div class="sumline"><div class="k">${label}</div><div style="font-size:13px;color:var(--text-dim);">${value}</div></div>`;
+}
+
+// --- Crystal Astrology (Marina Costelloe book, 360 zodiac-degree entries) ---
+
+function renderCrystalAstrologyEntryHtml(entry) {
+  if (!entry) return '';
+  return `
+    <div class="insight-topic" style="margin-bottom:14px;">
+      <div class="insight-topic-header" style="cursor:default;">
+        <div>
+          <h3 style="margin:0;">${entry.sign} ${entry.degree} <span style="font-weight:400;font-size:13px;color:var(--text-dim);">Astrological Numerology ${entry.astrologicalNumerology} &middot; Birthdays: ${entry.birthdays}</span></h3>
+        </div>
+      </div>
+      <div class="insight-evidence-body expanded">
+        <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;">
+          ${entry.image ? `<img src="${entry.image}" alt="${entry.crystalElement}" style="max-width:140px;border-radius:8px;flex-shrink:0;" loading="lazy">` : ''}
+          <div style="flex:1;min-width:220px;display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+            ${npRow('Sabian Symbol', entry.sabianSymbol)}
+            ${npRow('Marc Edmund Jones Key Word', entry.keyWord)}
+            ${npRow('Jane Ridder-Patrick Healing Body Point', entry.healingBodyPoint)}
+            ${npRow('Crystal Element', entry.crystalElement)}
+          </div>
+        </div>
+        <div class="k" style="margin-top:14px;">Expression</div>
+        <p style="font-size:13px;color:var(--text-dim);">${entry.expression}</p>
+        <div class="k" style="margin-top:14px;">Message</div>
+        <p style="font-size:13px;color:var(--text-dim);">${entry.message}</p>
+        ${entry.sunFocus ? `<div class="k" style="margin-top:14px;">Sun Focus</div><p style="font-size:13px;color:var(--text-dim);">${entry.sunFocus}</p>` : ''}
+        ${entry.reflection ? `<div class="k" style="margin-top:14px;">Reflection</div><p style="font-size:13px;color:var(--text-dim);">${entry.reflection}</p>` : ''}
+        <div class="k" style="margin-top:14px;">Affirmation</div>
+        <p style="font-size:13px;color:var(--text-dim);font-style:italic;">${entry.affirmation}</p>
+      </div>
+    </div>
+  `;
+}
+
+async function loadCrystalAstrology(day, month, ns = '') {
+  const container = document.getElementById('crystalAstrologyContainer' + ns);
+  if (!container) return;
+  if (!day || !month) {
+    container.innerHTML = '<p class="insight-none">No date of birth on file for this case.</p>';
+    return;
+  }
+  container.innerHTML = '<p class="loading-note">Loading Crystal Astrology…</p>';
+  try {
+    const res = await fetch(`/api/crystal-astrology/${month}/${day}`);
+    const data = await res.json();
+    if (!res.ok || !data.entries || data.entries.length === 0) {
+      container.innerHTML = '<p class="insight-none">No Crystal Astrology reference data available right now.</p>';
+      return;
+    }
+    // A single date of birth genuinely falls inside more than one of the
+    // book's 360 zodiac-degree sections (its ranges overlap by design --
+    // see the book's own "Karmic Condition / Focus / Quest" method).
+    // Which one is the person's exact match depends on their precise
+    // birth time and location, which this app doesn't calculate, so
+    // every matching section for the date is shown rather than guessing.
+    const introHtml = `
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 16px;">
+        Source: <em>${data.title}</em> by ${data.source.author}, ${data.source.publisher}.
+        ${data.entries.length > 1 ? 'This date of birth falls within more than one of the book’s 360 zodiac-degree sections below — which one is the exact match depends on the precise time and place of birth, per the book’s own method.' : ''}
+      </p>
+    `;
+    container.innerHTML = introHtml + data.entries.map(renderCrystalAstrologyEntryHtml).join('');
+  } catch (err) {
+    console.error('Failed to load Crystal Astrology data:', err);
+    container.innerHTML = '<p class="insight-none">Could not load Crystal Astrology data right now.</p>';
+  }
 }
 
 function renderYantraGrid(yantra) {
@@ -4588,7 +4656,7 @@ function renderSavedProfilesTable(profiles) {
         <td data-label="Name">${p.name || '\u2014'}</td>
         <td data-label="Phone">${p.phone || '\u2014'}</td>
         <td data-label="DOB">${dob}</td>
-        <td data-label="Crystal suggestion">${p.crystalSuggestion || '\u2014'}</td>
+        <td data-label="Crystal &amp; Gem Stones Suggestion">${p.crystalSuggestion || '\u2014'}</td>
         <td data-label="Description" style="font-size:12px;color:var(--text-dim);">${descriptionText}</td>
         <td data-label="Actions">
           <div class="row-actions" onclick="event.stopPropagation()">
@@ -4601,7 +4669,7 @@ function renderSavedProfilesTable(profiles) {
 
   container.innerHTML = `
     <table class="saved-table">
-      <thead><tr><th>Name</th><th>Phone</th><th>DOB</th><th>Crystal suggestion</th><th>Description</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Name</th><th>Phone</th><th>DOB</th><th>Crystal &amp; Gem Stones Suggestion</th><th>Description</th><th>Actions</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
   `;
@@ -5155,8 +5223,13 @@ function openCaseDrawer(id) {
         <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">From: ${TAB_SOURCE_LABELS[p.tabSource] || p.tabSource}</p>
       </div>
 
+      <details class="block section-accordion" id="crystalAstrologySectionDrawer" open><summary class="section-accordion-summary">Crystal Astrology</summary><div class="section-accordion-body">
+        <p style="font-size:12px;color:var(--text-dim);margin:0 0 14px;">From <em>The Complete Guide to Crystal Astrology: 360 Crystals and Sabian Symbols for Personal Health, Astrology and Numerology</em> by Marina Costelloe &mdash; the zodiac-degree Sabian Symbol, crystal and reading for this date of birth.</p>
+        <div id="crystalAstrologyContainerDrawer"><p style="font-size:13px;color:var(--text-dim);">Loading&hellip;</p></div>
+      </div></details>
+
       <div class="case-panel">
-        <h3>Crystal suggestion</h3>
+        <h3>Crystal &amp; Gem Stones Suggestion</h3>
         <p>${p.crystalSuggestion || 'No crystal suggestion recorded for this case.'}</p>
       </div>
 
@@ -5394,6 +5467,7 @@ async function loadCaseDrawerFullAnalysis(p) {
     loadCombinationVideoTable(result.driverNumber.value, result.conductorNumber.value, 'Drawer');
     loadLoShuProjection(p.day, p.month, result.nameNumber ? result.nameNumber.value : null);
     loadCelebrityMatches(p.day, p.month, p.year);
+    loadCrystalAstrology(p.day, p.month, 'Drawer');
 
     // If this case already has a saved correction from a previous visit,
     // restore its grid too -- otherwise the "corrected" side stays empty
