@@ -720,6 +720,7 @@
     <button type="button" class="tab-btn" data-tab="tab4">Business Name Compatibility</button>
     <button type="button" class="tab-btn" data-tab="tab5">Number Compatibility Calculator</button>
     <button type="button" class="tab-btn" data-tab="tab6">Relationship Compatibility Calculator</button>
+    <button type="button" class="tab-btn" data-tab="tab7">Future Prediction</button>
     <button type="button" class="tab-btn" data-tab="tab11">Numerology Name Calculator</button>
     <button type="button" class="tab-btn" data-tab="tab13">Lucky Number Finder</button>
     <button type="button" class="tab-btn" data-tab="tab9">Numerology News</button>
@@ -1459,8 +1460,54 @@
   </div>
 </div>
 
+<div id="tab7Content" style="display:none;">
+  <header class="hero" style="padding-top:56px;padding-bottom:56px;">
+    <div class="sacred-lines" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <p class="kicker">Future Prediction</p>
+      <h1>Personal Year &amp; Personal Month</h1>
+      <p class="lead">Based on date of birth only (day and month) combined with the calendar year and month you're checking &mdash; a 9-year, 9-month cycle that predicts what kind of year or month someone is in.</p>
+    </div>
+  </header>
 
+  <div class="wrap" style="padding-bottom:56px;">
+    <div class="card" style="max-width:520px;">
+      <div class="field">
+        <label for="futurePredictionDobInput">Date of birth</label>
+        <input type="date" id="futurePredictionDobInput">
+      </div>
+      <div class="field">
+        <label for="futurePredictionYearInput">Year to check</label>
+        <input type="number" id="futurePredictionYearInput" placeholder="e.g. 2026">
+      </div>
+      <div class="field">
+        <label for="futurePredictionMonthInput">Month to check</label>
+        <select id="futurePredictionMonthInput" style="width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:15px;font-family:'Inter',sans-serif;">
+          <option value="1">January</option>
+          <option value="2">February</option>
+          <option value="3">March</option>
+          <option value="4">April</option>
+          <option value="5">May</option>
+          <option value="6">June</option>
+          <option value="7">July</option>
+          <option value="8">August</option>
+          <option value="9">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option>
+        </select>
+      </div>
+      <div class="field-error" id="futurePredictionError" role="alert"></div>
+      <button class="calc-btn" id="futurePredictionBtn">Calculate</button>
+    </div>
+    <div id="futurePredictionResults" style="margin-top:20px;max-width:600px;"></div>
 
+    <p class="eyebrow" style="margin:40px 0 12px;">My Client Cases</p>
+    <div id="futurePredictionCasesTable">
+      <p style="font-size:13px;color:var(--text-dim);">No profiles saved yet.</p>
+    </div>
+  </div>
+</div>
 
 
 
@@ -2254,6 +2301,7 @@ document.getElementById('tabNav').addEventListener('click', (e) => {
   document.getElementById('tab4Content').style.display = btn.dataset.tab === 'tab4' ? 'block' : 'none';
   document.getElementById('tab5Content').style.display = btn.dataset.tab === 'tab5' ? 'block' : 'none';
   document.getElementById('tab6Content').style.display = btn.dataset.tab === 'tab6' ? 'block' : 'none';
+  document.getElementById('tab7Content').style.display = btn.dataset.tab === 'tab7' ? 'block' : 'none';
   document.getElementById('tab9Content').style.display = btn.dataset.tab === 'tab9' ? 'block' : 'none';
   document.getElementById('tab10Content').style.display = btn.dataset.tab === 'tab10' ? 'block' : 'none';
   document.getElementById('tab11Content').style.display = btn.dataset.tab === 'tab11' ? 'block' : 'none';
@@ -2286,6 +2334,16 @@ document.getElementById('tabNav').addEventListener('click', (e) => {
     const relAName = document.getElementById('relAName');
     if (!relADob.value && dobInput.value) relADob.value = dobInput.value;
     if (!relAName.value && document.getElementById('nameInput').value) relAName.value = document.getElementById('nameInput').value;
+  }
+  if (btn.dataset.tab === 'tab7') {
+    const fpDob = document.getElementById('futurePredictionDobInput');
+    if (!fpDob.value && dobInput.value) fpDob.value = dobInput.value;
+    const now = new Date();
+    const fpYear = document.getElementById('futurePredictionYearInput');
+    const fpMonth = document.getElementById('futurePredictionMonthInput');
+    if (!fpYear.value) fpYear.value = now.getFullYear();
+    if (!fpMonth.value) fpMonth.value = String(now.getMonth() + 1);
+    loadFuturePredictionCases();
   }
   if (btn.dataset.tab === 'tab0') {
     checkDashboardLogin();
@@ -2702,6 +2760,135 @@ async function loadCrystalAstrology(day, month, ns = '') {
     console.error('Failed to load Crystal Astrology data:', err);
     container.innerHTML = '<p class="insight-none">Could not load Crystal Astrology data right now.</p>';
   }
+}
+
+// --- Future Prediction (Personal Year / Personal Month) ---
+//
+// Original calculation for this app: a person's Personal Year is derived
+// from the digits of their birth day and month (never their birth year)
+// plus a digit for whichever calendar year is being checked; Personal
+// Month adds a digit for whichever calendar month is being checked on
+// top of that. Everything reduces to a single digit 1-9 (no master
+// numbers kept here -- this is a separate, simpler system from the
+// Driver/Conductor calculation elsewhere in this app).
+//
+// Worked example this was built from: Albert Einstein, 14/03.
+// digitSum(14) + digitSum(3) = (1+4) + 3 = 8. For year 2026 (digit 1):
+// 8 + 1 = 9 -- "Albert will be in a 9 year" in 2026.
+
+function digitSum(n) {
+  return String(Math.abs(Math.trunc(n))).split('').reduce((sum, ch) => sum + Number(ch), 0);
+}
+
+function reduceToSingleDigit(n) {
+  let v = n;
+  while (v > 9) v = digitSum(v);
+  return v;
+}
+
+function personalYearDigitForCalendarYear(year) {
+  return reduceToSingleDigit(digitSum(year));
+}
+
+function personalMonthDigitForCalendarMonth(month) {
+  return reduceToSingleDigit(month + 1);
+}
+
+const PERSONAL_NUMBER_MEANINGS = {
+  1: { theme: 'New beginnings', description: 'A time for fresh starts, independence, and taking the lead on something new.' },
+  2: { theme: 'Partnership & patience', description: 'A time for cooperation, diplomacy, and steady progress rather than force.' },
+  3: { theme: 'Self-expression', description: 'A time for creativity, communication, and putting yourself out there socially.' },
+  4: { theme: 'Structure & effort', description: 'A time for discipline, hard work, and building solid, practical foundations.' },
+  5: { theme: 'Change & freedom', description: 'A time for unexpected shifts, travel, and new experiences — stay flexible.' },
+  6: { theme: 'Responsibility & home', description: 'A time focused on family, care-giving, and honoring commitments.' },
+  7: { theme: 'Reflection & study', description: 'A time for introspection, learning, and inner, often spiritual, growth.' },
+  8: { theme: 'Ambition & achievement', description: 'A time for career moves, financial matters, and visible recognition.' },
+  9: { theme: 'Completion & release', description: 'A time to finish what’s done and let go, clearing the way for a new cycle.' },
+};
+
+function computeFuturePrediction(day, month, targetYear, targetMonth) {
+  const base = digitSum(day) + digitSum(month);
+  const yearDigit = personalYearDigitForCalendarYear(targetYear);
+  const personalYear = reduceToSingleDigit(base + yearDigit);
+  const monthDigit = personalMonthDigitForCalendarMonth(targetMonth);
+  const personalMonth = reduceToSingleDigit(personalYear + monthDigit);
+  return { base, targetYear, yearDigit, personalYear, targetMonth, monthDigit, personalMonth };
+}
+
+function renderFuturePredictionResultHtml(result) {
+  const yearMeaning = PERSONAL_NUMBER_MEANINGS[result.personalYear];
+  const monthMeaning = PERSONAL_NUMBER_MEANINGS[result.personalMonth];
+  const MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  return `
+    <div class="card">
+      <div class="sumline"><div class="k">Personal Year (${result.targetYear})</div><div style="font-size:22px;font-weight:700;">${result.personalYear}</div></div>
+      <p style="font-size:13px;color:var(--text-dim);margin:2px 0 16px;"><b>${yearMeaning.theme}</b> — ${yearMeaning.description}</p>
+      <div class="sumline"><div class="k">Personal Month (${MONTH_NAMES[result.targetMonth]} ${result.targetYear})</div><div style="font-size:22px;font-weight:700;">${result.personalMonth}</div></div>
+      <p style="font-size:13px;color:var(--text-dim);margin:2px 0 0;"><b>${monthMeaning.theme}</b> — ${monthMeaning.description}</p>
+    </div>
+  `;
+}
+
+document.getElementById('futurePredictionBtn').addEventListener('click', () => {
+  const errorEl = document.getElementById('futurePredictionError');
+  const resultsEl = document.getElementById('futurePredictionResults');
+  errorEl.textContent = '';
+  const dobRaw = document.getElementById('futurePredictionDobInput').value;
+  const targetYear = Number(document.getElementById('futurePredictionYearInput').value);
+  const targetMonth = Number(document.getElementById('futurePredictionMonthInput').value);
+  if (!dobRaw) { errorEl.textContent = 'Please enter a date of birth.'; return; }
+  if (!targetYear || targetYear < 1) { errorEl.textContent = 'Please enter a year to check.'; return; }
+  const [, m, d] = dobRaw.split('-').map(Number);
+  const result = computeFuturePrediction(d, m, targetYear, targetMonth);
+  resultsEl.innerHTML = renderFuturePredictionResultHtml(result);
+});
+
+async function loadFuturePredictionCases() {
+  const container = document.getElementById('futurePredictionCasesTable');
+  try {
+    const res = await fetch('/api/dashboard/list');
+    const data = await res.json();
+    renderFuturePredictionCasesTable(data.profiles || []);
+  } catch (err) {
+    container.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Could not load saved profiles right now.</p>';
+  }
+}
+
+function renderFuturePredictionCasesTable(profiles) {
+  const container = document.getElementById('futurePredictionCasesTable');
+  const withDob = profiles.filter((p) => p.day && p.month);
+  if (withDob.length === 0) {
+    container.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">No profiles with a date of birth saved yet.</p>';
+    return;
+  }
+  const now = new Date();
+  const targetYear = now.getFullYear();
+  const targetMonth = now.getMonth() + 1;
+
+  const rows = withDob.map((p) => {
+    const dob = (p.day && p.month && p.year) ? `${String(p.day).padStart(2, '0')}/${String(p.month).padStart(2, '0')}/${p.year}` : '—';
+    const result = computeFuturePrediction(p.day, p.month, targetYear, targetMonth);
+    return `
+      <tr data-id="${p._id}" class="case-row">
+        <td data-label="Name">${p.name || '—'}</td>
+        <td data-label="Phone">${p.phone || '—'}</td>
+        <td data-label="DOB">${dob}</td>
+        <td data-label="Personal Year (${targetYear})">${result.personalYear}</td>
+        <td data-label="Personal Month">${result.personalMonth}</td>
+      </tr>
+    `;
+  }).join('');
+
+  container.innerHTML = `
+    <table class="saved-table">
+      <thead><tr><th>Name</th><th>Phone</th><th>DOB</th><th>Personal Year (${targetYear})</th><th>Personal Month</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+
+  container.querySelectorAll('.case-row').forEach((row) => {
+    row.addEventListener('click', () => openCaseDrawer(row.dataset.id));
+  });
 }
 
 function renderYantraGrid(yantra) {
@@ -5221,6 +5408,26 @@ function openCaseDrawer(id) {
         <h3>Compatibility</h3>
         <p>Overall Match: <b>${p.matchScore !== undefined && p.matchScore !== null ? p.matchScore + '%' : '\u2014'}</b></p>
         <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">From: ${TAB_SOURCE_LABELS[p.tabSource] || p.tabSource}</p>
+      </div>
+
+      <div class="case-panel">
+        <h3>Future Prediction</h3>
+        ${(() => {
+          if (!p.day || !p.month) {
+            return '<p style="font-size:12px;color:var(--text-muted);">No date of birth on file for this case.</p>';
+          }
+          const now = new Date();
+          const fpResult = computeFuturePrediction(p.day, p.month, now.getFullYear(), now.getMonth() + 1);
+          const fpYearMeaning = PERSONAL_NUMBER_MEANINGS[fpResult.personalYear];
+          const fpMonthMeaning = PERSONAL_NUMBER_MEANINGS[fpResult.personalMonth];
+          const FP_MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+          return `
+            <p>Personal Year (${fpResult.targetYear}): <b>${fpResult.personalYear}</b> \u2014 ${fpYearMeaning.theme}</p>
+            <p style="font-size:12px;color:var(--text-dim);margin-top:-4px;">${fpYearMeaning.description}</p>
+            <p style="margin-top:10px;">Personal Month (${FP_MONTH_NAMES[fpResult.targetMonth]} ${fpResult.targetYear}): <b>${fpResult.personalMonth}</b> \u2014 ${fpMonthMeaning.theme}</p>
+            <p style="font-size:12px;color:var(--text-dim);margin-top:-4px;">${fpMonthMeaning.description}</p>
+          `;
+        })()}
       </div>
 
       <div class="case-panel">
