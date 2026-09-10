@@ -1502,9 +1502,9 @@
     </div>
     <div id="futurePredictionResults" style="margin-top:20px;max-width:600px;"></div>
 
-    <p class="eyebrow" style="margin:40px 0 12px;">My Client Cases</p>
-    <div id="futurePredictionCasesTable">
-      <p style="font-size:13px;color:var(--text-dim);">No profiles saved yet.</p>
+    <p class="eyebrow" style="margin:40px 0 12px;">Calculation History</p>
+    <div id="futurePredictionHistoryList">
+      <p style="font-size:13px;color:var(--text-dim);">No calculations yet — click Calculate above to add one here.</p>
     </div>
   </div>
 </div>
@@ -2343,7 +2343,6 @@ document.getElementById('tabNav').addEventListener('click', (e) => {
     const fpMonth = document.getElementById('futurePredictionMonthInput');
     if (!fpYear.value) fpYear.value = now.getFullYear();
     if (!fpMonth.value) fpMonth.value = String(now.getMonth() + 1);
-    loadFuturePredictionCases();
   }
   if (btn.dataset.tab === 'tab0') {
     checkDashboardLogin();
@@ -2815,18 +2814,104 @@ function computeFuturePrediction(day, month, targetYear, targetMonth) {
   return { base, targetYear, yearDigit, personalYear, targetMonth, monthDigit, personalMonth };
 }
 
+const FUTURE_PREDICTION_MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
 function renderFuturePredictionResultHtml(result) {
   const yearMeaning = PERSONAL_NUMBER_MEANINGS[result.personalYear];
   const monthMeaning = PERSONAL_NUMBER_MEANINGS[result.personalMonth];
-  const MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   return `
     <div class="card">
       <div class="sumline"><div class="k">Personal Year (${result.targetYear})</div><div style="font-size:22px;font-weight:700;">${result.personalYear}</div></div>
       <p style="font-size:13px;color:var(--text-dim);margin:2px 0 16px;"><b>${yearMeaning.theme}</b> — ${yearMeaning.description}</p>
-      <div class="sumline"><div class="k">Personal Month (${MONTH_NAMES[result.targetMonth]} ${result.targetYear})</div><div style="font-size:22px;font-weight:700;">${result.personalMonth}</div></div>
+      <div class="sumline"><div class="k">Personal Month (${FUTURE_PREDICTION_MONTH_NAMES[result.targetMonth]} ${result.targetYear})</div><div style="font-size:22px;font-weight:700;">${result.personalMonth}</div></div>
       <p style="font-size:13px;color:var(--text-dim);margin:2px 0 0;"><b>${monthMeaning.theme}</b> — ${monthMeaning.description}</p>
     </div>
   `;
+}
+
+// Running, in-page history of every calculation made in this tab (newest
+// first). Deliberately not persisted anywhere -- it's a scratch list for
+// the current visit, cleared on refresh, per the user's choice.
+let futurePredictionHistory = [];
+let futurePredictionHistorySeq = 0;
+
+function renderFuturePredictionYearWiseTableHtml(day, month, centerYear) {
+  const rows = [];
+  for (let y = centerYear - 4; y <= centerYear + 4; y++) {
+    const r = computeFuturePrediction(day, month, y, 1);
+    const meaning = PERSONAL_NUMBER_MEANINGS[r.personalYear];
+    rows.push(`<tr${y === centerYear ? ' style="background:var(--navy-2);"' : ''}><td data-label="Year">${y}</td><td data-label="Personal Year">${r.personalYear}</td><td data-label="Theme">${meaning.theme}</td></tr>`);
+  }
+  return `
+    <table class="saved-table">
+      <thead><tr><th>Year</th><th>Personal Year</th><th>Theme</th></tr></thead>
+      <tbody>${rows.join('')}</tbody>
+    </table>
+  `;
+}
+
+function renderFuturePredictionMonthWiseTableHtml(day, month, year) {
+  const rows = [];
+  for (let m = 1; m <= 12; m++) {
+    const r = computeFuturePrediction(day, month, year, m);
+    const meaning = PERSONAL_NUMBER_MEANINGS[r.personalMonth];
+    rows.push(`<tr><td data-label="Month">${FUTURE_PREDICTION_MONTH_NAMES[m]}</td><td data-label="Personal Month">${r.personalMonth}</td><td data-label="Theme">${meaning.theme}</td></tr>`);
+  }
+  return `
+    <table class="saved-table">
+      <thead><tr><th>Month</th><th>Personal Month</th><th>Theme</th></tr></thead>
+      <tbody>${rows.join('')}</tbody>
+    </table>
+  `;
+}
+
+function renderFuturePredictionHistoryList() {
+  const container = document.getElementById('futurePredictionHistoryList');
+  if (futurePredictionHistory.length === 0) {
+    container.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">No calculations yet — click Calculate above to add one here.</p>';
+    return;
+  }
+  container.innerHTML = futurePredictionHistory.map((entry) => {
+    const { result } = entry;
+    const yearMeaning = PERSONAL_NUMBER_MEANINGS[result.personalYear];
+    const monthMeaning = PERSONAL_NUMBER_MEANINGS[result.personalMonth];
+    return `
+      <div class="card" style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;">
+          <p style="font-size:13px;color:var(--text-dim);margin:0;">DOB: <b style="color:var(--text);">${entry.dobDisplay}</b> &middot; Checked for ${FUTURE_PREDICTION_MONTH_NAMES[result.targetMonth]} ${result.targetYear}</p>
+        </div>
+        <div class="sumline" style="margin-top:10px;"><div class="k">Personal Year (${result.targetYear})</div><div style="font-size:20px;font-weight:700;">${result.personalYear}</div></div>
+        <p style="font-size:12px;color:var(--text-dim);margin:2px 0 10px;"><b>${yearMeaning.theme}</b> — ${yearMeaning.description}</p>
+        <div class="sumline"><div class="k">Personal Month (${FUTURE_PREDICTION_MONTH_NAMES[result.targetMonth]} ${result.targetYear})</div><div style="font-size:20px;font-weight:700;">${result.personalMonth}</div></div>
+        <p style="font-size:12px;color:var(--text-dim);margin:2px 0 12px;"><b>${monthMeaning.theme}</b> — ${monthMeaning.description}</p>
+        <button type="button" class="ghost fp-breakdown-toggle" data-entry-id="${entry.id}" style="font-size:12px;padding:7px 12px;">Show year-wise, month-wise prediction</button>
+        <div id="fpBreakdown-${entry.id}" style="display:none;margin-top:14px;"></div>
+      </div>
+    `;
+  }).join('');
+
+  container.querySelectorAll('.fp-breakdown-toggle').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.entryId;
+      const entry = futurePredictionHistory.find((e) => String(e.id) === id);
+      if (!entry) return;
+      const breakdownEl = document.getElementById(`fpBreakdown-${id}`);
+      const isOpen = breakdownEl.style.display !== 'none';
+      if (isOpen) {
+        breakdownEl.style.display = 'none';
+        btn.textContent = 'Show year-wise, month-wise prediction';
+        return;
+      }
+      breakdownEl.innerHTML = `
+        <p class="eyebrow" style="margin:0 0 8px;">Year-wise (Personal Year, ${entry.result.targetYear - 4}–${entry.result.targetYear + 4})</p>
+        ${renderFuturePredictionYearWiseTableHtml(entry.day, entry.month, entry.result.targetYear)}
+        <p class="eyebrow" style="margin:18px 0 8px;">Month-wise (Personal Month, ${entry.result.targetYear})</p>
+        ${renderFuturePredictionMonthWiseTableHtml(entry.day, entry.month, entry.result.targetYear)}
+      `;
+      breakdownEl.style.display = 'block';
+      btn.textContent = 'Hide year-wise, month-wise prediction';
+    });
+  });
 }
 
 document.getElementById('futurePredictionBtn').addEventListener('click', () => {
@@ -2838,58 +2923,20 @@ document.getElementById('futurePredictionBtn').addEventListener('click', () => {
   const targetMonth = Number(document.getElementById('futurePredictionMonthInput').value);
   if (!dobRaw) { errorEl.textContent = 'Please enter a date of birth.'; return; }
   if (!targetYear || targetYear < 1) { errorEl.textContent = 'Please enter a year to check.'; return; }
-  const [, m, d] = dobRaw.split('-').map(Number);
+  const [y, m, d] = dobRaw.split('-').map(Number);
   const result = computeFuturePrediction(d, m, targetYear, targetMonth);
   resultsEl.innerHTML = renderFuturePredictionResultHtml(result);
-});
 
-async function loadFuturePredictionCases() {
-  const container = document.getElementById('futurePredictionCasesTable');
-  try {
-    const res = await fetch('/api/dashboard/list');
-    const data = await res.json();
-    renderFuturePredictionCasesTable(data.profiles || []);
-  } catch (err) {
-    container.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">Could not load saved profiles right now.</p>';
-  }
-}
-
-function renderFuturePredictionCasesTable(profiles) {
-  const container = document.getElementById('futurePredictionCasesTable');
-  const withDob = profiles.filter((p) => p.day && p.month);
-  if (withDob.length === 0) {
-    container.innerHTML = '<p style="font-size:13px;color:var(--text-dim);">No profiles with a date of birth saved yet.</p>';
-    return;
-  }
-  const now = new Date();
-  const targetYear = now.getFullYear();
-  const targetMonth = now.getMonth() + 1;
-
-  const rows = withDob.map((p) => {
-    const dob = (p.day && p.month && p.year) ? `${String(p.day).padStart(2, '0')}/${String(p.month).padStart(2, '0')}/${p.year}` : '—';
-    const result = computeFuturePrediction(p.day, p.month, targetYear, targetMonth);
-    return `
-      <tr data-id="${p._id}" class="case-row">
-        <td data-label="Name">${p.name || '—'}</td>
-        <td data-label="Phone">${p.phone || '—'}</td>
-        <td data-label="DOB">${dob}</td>
-        <td data-label="Personal Year (${targetYear})">${result.personalYear}</td>
-        <td data-label="Personal Month">${result.personalMonth}</td>
-      </tr>
-    `;
-  }).join('');
-
-  container.innerHTML = `
-    <table class="saved-table">
-      <thead><tr><th>Name</th><th>Phone</th><th>DOB</th><th>Personal Year (${targetYear})</th><th>Personal Month</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-  `;
-
-  container.querySelectorAll('.case-row').forEach((row) => {
-    row.addEventListener('click', () => openCaseDrawer(row.dataset.id));
+  futurePredictionHistorySeq += 1;
+  futurePredictionHistory.unshift({
+    id: futurePredictionHistorySeq,
+    day: d,
+    month: m,
+    dobDisplay: `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`,
+    result,
   });
-}
+  renderFuturePredictionHistoryList();
+});
 
 function renderYantraGrid(yantra) {
   if (!yantra || !yantra.grid) return '';
