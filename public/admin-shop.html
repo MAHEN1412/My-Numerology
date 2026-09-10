@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop Manager &mdash; Numerology Consultant Engine</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#F8FAFC; --navy-2:#F1F5F9; --surface:#FFFFFF; --surface-2:#EEF2FF;
+    --border:#E2E8F0; --border-strong:#CBD5E1;
+    --indigo:#4F46E5; --violet:#4338CA; --gold:#CA8A04;
+    --text:#0F172A; --text-dim:#475569; --text-muted:#94A3B8;
+    --danger:#DC2626;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--navy);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;line-height:1.6;min-height:100vh;}
+  h1,h2{font-family:'Inter',system-ui,-apple-system,sans-serif;font-weight:800;margin:0;color:var(--text);}
+  .topbar{height:72px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:16px;}
+  .topbar-logo-title{font-size:19px;font-weight:800;color:var(--indigo);letter-spacing:.4px;}
+  .topbar-logo-sub{font-size:9px;color:var(--text-muted);font-weight:700;display:block;margin-top:2px;letter-spacing:.05em;}
+  .topbar-back{margin-left:auto;font-size:13px;font-weight:600;color:var(--text-dim);text-decoration:none;padding:8px 14px;border-radius:8px;}
+  .topbar-back:hover{background:var(--navy-2);}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 24px 56px;}
+  .card{background:var(--surface);border:1px solid #EDF1F5;border-radius:14px;padding:20px;box-shadow:0 1px 2px rgba(15,23,42,0.03);}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:13px;font-weight:500;margin-bottom:8px;color:var(--text);}
+  .field input,.field select,.field textarea{
+    width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;
+    padding:12px 14px;color:var(--text);font-size:15px;font-family:'Inter',sans-serif;
+  }
+  .field textarea{resize:vertical;min-height:70px;}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(67,56,202,0.15);}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  button{
+    font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;
+    padding:11px 17px;border-radius:9px;border:none;background:var(--indigo);color:#fff;
+  }
+  button:hover:not(:disabled){background:var(--violet);}
+  button:disabled{opacity:0.6;cursor:default;}
+  button.ghost{background:var(--surface-2);color:var(--violet);}
+  button.ghost:hover:not(:disabled){background:var(--navy-2);}
+  button.danger{background:transparent;border:1px solid var(--danger);color:var(--danger);padding:6px 12px;font-size:12px;font-weight:600;}
+  button.danger:hover:not(:disabled){background:rgba(220,38,38,0.06);}
+  .err{color:var(--danger);font-size:13px;margin-top:10px;display:none;}
+  .err.show{display:block;}
+  .top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;}
+  .empty{font-size:13px;color:var(--text-muted);}
+  .loading{font-size:13px;color:var(--text-dim);}
+  a{color:var(--violet);font-size:13px;}
+  .subtabs{display:flex;gap:8px;margin-bottom:24px;}
+  .subtab-btn{background:var(--surface);border:1px solid var(--border-strong);color:var(--text-dim);border-radius:9px;padding:9px 16px;}
+  .subtab-btn.active{background:var(--indigo);color:#fff;border-color:var(--indigo);}
+  .product-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;}
+  .product-item{background:var(--navy-2);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;}
+  .product-item img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;background:var(--surface);}
+  .product-item .pt{font-size:14px;font-weight:700;}
+  .product-item .pm{font-size:12px;color:var(--text-muted);}
+  .product-item .pp{font-size:15px;font-weight:800;color:var(--indigo);}
+  .product-item .pactions{display:flex;gap:8px;margin-top:6px;}
+  .badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:20px;background:var(--surface-2);color:var(--violet);}
+  .badge.oos{background:rgba(220,38,38,0.1);color:var(--danger);}
+  .order-item{background:var(--navy-2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+  .order-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+  .order-name{font-size:14px;font-weight:700;}
+  .order-meta{font-size:12px;color:var(--text-muted);margin-top:2px;}
+  .order-items{font-size:12px;color:var(--text-dim);margin-top:8px;line-height:1.7;}
+  .order-total{font-size:14px;font-weight:800;color:var(--indigo);margin-top:6px;}
+  .order-note{font-size:12px;color:var(--text-dim);margin-top:6px;font-style:italic;}
+  .status-select{width:auto;padding:6px 10px;font-size:12px;}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div>
+    <span class="topbar-logo-title">NUMEROLOGY</span>
+    <span class="topbar-logo-sub">CONSULTANT ENGINE</span>
+  </div>
+  <a href="/" class="topbar-back">&larr; Back to app</a>
+</header>
+<div class="wrap">
+
+  <div id="loginView">
+    <h1 style="text-align:center;margin-bottom:24px;font-size:22px;">Shop Manager</h1>
+    <div class="card" style="max-width:360px;margin:0 auto;">
+      <div class="field">
+        <label for="passwordInput">Admin password</label>
+        <input type="password" id="passwordInput" autocomplete="current-password">
+      </div>
+      <div class="err" id="loginError"></div>
+      <button id="loginBtn" style="width:100%;margin-top:8px;">Log in</button>
+    </div>
+  </div>
+
+  <div id="panelView" style="display:none;">
+    <div class="top-row">
+      <h1 style="font-size:22px;">Shop Manager</h1>
+      <div style="display:flex;gap:10px;">
+        <a href="/shop" target="_blank" rel="noopener"><button type="button" class="ghost">View live shop &nearr;</button></a>
+        <button class="ghost" id="logoutBtn">Log out</button>
+      </div>
+    </div>
+
+    <div class="subtabs">
+      <button type="button" class="subtab-btn active" data-subtab="products">Products</button>
+      <button type="button" class="subtab-btn" data-subtab="orders">Order requests</button>
+    </div>
+
+    <div id="productsView">
+      <div class="card" style="margin-bottom:32px;">
+        <h2 style="font-size:18px;margin-bottom:16px;" id="formTitle">Add a product</h2>
+        <input type="hidden" id="productIdInput">
+        <div class="field">
+          <label for="nameInput">Name</label>
+          <input type="text" id="nameInput" placeholder="e.g. Rose Quartz Bracelet">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="categoryInput">Category</label>
+            <select id="categoryInput">
+              <option value="crystal">Crystal</option>
+              <option value="book">Book</option>
+              <option value="pen">Pen</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="priceInput">Price (INR)</label>
+            <input type="number" id="priceInput" min="0" step="1" placeholder="e.g. 499">
+          </div>
+        </div>
+        <div class="field">
+          <label for="descriptionInput">Description <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+          <textarea id="descriptionInput" placeholder="A short description clients will see"></textarea>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="imageFileInput">Photo upload <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+            <input type="file" id="imageFileInput" accept="image/*">
+          </div>
+          <div class="field">
+            <label for="imageUrlInput">...or photo URL <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+            <input type="text" id="imageUrlInput" placeholder="https://...">
+          </div>
+        </div>
+        <div class="field">
+          <label><input type="checkbox" id="inStockInput" checked style="width:auto;margin-right:8px;">In stock</label>
+        </div>
+        <div class="err" id="formError"></div>
+        <div style="display:flex;gap:10px;">
+          <button id="saveBtn">Add product</button>
+          <button type="button" class="ghost" id="cancelEditBtn" style="display:none;">Cancel edit</button>
+        </div>
+      </div>
+
+      <h2 style="font-size:18px;margin-bottom:16px;">Products</h2>
+      <div id="productListContainer"></div>
+    </div>
+
+    <div id="ordersView" style="display:none;">
+      <h2 style="font-size:18px;margin-bottom:16px;">Order requests</h2>
+      <div id="orderListContainer"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const loginView = document.getElementById('loginView');
+const panelView = document.getElementById('panelView');
+
+async function checkSession() {
+  const res = await fetch('/api/admin/me');
+  const data = await res.json();
+  if (data.loggedIn) {
+    loginView.style.display = 'none';
+    panelView.style.display = 'block';
+    loadProductList();
+  } else {
+    loginView.style.display = 'block';
+    panelView.style.display = 'none';
+  }
+}
+
+document.getElementById('loginBtn').addEventListener('click', async () => {
+  const password = document.getElementById('passwordInput').value;
+  const errEl = document.getElementById('loginError');
+  errEl.classList.remove('show');
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'Logging in…';
+  try {
+    const res = await fetch('/api/admin/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.error || 'Login failed.'; errEl.classList.add('show'); return; }
+    document.getElementById('passwordInput').value = '';
+    checkSession();
+  } catch (err) {
+    errEl.textContent = 'Could not reach the server.'; errEl.classList.add('show');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Log in';
+  }
+});
+
+document.getElementById('passwordInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('loginBtn').click();
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await fetch('/api/admin/logout', { method: 'POST' });
+  checkSession();
+});
+
+// ---- Subtabs ----
+document.querySelectorAll('.subtab-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.subtab-btn').forEach((b) => b.classList.toggle('active', b === btn));
+    const isProducts = btn.dataset.subtab === 'products';
+    document.getElementById('productsView').style.display = isProducts ? 'block' : 'none';
+    document.getElementById('ordersView').style.display = isProducts ? 'none' : 'block';
+    if (!isProducts) loadOrderList();
+  });
+});
+
+// ---- Products ----
+const CATEGORY_LABELS = { crystal: 'Crystal', book: 'Book', pen: 'Pen', other: 'Other' };
+
+function resetForm() {
+  document.getElementById('productIdInput').value = '';
+  document.getElementById('nameInput').value = '';
+  document.getElementById('categoryInput').value = 'crystal';
+  document.getElementById('priceInput').value = '';
+  document.getElementById('descriptionInput').value = '';
+  document.getElementById('imageFileInput').value = '';
+  document.getElementById('imageUrlInput').value = '';
+  document.getElementById('inStockInput').checked = true;
+  document.getElementById('formTitle').textContent = 'Add a product';
+  document.getElementById('saveBtn').textContent = 'Add product';
+  document.getElementById('cancelEditBtn').style.display = 'none';
+}
+
+document.getElementById('cancelEditBtn').addEventListener('click', resetForm);
+
+async function loadProductList() {
+  const container = document.getElementById('productListContainer');
+  container.innerHTML = '<p class="loading">Loading…</p>';
+  try {
+    const res = await fetch('/api/shop/products?all=1');
+    if (res.status === 401) { checkSession(); return; }
+    const data = await res.json();
+    container.innerHTML = '';
+    if (!data.products || data.products.length === 0) {
+      container.innerHTML = '<p class="empty">No products yet. Add your first one above.</p>';
+      return;
+    }
+    const grid = document.createElement('div');
+    grid.className = 'product-list';
+    data.products.forEach((p) => {
+      const item = document.createElement('div');
+      item.className = 'product-item';
+      item.innerHTML = `
+        ${p.imageUrl ? `<img src="${p.imageUrl}" alt="">` : ''}
+        <span class="badge ${!p.inStock ? 'oos' : ''}">${p.inStock ? CATEGORY_LABELS[p.category] || p.category : 'Out of stock'}</span>
+        <div class="pt">${escapeHtml(p.name)}</div>
+        <div class="pp">₹${Number(p.price).toLocaleString('en-IN')}</div>
+        ${p.description ? `<div class="pm">${escapeHtml(p.description)}</div>` : ''}
+        <div class="pactions">
+          <button type="button" class="ghost" data-edit>Edit</button>
+          <button type="button" class="danger" data-delete>Remove</button>
+        </div>
+      `;
+      item.querySelector('[data-edit]').addEventListener('click', () => editProduct(p));
+      item.querySelector('[data-delete]').addEventListener('click', async (e) => {
+        e.target.disabled = true; e.target.textContent = 'Removing…';
+        await fetch(`/api/shop/products/${p.id}`, { method: 'DELETE' });
+        loadProductList();
+      });
+      grid.appendChild(item);
+    });
+    container.appendChild(grid);
+  } catch (err) {
+    container.innerHTML = '<p class="empty">Could not load products right now.</p>';
+  }
+}
+
+function editProduct(p) {
+  document.getElementById('productIdInput').value = p.id;
+  document.getElementById('nameInput').value = p.name;
+  document.getElementById('categoryInput').value = p.category;
+  document.getElementById('priceInput').value = p.price;
+  document.getElementById('descriptionInput').value = p.description || '';
+  document.getElementById('imageUrlInput').value = p.imageUrl && !p.imageUrl.startsWith('/product-images/') ? p.imageUrl : '';
+  document.getElementById('inStockInput').checked = p.inStock;
+  document.getElementById('formTitle').textContent = 'Edit product';
+  document.getElementById('saveBtn').textContent = 'Save changes';
+  document.getElementById('cancelEditBtn').style.display = 'inline-block';
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('saveBtn').addEventListener('click', async () => {
+  const idEl = document.getElementById('productIdInput');
+  const errEl = document.getElementById('formError');
+  const btn = document.getElementById('saveBtn');
+  errEl.classList.remove('show');
+
+  const name = document.getElementById('nameInput').value.trim();
+  const price = document.getElementById('priceInput').value;
+  if (!name) { errEl.textContent = 'Product name is required.'; errEl.classList.add('show'); return; }
+  if (price === '' || Number(price) < 0) { errEl.textContent = 'Enter a valid price.'; errEl.classList.add('show'); return; }
+
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('category', document.getElementById('categoryInput').value);
+  formData.append('price', price);
+  formData.append('description', document.getElementById('descriptionInput').value.trim());
+  formData.append('inStock', document.getElementById('inStockInput').checked);
+  const file = document.getElementById('imageFileInput').files[0];
+  if (file) formData.append('image', file);
+  const imageUrl = document.getElementById('imageUrlInput').value.trim();
+  if (imageUrl) formData.append('imageUrl', imageUrl);
+
+  const isEdit = !!idEl.value;
+  btn.disabled = true; btn.textContent = isEdit ? 'Saving…' : 'Adding…';
+  try {
+    const res = await fetch(isEdit ? `/api/shop/products/${idEl.value}` : '/api/shop/products', {
+      method: isEdit ? 'PUT' : 'POST',
+      body: formData,
+    });
+    if (res.status === 401) { checkSession(); return; }
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.error || 'Could not save this product.'; errEl.classList.add('show'); return; }
+    resetForm();
+    loadProductList();
+  } catch (err) {
+    errEl.textContent = 'Could not reach the server.'; errEl.classList.add('show');
+  } finally {
+    btn.disabled = false; btn.textContent = isEdit ? 'Save changes' : 'Add product';
+  }
+});
+
+// ---- Orders ----
+async function loadOrderList() {
+  const container = document.getElementById('orderListContainer');
+  container.innerHTML = '<p class="loading">Loading…</p>';
+  try {
+    const res = await fetch('/api/shop/orders');
+    if (res.status === 401) { checkSession(); return; }
+    const data = await res.json();
+    container.innerHTML = '';
+    if (!data.orders || data.orders.length === 0) {
+      container.innerHTML = '<p class="empty">No order requests yet.</p>';
+      return;
+    }
+    data.orders.forEach((o) => {
+      const item = document.createElement('div');
+      item.className = 'order-item';
+      const itemsList = (o.items || []).map((it) => `${it.quantity} × ${escapeHtml(it.name)}`).join('<br>');
+      const date = new Date(o.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+      item.innerHTML = `
+        <div class="order-top">
+          <div>
+            <div class="order-name">${escapeHtml(o.customerName)}</div>
+            <div class="order-meta">${escapeHtml(o.customerPhone)}${o.customerEmail ? ' &middot; ' + escapeHtml(o.customerEmail) : ''} &middot; ${date}</div>
+          </div>
+          <select class="status-select" data-id="${o._id}">
+            <option value="new" ${o.status === 'new' ? 'selected' : ''}>New</option>
+            <option value="contacted" ${o.status === 'contacted' ? 'selected' : ''}>Contacted</option>
+            <option value="fulfilled" ${o.status === 'fulfilled' ? 'selected' : ''}>Fulfilled</option>
+            <option value="cancelled" ${o.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+          </select>
+        </div>
+        <div class="order-items">${itemsList}</div>
+        <div class="order-total">₹${Number(o.totalAmount).toLocaleString('en-IN')}</div>
+        ${o.note ? `<div class="order-note">"${escapeHtml(o.note)}"</div>` : ''}
+      `;
+      item.querySelector('select').addEventListener('change', async (e) => {
+        await fetch(`/api/shop/orders/${e.target.dataset.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: e.target.value }),
+        });
+      });
+      container.appendChild(item);
+    });
+  } catch (err) {
+    container.innerHTML = '<p class="empty">Could not load order requests right now.</p>';
+  }
+}
+
+function escapeHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+checkSession();
+</script>
+</body>
+</html>

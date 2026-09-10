@@ -53,6 +53,7 @@ const actorsRouter = require('./routes/actors');
 const newsRouter = require('./routes/news');
 const numberProfileRouter = require('./routes/numberProfile');
 const crystalAstrologyRouter = require('./routes/crystalAstrology');
+const shopRouter = require('./routes/shop');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -116,6 +117,16 @@ app.use('/api/news', newsRouter);
 app.use('/api/number-profile', numberProfileRouter);
 app.use('/api/crystal-astrology', crystalAstrologyRouter);
 
+// Order requests get the same light abuse protection as other write
+// endpoints — a client shouldn't be able to flood the orders inbox.
+const orderLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { error: 'Too many order requests. Please wait a few minutes and try again.' },
+});
+app.use('/api/shop/orders', (req, res, next) => (req.method === 'POST' ? orderLimiter(req, res, next) : next()));
+app.use('/api/shop', shopRouter);
+
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, dbState: mongoose.connection.readyState });
 });
@@ -127,6 +138,15 @@ app.use('/book-data-images', express.static(path.join(__dirname, 'knowledge', 'b
 // Static crystal photos for the "Crystal Astrology" reference data
 // (extracted alongside server/knowledge/crystalAstrology).
 app.use('/crystal-astrology-images', express.static(path.join(__dirname, 'knowledge', 'crystalAstrology', 'images')));
+
+// Static photos for shop products uploaded via the Shop admin panel.
+app.use('/product-images', express.static(path.join(__dirname, 'uploads', 'products')));
+
+// Clean, shareable URL for the client-facing shop page (same file as
+// /shop.html, just without the extension, so the link looks nicer).
+app.get('/shop', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'shop.html'));
+});
 
 // Serve the frontend
 app.use(express.static(path.join(__dirname, '..', 'public')));

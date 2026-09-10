@@ -725,7 +725,9 @@
     <button type="button" class="tab-btn" data-tab="tab13">Lucky Number Finder</button>
     <button type="button" class="tab-btn" data-tab="tab9">Numerology News</button>
     <button type="button" class="tab-btn" data-tab="tab10">Celebrity Birthdays</button>
+    <button type="button" class="tab-btn" data-tab="tabShop">Shop</button>
     <a href="/admin.html" target="_blank" rel="noopener" class="tab-btn">Manage Books</a>
+    <a href="/admin-shop.html" target="_blank" rel="noopener" class="tab-btn">Manage Shop</a>
   </aside>
 
   <div class="main-content">
@@ -835,6 +837,21 @@
     <div style="text-align:center;margin-top:24px;">
       <button type="button" class="ghost" id="actorsShowAllBtn">Show All</button>
     </div>
+  </div>
+</div>
+
+<div id="tabShopContent" style="display:none;">
+  <header class="hero" style="padding-top:56px;padding-bottom:32px;">
+    <div class="sacred-lines" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <p class="kicker">Shop</p>
+      <h1>Crystals, Books &amp; More</h1>
+      <p class="lead">Browse the same catalog your clients see. Share <code>/shop</code> as a direct link, or manage products from <a href="/admin-shop.html" target="_blank" rel="noopener">Manage Shop</a>.</p>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-bottom:56px;">
+    <div id="shopTabMount"></div>
   </div>
 </div>
 
@@ -1654,6 +1671,7 @@
   </div>
 </div>
 
+<script src="/shop.js"></script>
 <script>
 const dobInput = document.getElementById('dobInput');
 const dobError = document.getElementById('dobError');
@@ -2265,6 +2283,7 @@ document.getElementById('systemToggle4').addEventListener('click', (e) => {
     news: `<g fill="none" stroke="${G}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M45 58v6l5 1"/><path d="M45 58l22-9v25l-22-9z"/><line x1="75" y1="53" x2="80" y2="51"/><line x1="77" y1="60" x2="82" y2="60"/><line x1="75" y1="67" x2="80" y2="69"/></g>`,
     celebrity: `<polygon points="60,42 64.5,55 78,55 67,63 71,77 60,69 49,77 53,63 42,55 55.5,55" fill="${G}"/><g fill="${P}"><rect x="53" y="60" width="14" height="8" rx="1.5"/></g><g stroke="${P}" stroke-width="1.3"><line x1="55.5" y1="56.5" x2="55.5" y2="60"/><line x1="60" y1="56.5" x2="60" y2="60"/><line x1="64.5" y1="56.5" x2="64.5" y2="60"/></g>`,
     books: `<g fill="${G}"><polygon points="60,44 73,50.5 60,57 47,50.5"/><polygon points="47,56 60,62.5 73,56 73,60.5 60,67 47,60.5"/><polygon points="47,63 60,69.5 73,63 73,67.5 60,74 47,67.5"/><polygon points="47,70 60,76.5 73,70 73,74.5 60,81 47,74.5"/></g>`,
+    shop: `<g fill="none" stroke="${G}" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M44 50h32l-3 22a3 3 0 0 1-3 2.6H50a3 3 0 0 1-3-2.6z"/><path d="M50 50v-4a10 10 0 0 1 20 0v4"/></g>`,
   };
 
   const HOME_TOOLS = [
@@ -2279,6 +2298,7 @@ document.getElementById('systemToggle4').addEventListener('click', (e) => {
     { icon: 'luckynumber',  title: 'Lucky Number Finder',                   tab: 'tab13' },
     { icon: 'news',         title: 'Numerology News',                       tab: 'tab9' },
     { icon: 'celebrity',    title: 'Celebrity Birthdays',                   tab: 'tab10' },
+    { icon: 'shop',         title: 'Shop',                                  tab: 'tabShop' },
   ];
 
   const grid = document.getElementById('homeIconGrid');
@@ -2301,6 +2321,14 @@ document.getElementById('systemToggle4').addEventListener('click', (e) => {
   booksLink.rel = 'noopener';
   booksLink.innerHTML = `<div class="home-badge">${badgeSVG(HOME_ICONS.books)}</div><span>Manage Books</span>`;
   grid.appendChild(booksLink);
+
+  const shopAdminLink = document.createElement('a');
+  shopAdminLink.className = 'home-item';
+  shopAdminLink.href = '/admin-shop.html';
+  shopAdminLink.target = '_blank';
+  shopAdminLink.rel = 'noopener';
+  shopAdminLink.innerHTML = `<div class="home-badge">${badgeSVG(HOME_ICONS.shop)}</div><span>Manage Shop</span>`;
+  grid.appendChild(shopAdminLink);
 })();
 
 document.getElementById('tabNav').addEventListener('click', (e) => {
@@ -2321,6 +2349,7 @@ document.getElementById('tabNav').addEventListener('click', (e) => {
   document.getElementById('tab10Content').style.display = btn.dataset.tab === 'tab10' ? 'block' : 'none';
   document.getElementById('tab11Content').style.display = btn.dataset.tab === 'tab11' ? 'block' : 'none';
   document.getElementById('tab13Content').style.display = btn.dataset.tab === 'tab13' ? 'block' : 'none';
+  document.getElementById('tabShopContent').style.display = btn.dataset.tab === 'tabShop' ? 'block' : 'none';
   syncSystemToggles(currentSystem);
   // Carry the DOB/name already entered on Tab 1 over to whichever tab is
   // opened, so the person doesn't have to retype it.
@@ -2368,6 +2397,10 @@ document.getElementById('tabNav').addEventListener('click', (e) => {
   if (btn.dataset.tab === 'tab10') {
     loadActorsCategories();
     loadActorsList();
+  }
+  if (btn.dataset.tab === 'tabShop' && !window._shopTabInited) {
+    window._shopTabInited = true;
+    NumerologyShop.init('shopTabMount');
   }
   window.scrollTo(0, 0);
 });

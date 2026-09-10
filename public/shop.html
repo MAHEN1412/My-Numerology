@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop &mdash; Numerology Consultant</title>
+<meta name="description" content="Crystals, books, and other numerology essentials &mdash; browse and request an order.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#F8FAFC; --navy-2:#F1F5F9; --surface:#FFFFFF; --surface-2:#F3E8F5;
+    --border:#E2E8F0; --border-strong:#CBD5E1;
+    --indigo:#5E0D69; --violet:#5E0D69; --gold:#CA8A04;
+    --text:#0F172A; --text-dim:#475569; --text-muted:#94A3B8;
+    --danger:#DC2626;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --navy:#0F1117; --navy-2:#1A1D26; --surface:#181B24; --surface-2:rgba(150,98,158,0.14);
+      --border:rgba(255,255,255,0.08); --border-strong:rgba(255,255,255,0.16);
+      --indigo:#96629E; --violet:#96629E; --gold:#E8A33D;
+      --text:#F1F5F9; --text-dim:#B8BFCC; --text-muted:#7B8296;
+      --danger:#F87171;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--navy);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;line-height:1.6;min-height:100vh;}
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:18px 20px;text-align:center;}
+  .topbar-title{font-size:18px;font-weight:800;color:var(--indigo);letter-spacing:.3px;}
+  .topbar-sub{font-size:11px;color:var(--text-muted);font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-top:2px;}
+  .hero{padding:32px 20px 8px;text-align:center;max-width:640px;margin:0 auto;}
+  .hero h1{font-size:24px;margin:0 0 8px;}
+  .hero p{font-size:13px;color:var(--text-dim);margin:0;}
+  .wrap{max-width:1100px;margin:0 auto;padding:24px 20px 60px;}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-title">NUMEROLOGY</div>
+  <div class="topbar-sub">Shop</div>
+</header>
+
+<div class="hero">
+  <h1>Crystals, Books &amp; More</h1>
+  <p>Browse below and submit an order request &mdash; we'll reach out to confirm details and arrange payment.</p>
+</div>
+
+<div class="wrap">
+  <div id="shopRoot"></div>
+</div>
+
+<script src="/shop.js"></script>
+<script>NumerologyShop.init('shopRoot');</script>
+</body>
+</html>
