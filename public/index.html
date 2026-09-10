@@ -1471,36 +1471,42 @@
   </header>
 
   <div class="wrap" style="padding-bottom:56px;">
-    <div class="card" style="max-width:520px;">
-      <div class="field">
-        <label for="futurePredictionDobInput">Date of birth</label>
-        <input type="date" id="futurePredictionDobInput">
+    <div class="tab7-layout">
+      <div class="card">
+        <div class="field">
+          <label for="futurePredictionDobInput">Date of birth</label>
+          <input type="date" id="futurePredictionDobInput">
+        </div>
+        <div class="field">
+          <label for="futurePredictionYearInput">Year to check</label>
+          <input type="number" id="futurePredictionYearInput" placeholder="e.g. 2026">
+        </div>
+        <div class="field">
+          <label for="futurePredictionMonthInput">Month to check</label>
+          <select id="futurePredictionMonthInput" style="width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:15px;font-family:'Inter',sans-serif;">
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+        </div>
+        <div class="field-error" id="futurePredictionError" role="alert"></div>
+        <button class="calc-btn" id="futurePredictionBtn">Calculate</button>
       </div>
-      <div class="field">
-        <label for="futurePredictionYearInput">Year to check</label>
-        <input type="number" id="futurePredictionYearInput" placeholder="e.g. 2026">
+      <div id="futurePredictionResults">
+        <div class="card" style="border-style:dashed;">
+          <p style="font-size:13px;color:var(--text-dim);margin:0;">Fill in the date of birth on the left and click Calculate &mdash; the Personal Year and Personal Month, with the calculation shown step by step, will appear right here.</p>
+        </div>
       </div>
-      <div class="field">
-        <label for="futurePredictionMonthInput">Month to check</label>
-        <select id="futurePredictionMonthInput" style="width:100%;background:var(--navy-2);border:1px solid var(--border-strong);border-radius:10px;padding:12px 14px;color:var(--text);font-size:15px;font-family:'Inter',sans-serif;">
-          <option value="1">January</option>
-          <option value="2">February</option>
-          <option value="3">March</option>
-          <option value="4">April</option>
-          <option value="5">May</option>
-          <option value="6">June</option>
-          <option value="7">July</option>
-          <option value="8">August</option>
-          <option value="9">September</option>
-          <option value="10">October</option>
-          <option value="11">November</option>
-          <option value="12">December</option>
-        </select>
-      </div>
-      <div class="field-error" id="futurePredictionError" role="alert"></div>
-      <button class="calc-btn" id="futurePredictionBtn">Calculate</button>
     </div>
-    <div id="futurePredictionResults" style="margin-top:20px;max-width:600px;"></div>
 
     <details class="block section-accordion" style="margin-top:24px;max-width:600px;">
       <summary class="section-accordion-summary">Reference: Year digit &amp; Month digit tables</summary>
