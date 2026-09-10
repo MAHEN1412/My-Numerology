@@ -2851,11 +2851,11 @@ function renderFuturePredictionYearWiseTableHtml(day, month, centerYear) {
   for (let y = centerYear - 4; y <= centerYear + 4; y++) {
     const r = computeFuturePrediction(day, month, y, 1);
     const meaning = PERSONAL_NUMBER_MEANINGS[r.personalYear];
-    rows.push(`<tr${y === centerYear ? ' style="background:var(--navy-2);"' : ''}><td data-label="Year">${y}</td><td data-label="Year digit">${r.yearDigit}</td><td data-label="Personal Year">${r.personalYear}</td><td data-label="Theme">${meaning.theme}</td></tr>`);
+    rows.push(`<tr${y === centerYear ? ' style="background:var(--navy-2);"' : ''}><td data-label="Year">${y}</td><td data-label="Personal Year">${r.personalYear}</td><td data-label="Theme">${meaning.theme}</td></tr>`);
   }
   return `
     <table class="saved-table">
-      <thead><tr><th>Year</th><th>Year digit</th><th>Personal Year</th><th>Theme</th></tr></thead>
+      <thead><tr><th>Year</th><th>Personal Year</th><th>Theme</th></tr></thead>
       <tbody>${rows.join('')}</tbody>
     </table>
   `;
@@ -2866,11 +2866,11 @@ function renderFuturePredictionMonthWiseTableHtml(day, month, year) {
   for (let m = 1; m <= 12; m++) {
     const r = computeFuturePrediction(day, month, year, m);
     const meaning = PERSONAL_NUMBER_MEANINGS[r.personalMonth];
-    rows.push(`<tr><td data-label="Month">${FUTURE_PREDICTION_MONTH_NAMES[m]}</td><td data-label="Month digit">${r.monthDigit}</td><td data-label="Personal Month">${r.personalMonth}</td><td data-label="Theme">${meaning.theme}</td></tr>`);
+    rows.push(`<tr><td data-label="Month">${FUTURE_PREDICTION_MONTH_NAMES[m]}</td><td data-label="Personal Month">${r.personalMonth}</td><td data-label="Theme">${meaning.theme}</td></tr>`);
   }
   return `
     <table class="saved-table">
-      <thead><tr><th>Month</th><th>Month digit</th><th>Personal Month</th><th>Theme</th></tr></thead>
+      <thead><tr><th>Month</th><th>Personal Month</th><th>Theme</th></tr></thead>
       <tbody>${rows.join('')}</tbody>
     </table>
   `;
