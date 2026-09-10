@@ -2846,18 +2846,15 @@ function renderFuturePredictionResultHtml(result) {
 let futurePredictionHistory = [];
 let futurePredictionHistorySeq = 0;
 
-function renderFuturePredictionYearWiseTableHtml(day, month, centerYear) {
-  const rows = [];
-  for (let y = centerYear - 4; y <= centerYear + 4; y++) {
-    const r = computeFuturePrediction(day, month, y, 1);
-    const meaning = PERSONAL_NUMBER_MEANINGS[r.personalYear];
-    rows.push(`<tr${y === centerYear ? ' style="background:var(--navy-2);"' : ''}><td data-label="Year">${y}</td><td data-label="Personal Year">${r.personalYear}</td><td data-label="Theme">${meaning.theme}</td></tr>`);
-  }
+// Instead of a static multi-year table, the Year-wise breakdown is a
+// single spinner (a native number input) the person can roll up/down to
+// check any year's Personal Year one at a time.
+function renderFuturePredictionYearSpinnerResultHtml(day, month, year) {
+  const r = computeFuturePrediction(day, month, year, 1);
+  const meaning = PERSONAL_NUMBER_MEANINGS[r.personalYear];
   return `
-    <table class="saved-table">
-      <thead><tr><th>Year</th><th>Personal Year</th><th>Theme</th></tr></thead>
-      <tbody>${rows.join('')}</tbody>
-    </table>
+    <div class="sumline"><div class="k">Personal Year (${year})</div><div style="font-size:20px;font-weight:700;">${r.personalYear}</div></div>
+    <p style="font-size:12px;color:var(--text-dim);margin:2px 0 0;"><b>${meaning.theme}</b> — ${meaning.description}</p>
   `;
 }
 
@@ -2950,11 +2947,23 @@ function renderFuturePredictionHistoryList() {
         return;
       }
       breakdownEl.innerHTML = `
-        <p class="eyebrow" style="margin:0 0 8px;">Year-wise (Personal Year, ${entry.result.targetYear - 4}–${entry.result.targetYear + 4})</p>
-        ${renderFuturePredictionYearWiseTableHtml(entry.day, entry.month, entry.result.targetYear)}
+        <p class="eyebrow" style="margin:0 0 8px;">Year-wise (Personal Year)</p>
+        <div class="field" style="max-width:160px;">
+          <label for="fpYearSpinner-${id}">Year to check</label>
+          <input type="number" id="fpYearSpinner-${id}" value="${entry.result.targetYear}">
+        </div>
+        <div id="fpYearSpinnerResult-${id}" style="margin-top:10px;max-width:400px;"></div>
         <p class="eyebrow" style="margin:18px 0 8px;">Month-wise (Personal Month, ${entry.result.targetYear})</p>
         ${renderFuturePredictionMonthWiseTableHtml(entry.day, entry.month, entry.result.targetYear)}
       `;
+      const yearSpinnerResultEl = document.getElementById(`fpYearSpinnerResult-${id}`);
+      const yearSpinnerInput = document.getElementById(`fpYearSpinner-${id}`);
+      yearSpinnerResultEl.innerHTML = renderFuturePredictionYearSpinnerResultHtml(entry.day, entry.month, entry.result.targetYear);
+      yearSpinnerInput.addEventListener('input', () => {
+        const y = Number(yearSpinnerInput.value);
+        if (!y) return;
+        yearSpinnerResultEl.innerHTML = renderFuturePredictionYearSpinnerResultHtml(entry.day, entry.month, y);
+      });
       breakdownEl.style.display = 'block';
       btn.textContent = 'Hide year-wise, month-wise prediction';
     });
