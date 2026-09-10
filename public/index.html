@@ -2826,10 +2826,32 @@ function computeFuturePrediction(day, month, targetYear, targetMonth) {
   const personalYear = reduceToSingleDigit(base + yearDigit);
   const monthDigit = personalMonthDigitForCalendarMonth(targetMonth);
   const personalMonth = reduceToSingleDigit(personalYear + monthDigit);
-  return { base, targetYear, yearDigit, personalYear, targetMonth, monthDigit, personalMonth };
+  return { day, month, base, targetYear, yearDigit, personalYear, targetMonth, monthDigit, personalMonth };
 }
 
 const FUTURE_PREDICTION_MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+// Splits a day or month into its two printed digits (04 -> 0, 4) so the
+// calculation can be shown exactly the way the original worked example
+// does: D + D + M + M = RESULT, RESULT + digit = Your Year -- one plain
+// addition line at a time, not a summarized "birth digits" number.
+function futurePredictionDigitPair(n) {
+  return String(n).padStart(2, '0').split('').map(Number);
+}
+
+function renderFuturePredictionCalculationHtml(result) {
+  const [d1, d2] = futurePredictionDigitPair(result.day);
+  const [m1, m2] = futurePredictionDigitPair(result.month);
+  return `
+    <div class="card" style="background:var(--navy-2);margin:10px 0 16px;">
+      <p style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin:0 0 8px;">Personal Year calculation</p>
+      <p style="font-size:16px;font-weight:700;margin:0 0 4px;">${d1} + ${d2} + ${m1} + ${m2} = ${result.base}</p>
+      <p style="font-size:16px;font-weight:700;margin:0;">${result.base} + ${result.yearDigit} = ${result.personalYear}</p>
+      <p style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin:16px 0 8px;">Personal Month calculation</p>
+      <p style="font-size:16px;font-weight:700;margin:0;">${result.personalYear} + ${result.monthDigit} = ${result.personalMonth}</p>
+    </div>
+  `;
+}
 
 function renderFuturePredictionResultHtml(result) {
   const yearMeaning = PERSONAL_NUMBER_MEANINGS[result.personalYear];
@@ -2837,11 +2859,10 @@ function renderFuturePredictionResultHtml(result) {
   return `
     <div class="card">
       <div class="sumline"><div class="k">Personal Year (${result.targetYear})</div><div style="font-size:22px;font-weight:700;">${result.personalYear}</div></div>
-      <p style="font-size:11px;color:var(--text-muted);margin:2px 0 6px;">Birth digits (${result.base}) + Year digit table’s ${result.targetYear} (${result.yearDigit}) = ${result.personalYear}</p>
       <p style="font-size:13px;color:var(--text-dim);margin:2px 0 16px;"><b>${yearMeaning.theme}</b> — ${yearMeaning.description}</p>
       <div class="sumline"><div class="k">Personal Month (${FUTURE_PREDICTION_MONTH_NAMES[result.targetMonth]} ${result.targetYear})</div><div style="font-size:22px;font-weight:700;">${result.personalMonth}</div></div>
-      <p style="font-size:11px;color:var(--text-muted);margin:2px 0 6px;">Personal Year (${result.personalYear}) + Month digit table’s ${FUTURE_PREDICTION_MONTH_NAMES[result.targetMonth]} (${result.monthDigit}) = ${result.personalMonth}</p>
-      <p style="font-size:13px;color:var(--text-dim);margin:2px 0 0;"><b>${monthMeaning.theme}</b> — ${monthMeaning.description}</p>
+      <p style="font-size:13px;color:var(--text-dim);margin:2px 0 16px;"><b>${monthMeaning.theme}</b> — ${monthMeaning.description}</p>
+      ${renderFuturePredictionCalculationHtml(result)}
     </div>
   `;
 }
@@ -2934,6 +2955,7 @@ function renderFuturePredictionHistoryList() {
         <p style="font-size:12px;color:var(--text-dim);margin:2px 0 10px;"><b>${yearMeaning.theme}</b> — ${yearMeaning.description}</p>
         <div class="sumline"><div class="k">Personal Month (${FUTURE_PREDICTION_MONTH_NAMES[result.targetMonth]} ${result.targetYear})</div><div style="font-size:20px;font-weight:700;">${result.personalMonth}</div></div>
         <p style="font-size:12px;color:var(--text-dim);margin:2px 0 12px;"><b>${monthMeaning.theme}</b> — ${monthMeaning.description}</p>
+        ${renderFuturePredictionCalculationHtml(result)}
         <button type="button" class="ghost fp-breakdown-toggle" data-entry-id="${entry.id}" style="font-size:12px;padding:7px 12px;">Show year-wise, month-wise prediction</button>
         <div id="fpBreakdown-${entry.id}" style="display:none;margin-top:14px;"></div>
       </div>
@@ -5532,11 +5554,10 @@ function openCaseDrawer(id) {
           const FP_MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
           return `
             <p>Personal Year (${fpResult.targetYear}): <b>${fpResult.personalYear}</b> \u2014 ${fpYearMeaning.theme}</p>
-            <p style="font-size:11px;color:var(--text-muted);margin-top:-4px;">Birth digits (${fpResult.base}) + Year digit table\u2019s ${fpResult.targetYear} (${fpResult.yearDigit}) = ${fpResult.personalYear}</p>
             <p style="font-size:12px;color:var(--text-dim);margin-top:2px;">${fpYearMeaning.description}</p>
             <p style="margin-top:10px;">Personal Month (${FP_MONTH_NAMES[fpResult.targetMonth]} ${fpResult.targetYear}): <b>${fpResult.personalMonth}</b> \u2014 ${fpMonthMeaning.theme}</p>
-            <p style="font-size:11px;color:var(--text-muted);margin-top:-4px;">Personal Year (${fpResult.personalYear}) + Month digit table\u2019s ${FP_MONTH_NAMES[fpResult.targetMonth]} (${fpResult.monthDigit}) = ${fpResult.personalMonth}</p>
             <p style="font-size:12px;color:var(--text-dim);margin-top:2px;">${fpMonthMeaning.description}</p>
+            ${renderFuturePredictionCalculationHtml(fpResult)}
           `;
         })()}
       </div>
