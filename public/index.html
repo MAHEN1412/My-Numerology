@@ -1502,6 +1502,15 @@
     </div>
     <div id="futurePredictionResults" style="margin-top:20px;max-width:600px;"></div>
 
+    <details class="block section-accordion" style="margin-top:24px;max-width:600px;">
+      <summary class="section-accordion-summary">Reference: Year digit &amp; Month digit tables</summary>
+      <div class="section-accordion-body">
+        <p style="font-size:12px;color:var(--text-dim);margin:0 0 14px;">These are the fixed tables the calculation above is built from &mdash; the same for every year, every month, and every person. Personal Year and Personal Month are these numbers combined with a person's own birth-date digits.</p>
+        <div id="futurePredictionYearDigitReference"></div>
+        <div id="futurePredictionMonthDigitReference" style="margin-top:18px;"></div>
+      </div>
+    </details>
+
     <p class="eyebrow" style="margin:40px 0 12px;">Calculation History</p>
     <div id="futurePredictionHistoryList">
       <p style="font-size:13px;color:var(--text-dim);">No calculations yet — click Calculate above to add one here.</p>
@@ -2822,8 +2831,10 @@ function renderFuturePredictionResultHtml(result) {
   return `
     <div class="card">
       <div class="sumline"><div class="k">Personal Year (${result.targetYear})</div><div style="font-size:22px;font-weight:700;">${result.personalYear}</div></div>
+      <p style="font-size:11px;color:var(--text-muted);margin:2px 0 6px;">Birth digits (${result.base}) + Year digit table’s ${result.targetYear} (${result.yearDigit}) = ${result.personalYear}</p>
       <p style="font-size:13px;color:var(--text-dim);margin:2px 0 16px;"><b>${yearMeaning.theme}</b> — ${yearMeaning.description}</p>
       <div class="sumline"><div class="k">Personal Month (${FUTURE_PREDICTION_MONTH_NAMES[result.targetMonth]} ${result.targetYear})</div><div style="font-size:22px;font-weight:700;">${result.personalMonth}</div></div>
+      <p style="font-size:11px;color:var(--text-muted);margin:2px 0 6px;">Personal Year (${result.personalYear}) + Month digit table’s ${FUTURE_PREDICTION_MONTH_NAMES[result.targetMonth]} (${result.monthDigit}) = ${result.personalMonth}</p>
       <p style="font-size:13px;color:var(--text-dim);margin:2px 0 0;"><b>${monthMeaning.theme}</b> — ${monthMeaning.description}</p>
     </div>
   `;
@@ -2840,11 +2851,11 @@ function renderFuturePredictionYearWiseTableHtml(day, month, centerYear) {
   for (let y = centerYear - 4; y <= centerYear + 4; y++) {
     const r = computeFuturePrediction(day, month, y, 1);
     const meaning = PERSONAL_NUMBER_MEANINGS[r.personalYear];
-    rows.push(`<tr${y === centerYear ? ' style="background:var(--navy-2);"' : ''}><td data-label="Year">${y}</td><td data-label="Personal Year">${r.personalYear}</td><td data-label="Theme">${meaning.theme}</td></tr>`);
+    rows.push(`<tr${y === centerYear ? ' style="background:var(--navy-2);"' : ''}><td data-label="Year">${y}</td><td data-label="Year digit">${r.yearDigit}</td><td data-label="Personal Year">${r.personalYear}</td><td data-label="Theme">${meaning.theme}</td></tr>`);
   }
   return `
     <table class="saved-table">
-      <thead><tr><th>Year</th><th>Personal Year</th><th>Theme</th></tr></thead>
+      <thead><tr><th>Year</th><th>Year digit</th><th>Personal Year</th><th>Theme</th></tr></thead>
       <tbody>${rows.join('')}</tbody>
     </table>
   `;
@@ -2855,15 +2866,51 @@ function renderFuturePredictionMonthWiseTableHtml(day, month, year) {
   for (let m = 1; m <= 12; m++) {
     const r = computeFuturePrediction(day, month, year, m);
     const meaning = PERSONAL_NUMBER_MEANINGS[r.personalMonth];
-    rows.push(`<tr><td data-label="Month">${FUTURE_PREDICTION_MONTH_NAMES[m]}</td><td data-label="Personal Month">${r.personalMonth}</td><td data-label="Theme">${meaning.theme}</td></tr>`);
+    rows.push(`<tr><td data-label="Month">${FUTURE_PREDICTION_MONTH_NAMES[m]}</td><td data-label="Month digit">${r.monthDigit}</td><td data-label="Personal Month">${r.personalMonth}</td><td data-label="Theme">${meaning.theme}</td></tr>`);
   }
   return `
     <table class="saved-table">
-      <thead><tr><th>Month</th><th>Personal Month</th><th>Theme</th></tr></thead>
+      <thead><tr><th>Month</th><th>Month digit</th><th>Personal Month</th><th>Theme</th></tr></thead>
       <tbody>${rows.join('')}</tbody>
     </table>
   `;
 }
+
+// Renders the two fixed reference tables (Year digit, Month digit) exactly
+// as given -- these never change per person, so they're generated once
+// from the same helper functions the real calculation uses, rather than
+// hardcoded, so they can never drift out of sync with it.
+function renderFuturePredictionReferenceTables() {
+  const yearEl = document.getElementById('futurePredictionYearDigitReference');
+  const monthEl = document.getElementById('futurePredictionMonthDigitReference');
+  if (!yearEl || !monthEl) return;
+
+  const thisYear = new Date().getFullYear();
+  const yearRows = [];
+  for (let y = 2017; y <= 2035; y++) {
+    yearRows.push(`<tr${y === thisYear ? ' style="background:var(--navy-2);"' : ''}><td data-label="Year">${y}</td><td data-label="Year digit">${personalYearDigitForCalendarYear(y)}</td></tr>`);
+  }
+  yearEl.innerHTML = `
+    <p class="eyebrow" style="margin:0 0 8px;">Year digit table</p>
+    <table class="saved-table">
+      <thead><tr><th>Year</th><th>Year digit</th></tr></thead>
+      <tbody>${yearRows.join('')}</tbody>
+    </table>
+  `;
+
+  const monthRows = [];
+  for (let m = 1; m <= 12; m++) {
+    monthRows.push(`<tr><td data-label="Month">${FUTURE_PREDICTION_MONTH_NAMES[m]}</td><td data-label="Month digit">${personalMonthDigitForCalendarMonth(m)}</td></tr>`);
+  }
+  monthEl.innerHTML = `
+    <p class="eyebrow" style="margin:0 0 8px;">Month digit table</p>
+    <table class="saved-table">
+      <thead><tr><th>Month</th><th>Month digit</th></tr></thead>
+      <tbody>${monthRows.join('')}</tbody>
+    </table>
+  `;
+}
+renderFuturePredictionReferenceTables();
 
 function renderFuturePredictionHistoryList() {
   const container = document.getElementById('futurePredictionHistoryList');
@@ -5470,9 +5517,11 @@ function openCaseDrawer(id) {
           const FP_MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
           return `
             <p>Personal Year (${fpResult.targetYear}): <b>${fpResult.personalYear}</b> \u2014 ${fpYearMeaning.theme}</p>
-            <p style="font-size:12px;color:var(--text-dim);margin-top:-4px;">${fpYearMeaning.description}</p>
+            <p style="font-size:11px;color:var(--text-muted);margin-top:-4px;">Birth digits (${fpResult.base}) + Year digit table\u2019s ${fpResult.targetYear} (${fpResult.yearDigit}) = ${fpResult.personalYear}</p>
+            <p style="font-size:12px;color:var(--text-dim);margin-top:2px;">${fpYearMeaning.description}</p>
             <p style="margin-top:10px;">Personal Month (${FP_MONTH_NAMES[fpResult.targetMonth]} ${fpResult.targetYear}): <b>${fpResult.personalMonth}</b> \u2014 ${fpMonthMeaning.theme}</p>
-            <p style="font-size:12px;color:var(--text-dim);margin-top:-4px;">${fpMonthMeaning.description}</p>
+            <p style="font-size:11px;color:var(--text-muted);margin-top:-4px;">Personal Year (${fpResult.personalYear}) + Month digit table\u2019s ${FP_MONTH_NAMES[fpResult.targetMonth]} (${fpResult.monthDigit}) = ${fpResult.personalMonth}</p>
+            <p style="font-size:12px;color:var(--text-dim);margin-top:2px;">${fpMonthMeaning.description}</p>
           `;
         })()}
       </div>
