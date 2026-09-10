@@ -5525,7 +5525,7 @@ const WIZARD_STEPS = [
   { id: 'basics', title: 'Client details & name correction' },
   { id: 'mobile', title: 'Mobile Compatibility' },
   { id: 'business', title: 'Business Name' },
-  { id: 'crystal', title: 'Crystal Compatibility' },
+  { id: 'crystal', title: 'Crystal & Gem Stones Suggestion' },
   { id: 'number', title: 'Number Compatibility' },
   { id: 'relationship', title: 'Relationship Match' },
 ];
@@ -5760,7 +5760,7 @@ function renderWizardCrystal() {
   const body = document.getElementById('wizardBody');
   body.innerHTML = `
     <p class="wizard-skip-note" style="margin:0 0 14px;">Optional \u2014 skip if not needed for this client.</p>
-    <button type="button" id="wizAnalyzeCrystal" class="calc-btn">Get crystal suggestion</button>
+    <button type="button" id="wizAnalyzeCrystal" class="calc-btn">Get Crystal &amp; Gem Stones Suggestion</button>
     <div id="wizCrystalResults" style="margin-top:16px;"></div>
   `;
   document.getElementById('wizAnalyzeCrystal').addEventListener('click', async () => {
