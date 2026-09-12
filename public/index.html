@@ -3780,7 +3780,7 @@ document.getElementById('crystalAnalyzeBtn').addEventListener('click', async () 
       });
     }
 
-    lastCrystalResult = { name, day: d, month: m, year: y, system: currentSystem, coreNumbers: data.coreNumbers, topCrystal: data.compatibility[0] ? data.compatibility[0].crystal : '' };
+    lastCrystalResult = { name, day: d, month: m, year: y, system: currentSystem, purpose: purpose || undefined, coreNumbers: data.coreNumbers, topCrystal: data.compatibility[0] ? data.compatibility[0].crystal : '' };
     document.getElementById('crystalSaveBtnWrap').style.display = 'block';
     document.getElementById('crystalV2BtnWrap').style.display = 'block';
 
@@ -4222,7 +4222,7 @@ document.addEventListener('click', () => {
 
 async function openCrystalV2Modal() {
   if (!lastCrystalResult) return;
-  const { day, month, year, name, system } = lastCrystalResult;
+  const { day, month, year, name, system, purpose } = lastCrystalResult;
 
   const root = document.createElement('div');
   root.id = 'crystalV2ModalRoot';
@@ -4244,7 +4244,7 @@ async function openCrystalV2Modal() {
   try {
     const res = await fetch('/api/crystals/analyze-v2', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ day, month, year, name: name || undefined, system }),
+      body: JSON.stringify({ day, month, year, name: name || undefined, system, purpose: purpose || undefined }),
     });
     const data = await res.json();
     if (!res.ok) { contentEl.innerHTML = `<p class="wizard-skip-note">${data.error}</p>`; return; }
