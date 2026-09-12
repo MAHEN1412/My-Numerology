@@ -935,8 +935,8 @@
     </div>
     <div class="wizard-body">
       <div class="actors-chip-group" style="margin-bottom:16px;">
-        <button type="button" class="actors-chip active" data-filter="unmapped">Needs data (25)</button>
-        <button type="button" class="actors-chip" data-filter="all">All 37 stones</button>
+        <button type="button" class="actors-chip active" data-filter="unmapped">Needs data (14)</button>
+        <button type="button" class="actors-chip" data-filter="all">All 39 stones</button>
       </div>
       <div id="crystalCurationList"><p class="loading-note">Loading\u2026</p></div>
     </div>
@@ -1347,7 +1347,7 @@
   <div class="wrap" style="padding-bottom:56px;">
     <div id="crystalResultsContainer"></div>
     <div id="crystalV2BtnWrap" style="display:none;text-align:center;padding:16px 0;">
-      <button type="button" class="ghost" id="crystalV2Btn">View New 37-Stone Analysis (Beta)</button>
+      <button type="button" class="ghost" id="crystalV2Btn">View New Crystal Analysis (Beta) — 39 stones, gemstone-free</button>
     </div>
     <div id="crystalSaveBtnWrap" style="display:none;text-align:center;padding:16px 0;">
       <button type="button" class="btn-ghost" id="crystalSaveToDashboardBtn">Save to Dashboard</button>
@@ -1721,7 +1721,7 @@ function showNumberGuideInfo(n, activeBtn) {
       <p style="font-size:13px;color:var(--text-dim);"><b>Career fit:</b> ${d.career}</p>
       <p style="font-size:13px;color:var(--text-dim);"><b>Friendly numbers:</b> ${d.friendly} &nbsp; <b>Neutral:</b> ${d.neutral} &nbsp; <b>Enemy:</b> ${d.enemy}</p>
       <p style="font-size:13px;color:var(--text-dim);"><b>Health notes:</b> ${d.health}</p>
-      <p style="font-size:13px;color:var(--text-dim);"><b>Lucky colors:</b> ${d.colors} &nbsp; <b>Gemstone:</b> ${d.gemstone}</p>
+      <p style="font-size:13px;color:var(--text-dim);"><b>Lucky colors:</b> ${d.colors} &nbsp; <b>Crystal:</b> ${d.gemstone}</p>
     </div>
   `;
 }
@@ -3638,16 +3638,22 @@ let lastCrystalResult = null;
 // depending on which number's own page you check), so these are shown
 // exactly as each number's own page states them, without attempting to
 // force them into agreement.
+// The `gemstone` field originally held that source's traditional Jyotish
+// gemstone picks (Ruby, Pearl, Yellow/Blue Sapphire, Emerald, Diamond,
+// Hessonite/Gomed, Cat's Eye, Coral). Per this app's crystals-only policy
+// those have been replaced with the same 2026 crystal-consensus research
+// pass used everywhere else in the app (see server/knowledge/
+// crystalDatabase37.js), so no gemstone name appears anywhere in the app.
 const NUMBER_GUIDE_DATA = {
-  1: { planet: 'Sun', theme: 'New beginnings, independence, leadership', strengths: 'Confident, creative, independent, decisive', weaknesses: 'Stubborn, bossy, impatient', career: 'Entrepreneur, manager/leader, creative fields, marketing & sales', friendly: '2,3,4,5,6,9', neutral: '6,7', enemy: '1,8', health: 'Possible heart, dental, eye, headache, and urinary issues', colors: 'Red, Yellow, Golden, Peach, Orange', gemstone: 'Ruby' },
-  2: { planet: 'Moon', theme: 'Cooperation, sensitivity, partnership', strengths: 'Kind, patient, diplomatic, good listener', weaknesses: 'Over-sensitive, indecisive, shy/introverted', career: 'Teacher, artist, social worker, diplomat', friendly: '1,2,3,5', neutral: '4,6,7,8', enemy: '4,6', health: 'Anxiety, stomach issues, gas, mental fatigue, lung problems', colors: 'Green, White', gemstone: 'Pearl, Moonstone, Jade' },
-  3: { planet: 'Jupiter', theme: 'Creativity, expression, optimism', strengths: 'Charming, social, optimistic, independent', weaknesses: 'Easily distracted, impulsive spender, can be superficial', career: 'Artist/writer, teacher/public speaker, entertainer, entrepreneur, marketing', friendly: '1,2,3,5,9', neutral: '4,7,8', enemy: '4,6', health: 'Nervous system, bone pain, throat infections, sciatica', colors: 'Light yellow, green, orange', gemstone: 'Yellow Sapphire' },
-  4: { planet: 'Rahu', theme: 'Discipline, structure, dependability', strengths: 'Hardworking, honest, analytical, trustworthy', weaknesses: 'Rigid, stubborn, overly serious, short-tempered', career: 'Law/justice, science/research, finance, technology, real estate', friendly: '1,5,6,7', neutral: '2,3,4,8', enemy: '2,9', health: 'Lung/heart issues, high BP, leg injuries, insomnia, low iron', colors: 'Blue, green, red (shades)', gemstone: 'Gomed / Hessonite' },
-  5: { planet: 'Mercury', theme: 'Freedom, adventure, communication', strengths: 'Energetic, adaptable, great communicator, quick decision-maker', weaknesses: 'Impatient, struggles with commitment, easily distracted', career: 'Writer, salesperson, public speaker, travel agent, government jobs', friendly: '1,2,4,5,6,8', neutral: '3,7,9', enemy: 'None', health: 'Indigestion, stress, headache, sinus, weak eyesight', colors: 'Green, Light Brown, Light Grey, White, Silver', gemstone: 'Emerald, Diamond' },
-  6: { planet: 'Venus', theme: 'Love, responsibility, beauty', strengths: 'Loving, protective, natural (quiet) leader, appreciates beauty/art', weaknesses: 'Overly trusting, fear of being alone, struggles to say no, can be controlling', career: 'Teacher, doctor/nurse, artist/actor, security officer, therapist/counselor', friendly: '4,5,6,7,8', neutral: '1,2,3,6', enemy: '2,9', health: 'Kidney, chest, urinary, heart, diabetes-related issues', colors: 'Dark Green, Red, shades of Blue', gemstone: 'Emerald, Jade' },
-  7: { planet: 'Ketu', theme: 'Wisdom, introspection, spirituality', strengths: 'Deep thinker, intuitive, independent, analytical', weaknesses: 'Overthinking, detached, overly critical, hard to open up', career: 'Philosopher/teacher, spiritual leader/healer, writer, scientist/researcher', friendly: '4,5,6,8', neutral: '1,2,3,7,9', enemy: 'None', health: 'Indigestion, stomach/lung/skin disease, blood disorders', colors: 'Light Blue, Pale Yellow, Light Green, White', gemstone: "Cat's Eye" },
-  8: { planet: 'Saturn', theme: 'Ambition, discipline, material mastery', strengths: 'Strong management skills, disciplined, loyal, financially savvy', weaknesses: 'Too serious, often misunderstood, slow/steady success, hard on self', career: 'Business/trading, law/politics, sports, film/media, spiritual roles', friendly: '5,6,7', neutral: '2,3,8,9', enemy: '1,9', health: 'Liver, respiratory, musculoskeletal, urinary issues', colors: 'Yellow, Dark Green, Blue', gemstone: 'Blue Sapphire (Neelam)' },
-  9: { planet: 'Mars', theme: 'Compassion, courage, endings/new beginnings', strengths: 'Compassionate, creative, strong-willed, honest, independent', weaknesses: 'Emotional, impulsive, aggressive, stubborn, skeptical/trust issues', career: 'Doctor/surgeon, writer/artist, defence services, technology, athletics', friendly: '1,3,5,7', neutral: '2,9', enemy: '4,8', health: 'Stomach problems, burns/injuries, urinary issues, skin disease', colors: 'Shades of red and pink', gemstone: 'Coral' },
+  1: { planet: 'Sun', theme: 'New beginnings, independence, leadership', strengths: 'Confident, creative, independent, decisive', weaknesses: 'Stubborn, bossy, impatient', career: 'Entrepreneur, manager/leader, creative fields, marketing & sales', friendly: '2,3,4,5,6,9', neutral: '6,7', enemy: '1,8', health: 'Possible heart, dental, eye, headache, and urinary issues', colors: 'Red, Yellow, Golden, Peach, Orange', gemstone: 'Carnelian' },
+  2: { planet: 'Moon', theme: 'Cooperation, sensitivity, partnership', strengths: 'Kind, patient, diplomatic, good listener', weaknesses: 'Over-sensitive, indecisive, shy/introverted', career: 'Teacher, artist, social worker, diplomat', friendly: '1,2,3,5', neutral: '4,6,7,8', enemy: '4,6', health: 'Anxiety, stomach issues, gas, mental fatigue, lung problems', colors: 'Green, White', gemstone: 'Moonstone, Selenite' },
+  3: { planet: 'Jupiter', theme: 'Creativity, expression, optimism', strengths: 'Charming, social, optimistic, independent', weaknesses: 'Easily distracted, impulsive spender, can be superficial', career: 'Artist/writer, teacher/public speaker, entertainer, entrepreneur, marketing', friendly: '1,2,3,5,9', neutral: '4,7,8', enemy: '4,6', health: 'Nervous system, bone pain, throat infections, sciatica', colors: 'Light yellow, green, orange', gemstone: 'Citrine' },
+  4: { planet: 'Rahu', theme: 'Discipline, structure, dependability', strengths: 'Hardworking, honest, analytical, trustworthy', weaknesses: 'Rigid, stubborn, overly serious, short-tempered', career: 'Law/justice, science/research, finance, technology, real estate', friendly: '1,5,6,7', neutral: '2,3,4,8', enemy: '2,9', health: 'Lung/heart issues, high BP, leg injuries, insomnia, low iron', colors: 'Blue, green, red (shades)', gemstone: 'Black Tourmaline' },
+  5: { planet: 'Mercury', theme: 'Freedom, adventure, communication', strengths: 'Energetic, adaptable, great communicator, quick decision-maker', weaknesses: 'Impatient, struggles with commitment, easily distracted', career: 'Writer, salesperson, public speaker, travel agent, government jobs', friendly: '1,2,4,5,6,8', neutral: '3,7,9', enemy: 'None', health: 'Indigestion, stress, headache, sinus, weak eyesight', colors: 'Green, Light Brown, Light Grey, White, Silver', gemstone: 'Citrine, Aquamarine' },
+  6: { planet: 'Venus', theme: 'Love, responsibility, beauty', strengths: 'Loving, protective, natural (quiet) leader, appreciates beauty/art', weaknesses: 'Overly trusting, fear of being alone, struggles to say no, can be controlling', career: 'Teacher, doctor/nurse, artist/actor, security officer, therapist/counselor', friendly: '4,5,6,7,8', neutral: '1,2,3,6', enemy: '2,9', health: 'Kidney, chest, urinary, heart, diabetes-related issues', colors: 'Dark Green, Red, shades of Blue', gemstone: 'Rose Quartz, Jade' },
+  7: { planet: 'Ketu', theme: 'Wisdom, introspection, spirituality', strengths: 'Deep thinker, intuitive, independent, analytical', weaknesses: 'Overthinking, detached, overly critical, hard to open up', career: 'Philosopher/teacher, spiritual leader/healer, writer, scientist/researcher', friendly: '4,5,6,8', neutral: '1,2,3,7,9', enemy: 'None', health: 'Indigestion, stomach/lung/skin disease, blood disorders', colors: 'Light Blue, Pale Yellow, Light Green, White', gemstone: 'Amethyst' },
+  8: { planet: 'Saturn', theme: 'Ambition, discipline, material mastery', strengths: 'Strong management skills, disciplined, loyal, financially savvy', weaknesses: 'Too serious, often misunderstood, slow/steady success, hard on self', career: 'Business/trading, law/politics, sports, film/media, spiritual roles', friendly: '5,6,7', neutral: '2,3,8,9', enemy: '1,9', health: 'Liver, respiratory, musculoskeletal, urinary issues', colors: 'Yellow, Dark Green, Blue', gemstone: 'Pyrite' },
+  9: { planet: 'Mars', theme: 'Compassion, courage, endings/new beginnings', strengths: 'Compassionate, creative, strong-willed, honest, independent', weaknesses: 'Emotional, impulsive, aggressive, stubborn, skeptical/trust issues', career: 'Doctor/surgeon, writer/artist, defence services, technology, athletics', friendly: '1,3,5,7', neutral: '2,9', enemy: '4,8', health: 'Stomach problems, burns/injuries, urinary issues, skin disease', colors: 'Shades of red and pink', gemstone: 'Amethyst' },
 };
 
 const KUA_TABLE_DATA = {
@@ -3661,11 +3667,12 @@ const KUA_TABLE_DATA = {
   9: { element: 'Fire', group: 'East' },
 };
 
-const RATNA_HINDI_NAMES = {
-  'Ruby': 'Manik', 'Pearl': 'Moti', 'Red Coral': 'Moonga', 'Emerald': 'Panna',
-  'Yellow Sapphire': 'Pukhraj', 'Diamond': 'Heera', 'Blue Sapphire': 'Neelam',
-  'Hessonite': 'Gomed', "Cat's Eye": 'Lehsunia', 'Moonstone': 'Moti (substitute)',
-};
+// NOTE: this app is crystals-only end-to-end -- traditional Jyotish
+// gemstones (Ruby/Manik, Pearl/Moti, Red Coral/Moonga, Emerald/Panna,
+// Yellow Sapphire/Pukhraj, Diamond/Heera, Blue Sapphire/Neelam,
+// Hessonite/Gomed, Cat's Eye/Lehsunia) are never recommended or scored
+// anywhere in the app, so there is no Hindi/Ratna naming to show here.
+const RATNA_HINDI_NAMES = {};
 
 document.getElementById('crystalAnalyzeBtn').addEventListener('click', async () => {
   const dobRaw = document.getElementById('crystalDobInput').value;
@@ -3716,7 +3723,7 @@ document.getElementById('crystalAnalyzeBtn').addEventListener('click', async () 
           ${tierCard('Balance', v2Data.tiers.balance)}
           ${tierCard('Alternative', v2Data.tiers.alternative)}
         </div>
-        <button type="button" class="ghost" id="crystalV2ShowAllBtnInline" style="margin-top:12px;">View Full 37-Stone Ranking</button>
+        <button type="button" class="ghost" id="crystalV2ShowAllBtnInline" style="margin-top:12px;">View Full Ranking (39 stones)</button>
         <div id="crystalV2FullTableInline" style="display:none;margin-top:16px;overflow-x:auto;">
           <table class="video-compare-table">
             <thead><tr><th>Rank</th><th>Stone</th><th>Score</th><th>Has data</th><th>Key reason</th></tr></thead>
@@ -3726,7 +3733,9 @@ document.getElementById('crystalAnalyzeBtn').addEventListener('click', async () 
       `;
     }
 
-    // ----- SECONDARY: the traditional Vedic astrology gemstones (Ratna) -----
+    // ----- SECONDARY: the original (v1) crystal scoring engine, kept as a
+    // simpler star-rated cross-check alongside the newer multi-factor
+    // engine above. Both are crystals-only -- no Jyotish gemstones. -----
     const summaryLine = `<p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Based on Driver ${data.coreNumbers.driverNumber}, Conductor ${data.coreNumbers.conductorNumber}${data.coreNumbers.nameNumber ? `, Name Number ${data.coreNumbers.nameNumber}` : ''}${data.loshuMissing.length ? `, and missing Lo Shu numbers ${data.loshuMissing.join(', ')}` : ''}.</p>`;
     const cards = data.compatibility.map(c => `
       <div class="crystal-card ${c.classification}">
@@ -3739,7 +3748,7 @@ document.getElementById('crystalAnalyzeBtn').addEventListener('click', async () 
     `).join('');
 
     const secondaryHtml = `
-      <p class="report-form-section-label">Astrology Gemstones (Ratna) <span style="color:var(--text-muted);font-weight:400;text-transform:none;">&mdash; secondary reference, traditional Vedic/Jyotish planetary gemstones, a different system from the crystal recommendations above</span></p>
+      <p class="report-form-section-label">Crystal Compatibility (star-rated) <span style="color:var(--text-muted);font-weight:400;text-transform:none;">&mdash; a simpler, secondary cross-check using the same crystals-only data, shown alongside the multi-factor analysis above</span></p>
       ${summaryLine}${cards}
     `;
 
@@ -3751,7 +3760,7 @@ document.getElementById('crystalAnalyzeBtn').addEventListener('click', async () 
         const table = document.getElementById('crystalV2FullTableInline');
         const isOpen = table.style.display !== 'none';
         table.style.display = isOpen ? 'none' : 'block';
-        e.target.textContent = isOpen ? 'View Full 37-Stone Ranking' : 'Hide Full Ranking';
+        e.target.textContent = isOpen ? 'View Full Ranking (39 stones)' : 'Hide Full Ranking';
       });
     }
 
@@ -4205,10 +4214,10 @@ async function openCrystalV2Modal() {
     <div class="case-overlay"></div>
     <div class="case-drawer" style="max-width:640px;">
       <div class="case-drawer-header">
-        <h2 style="font-size:18px;margin:0;">37-Stone Crystal Analysis <span style="font-size:11px;color:var(--text-muted);font-weight:400;">(Beta)</span></h2>
+        <h2 style="font-size:18px;margin:0;">Crystal Analysis <span style="font-size:11px;color:var(--text-muted);font-weight:400;">(Beta — 39 stones, crystals only, no Jyotish gemstones)</span></h2>
         <button type="button" class="case-drawer-close" id="crystalV2ModalCloseBtn">\u2715</button>
       </div>
-      <div id="crystalV2Content" style="margin-top:16px;"><p class="loading-note">Scoring all 37 stones\u2026</p></div>
+      <div id="crystalV2Content" style="margin-top:16px;"><p class="loading-note">Scoring all 39 stones\u2026</p></div>
     </div>
   `;
   document.body.appendChild(root);
@@ -4255,9 +4264,9 @@ async function openCrystalV2Modal() {
     `).join('');
 
     contentEl.innerHTML = `
-      <p style="font-size:12px;color:var(--text-muted);margin:0 0 16px;">Experimental multi-factor engine: scores every stone on real Driver/Conductor/Name Number associations, Lo Shu balance, and (if set) your stated purpose \u2014 not just \u201cmissing number = crystal.\u201d Roles are left blank rather than forced when nothing genuinely qualifies. Only 12 of these 37 stones have a documented number association in this app's existing data; the rest are scored on Lo Shu balance alone and marked accordingly.</p>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 16px;">Experimental multi-factor engine: scores every stone on real Driver/Conductor/Name Number associations, Lo Shu balance, and (if set) your stated purpose \u2014 not just \u201cmissing number = crystal.\u201d Roles are left blank rather than forced when nothing genuinely qualifies. This engine is crystals-only: traditional Jyotish gemstones (Ruby, Pearl, Yellow/Blue Sapphire, Red Coral, Hessonite, Cat's Eye, Diamond) are permanently excluded, never scored or recommended here. 25 of these 39 stones have a documented, cited number association from the 2026 research pass; the rest are scored on Lo Shu balance alone and marked accordingly.</p>
       ${tiersHtml}
-      <button type="button" class="ghost" id="crystalV2ShowAllBtn" style="margin-top:16px;">View Full 37-Stone Ranking</button>
+      <button type="button" class="ghost" id="crystalV2ShowAllBtn" style="margin-top:16px;">View Full Ranking (39 stones)</button>
       <div id="crystalV2FullTable" style="display:none;margin-top:16px;overflow-x:auto;">
         <table class="video-compare-table">
           <thead><tr><th>Rank</th><th>Stone</th><th>Score</th><th>Has data</th><th>Key reason</th></tr></thead>
@@ -4270,7 +4279,7 @@ async function openCrystalV2Modal() {
       const table = document.getElementById('crystalV2FullTable');
       const isOpen = table.style.display !== 'none';
       table.style.display = isOpen ? 'none' : 'block';
-      e.target.textContent = isOpen ? 'View Full 37-Stone Ranking' : 'Hide Full Ranking';
+      e.target.textContent = isOpen ? 'View Full Ranking (39 stones)' : 'Hide Full Ranking';
     });
   } catch (err) {
     contentEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';
