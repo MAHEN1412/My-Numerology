@@ -54,19 +54,38 @@ function scoreStone(stone, profile) {
 
   const stoneNumbers = stone.numberAssociations.map((a) => a.number);
 
+  // Pulls the real citation list off an association, so the UI can show
+  // exactly which named websites back a given pick and how many agreed --
+  // never just an unsourced score. Falls back to the older single-string
+  // `source` field for associations that predate the multi-source schema.
+  function citationsFor(assoc) {
+    if (!assoc) return { evidenceTier: null, sourceCount: 0, sources: [] };
+    const sources = (assoc.sources && assoc.sources.length) ? assoc.sources : (assoc.source ? [assoc.source] : []);
+    return { evidenceTier: assoc.evidenceTier || null, sourceCount: sources.length, sources };
+  }
+
   coreNumbers.forEach(({ role, value }) => {
     const assoc = stone.numberAssociations.find((a) => a.number === value);
     if (assoc) {
       const points = assoc.role === 'primary' ? WEIGHTS.CORE_COMPATIBILITY : WEIGHTS.CORE_SUPPORTING;
       scoreComponents.coreCompatibility += points;
-      matchedRules.push({ dimension: 'CORE_COMPATIBILITY', points, text: `${assoc.role === 'primary' ? 'Primary' : 'Supporting'} association with your ${role} (${value}).` });
+      matchedRules.push({
+        dimension: 'CORE_COMPATIBILITY', points,
+        text: `${assoc.role === 'primary' ? 'Primary' : 'Supporting'} association with your ${role} (${value}).`,
+        ...citationsFor(assoc),
+      });
     }
   });
 
   missingNumbers.forEach((n) => {
     if (stoneNumbers.includes(n)) {
       scoreComponents.loShuBalance += WEIGHTS.LO_SHU_BALANCE;
-      matchedRules.push({ dimension: 'LO_SHU_BALANCE', points: WEIGHTS.LO_SHU_BALANCE, text: `Number ${n} is absent from the Lo Shu grid; this stone is associated with that number.` });
+      const assoc = stone.numberAssociations.find((a) => a.number === n);
+      matchedRules.push({
+        dimension: 'LO_SHU_BALANCE', points: WEIGHTS.LO_SHU_BALANCE,
+        text: `Number ${n} is absent from the Lo Shu grid; this stone is associated with that number.`,
+        ...citationsFor(assoc),
+      });
     }
   });
 
