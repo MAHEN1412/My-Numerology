@@ -112,12 +112,21 @@ function scoreStone(stone, profile) {
 
   const rawScore = scoreComponents.coreCompatibility + scoreComponents.loShuBalance + scoreComponents.planetaryCompatibility + scoreComponents.purposeMatch + scoreComponents.conflictPenalty;
 
+  // Whether this stone is the actual "primary" pick (not just "supporting")
+  // for at least one of the person's own core numbers. Used only to break
+  // ties in overall score -- a stone that IS someone's primary crystal
+  // should outrank one that's merely supporting when both land on the same
+  // final score, so the "Top Match" card never contradicts its own reason
+  // text (e.g. showing a stone whose listed reason says "Supporting...").
+  const hasPrimaryCoreMatch = matchedRules.some((r) => r.dimension === 'CORE_COMPATIBILITY' && r.points === WEIGHTS.CORE_COMPATIBILITY);
+
   return {
     id: stone.stoneId,
     name: stone.name,
     hasDirectNumberData: stone.numberAssociations.length > 0,
     sourceNotes: stone.sourceNotes,
     rawScore,
+    hasPrimaryCoreMatch,
     scoreComponents,
     matchedRules,
     penaltyRules,
@@ -160,7 +169,14 @@ async function calculateCrystalRecommendations(numerologyProfile) {
   const stones = await CrystalStone.find({ active: true });
   const scored = stones.map((stone) => scoreStone(stone, numerologyProfile));
   const normalized = normalizeScores(scored);
-  const ranked = [...normalized].sort((a, b) => b.finalScore - a.finalScore);
+  const ranked = [...normalized].sort((a, b) => {
+    if (b.finalScore !== a.finalScore) return b.finalScore - a.finalScore;
+    // Tie-break: a stone that's the actual PRIMARY pick for one of the
+    // person's core numbers outranks one that's only SUPPORTING, even if
+    // Lo Shu/purpose bonuses brought them to the same overall score.
+    if (b.hasPrimaryCoreMatch !== a.hasPrimaryCoreMatch) return (b.hasPrimaryCoreMatch ? 1 : 0) - (a.hasPrimaryCoreMatch ? 1 : 0);
+    return b.scoreComponents.coreCompatibility - a.scoreComponents.coreCompatibility;
+  });
   const tiers = classifyTiers(ranked);
 
   return { ranked, tiers, weightsUsed: { ...WEIGHTS }, thresholdsUsed: { ...TIER_THRESHOLDS } };

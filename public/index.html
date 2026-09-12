@@ -3734,7 +3734,7 @@ document.getElementById('crystalAnalyzeBtn').addEventListener('click', async () 
       primaryHtml = `
         <p class="report-form-section-label" style="margin-top:0;">Crystal Recommendations</p>
         <div class="report-card-grid" style="grid-template-columns:1fr 1fr;">
-          ${tierCard('Primary', v2Data.tiers.primary)}
+          ${tierCard('Top Match', v2Data.tiers.primary)}
           ${tierCard('Harmony', v2Data.tiers.harmony)}
           ${tierCard('Balance', v2Data.tiers.balance)}
           ${tierCard('Alternative', v2Data.tiers.alternative)}
@@ -4263,7 +4263,7 @@ async function openCrystalV2Modal() {
 
     const tiersHtml = `
       <div class="report-card-grid" style="grid-template-columns:1fr 1fr;">
-        ${tierCard('Primary', data.tiers.primary)}
+        ${tierCard('Top Match', data.tiers.primary)}
         ${tierCard('Harmony', data.tiers.harmony)}
         ${tierCard('Balance', data.tiers.balance)}
         ${tierCard('Alternative', data.tiers.alternative)}
