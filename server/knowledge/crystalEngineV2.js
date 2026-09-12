@@ -27,6 +27,30 @@ const WEIGHTS = {
   CONFLICT_PENALTY: -15,
 };
 
+// EVIDENCE-STRENGTH MULTIPLIER -- requested by the client so a crystal
+// backed by many independent websites doesn't score identically to one
+// backed by only one or two. A point value earned from a numberAssociation
+// is scaled by how strong the real-world evidence for that association is:
+// Tier A (3+ independent sources agree) keeps full points, Tier B (exactly
+// 2 sources) keeps most of the points, Tier D (a single source) keeps only
+// half. Anything with no evidenceTier at all (legacy/unresearched data) is
+// treated as conservatively as a single source, never as strong as one.
+// As of the 2026 expanded research pass every scored association in
+// crystalDatabase37.js is Tier A (the research bar itself was raised to
+// require 3+ sources before an association is scored at all), so this
+// multiplier is currently a 1.0x no-op across the board -- but it's real,
+// permanent infrastructure: the moment a weaker (Tier B/D) association is
+// ever added back (a future number, a purpose-specific pass, etc.), it
+// will automatically be worth less than a well-documented one instead of
+// being treated as equally certain.
+const EVIDENCE_MULTIPLIER = { A: 1, B: 0.75, D: 0.5 };
+const DEFAULT_EVIDENCE_MULTIPLIER = 0.5; // no evidenceTier at all -- treat as unverified, not as strong as Tier A/B.
+
+function evidenceMultiplierFor(assoc) {
+  if (!assoc || !assoc.evidenceTier) return DEFAULT_EVIDENCE_MULTIPLIER;
+  return EVIDENCE_MULTIPLIER[assoc.evidenceTier] ?? DEFAULT_EVIDENCE_MULTIPLIER;
+}
+
 const TIER_THRESHOLDS = {
   PRIMARY: 40,
   HARMONY: 25,
@@ -67,10 +91,12 @@ function scoreStone(stone, profile) {
   coreNumbers.forEach(({ role, value }) => {
     const assoc = stone.numberAssociations.find((a) => a.number === value);
     if (assoc) {
-      const points = assoc.role === 'primary' ? WEIGHTS.CORE_COMPATIBILITY : WEIGHTS.CORE_SUPPORTING;
+      const basePoints = assoc.role === 'primary' ? WEIGHTS.CORE_COMPATIBILITY : WEIGHTS.CORE_SUPPORTING;
+      const multiplier = evidenceMultiplierFor(assoc);
+      const points = Math.round(basePoints * multiplier);
       scoreComponents.coreCompatibility += points;
       matchedRules.push({
-        dimension: 'CORE_COMPATIBILITY', points,
+        dimension: 'CORE_COMPATIBILITY', points, basePoints, evidenceMultiplier: multiplier,
         text: `${assoc.role === 'primary' ? 'Primary' : 'Supporting'} association with your ${role} (${value}).`,
         ...citationsFor(assoc),
       });
@@ -79,10 +105,12 @@ function scoreStone(stone, profile) {
 
   missingNumbers.forEach((n) => {
     if (stoneNumbers.includes(n)) {
-      scoreComponents.loShuBalance += WEIGHTS.LO_SHU_BALANCE;
       const assoc = stone.numberAssociations.find((a) => a.number === n);
+      const multiplier = evidenceMultiplierFor(assoc);
+      const points = Math.round(WEIGHTS.LO_SHU_BALANCE * multiplier);
+      scoreComponents.loShuBalance += points;
       matchedRules.push({
-        dimension: 'LO_SHU_BALANCE', points: WEIGHTS.LO_SHU_BALANCE,
+        dimension: 'LO_SHU_BALANCE', points, basePoints: WEIGHTS.LO_SHU_BALANCE, evidenceMultiplier: multiplier,
         text: `Number ${n} is absent from the Lo Shu grid; this stone is associated with that number.`,
         ...citationsFor(assoc),
       });
@@ -182,4 +210,4 @@ async function calculateCrystalRecommendations(numerologyProfile) {
   return { ranked, tiers, weightsUsed: { ...WEIGHTS }, thresholdsUsed: { ...TIER_THRESHOLDS } };
 }
 
-module.exports = { calculateCrystalRecommendations, scoreStone, normalizeScores, classifyTiers, WEIGHTS, TIER_THRESHOLDS };
+module.exports = { calculateCrystalRecommendations, scoreStone, normalizeScores, classifyTiers, WEIGHTS, TIER_THRESHOLDS, EVIDENCE_MULTIPLIER };

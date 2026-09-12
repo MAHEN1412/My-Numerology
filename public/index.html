@@ -936,7 +936,7 @@
     <div class="wizard-body">
       <div class="actors-chip-group" style="margin-bottom:16px;">
         <button type="button" class="actors-chip active" data-filter="unmapped">Needs data (14)</button>
-        <button type="button" class="actors-chip" data-filter="all">All 39 stones</button>
+        <button type="button" class="actors-chip" data-filter="all">All 43 stones</button>
       </div>
       <div id="crystalCurationList"><p class="loading-note">Loading\u2026</p></div>
     </div>
@@ -1347,7 +1347,7 @@
   <div class="wrap" style="padding-bottom:56px;">
     <div id="crystalResultsContainer"></div>
     <div id="crystalV2BtnWrap" style="display:none;text-align:center;padding:16px 0;">
-      <button type="button" class="ghost" id="crystalV2Btn">View New Crystal Analysis (Beta) — 39 stones, gemstone-free</button>
+      <button type="button" class="ghost" id="crystalV2Btn">View New Crystal Analysis (Beta) — 43 stones, gemstone-free</button>
     </div>
     <div id="crystalSaveBtnWrap" style="display:none;text-align:center;padding:16px 0;">
       <button type="button" class="btn-ghost" id="crystalSaveToDashboardBtn">Save to Dashboard</button>
@@ -3677,7 +3677,7 @@ const RATNA_HINDI_NAMES = {};
 // Renders how many named websites back a given crystal pick, and what
 // evidence tier that agreement earned (A = 3+ independent sources, B = 2,
 // D = 1) -- hovering shows the actual source names/citations. Used by both
-// the inline "Crystal Recommendations" cards and the 39-Stone Analysis
+// the inline "Crystal Recommendations" cards and the 43-Stone Analysis
 // modal so every score traces back to something checkable, not a bare
 // number.
 function evidenceBadge(rule) {
@@ -3739,7 +3739,7 @@ document.getElementById('crystalAnalyzeBtn').addEventListener('click', async () 
           ${tierCard('Balance', v2Data.tiers.balance)}
           ${tierCard('Alternative', v2Data.tiers.alternative)}
         </div>
-        <button type="button" class="ghost" id="crystalV2ShowAllBtnInline" style="margin-top:12px;">View Full Ranking (39 stones)</button>
+        <button type="button" class="ghost" id="crystalV2ShowAllBtnInline" style="margin-top:12px;">View Full Ranking (43 stones)</button>
         <div id="crystalV2FullTableInline" style="display:none;margin-top:16px;overflow-x:auto;">
           <table class="video-compare-table">
             <thead><tr><th>Rank</th><th>Stone</th><th>Score</th><th>Has data</th><th>Key reason</th></tr></thead>
@@ -3776,7 +3776,7 @@ document.getElementById('crystalAnalyzeBtn').addEventListener('click', async () 
         const table = document.getElementById('crystalV2FullTableInline');
         const isOpen = table.style.display !== 'none';
         table.style.display = isOpen ? 'none' : 'block';
-        e.target.textContent = isOpen ? 'View Full Ranking (39 stones)' : 'Hide Full Ranking';
+        e.target.textContent = isOpen ? 'View Full Ranking (43 stones)' : 'Hide Full Ranking';
       });
     }
 
@@ -4230,10 +4230,10 @@ async function openCrystalV2Modal() {
     <div class="case-overlay"></div>
     <div class="case-drawer" style="max-width:640px;">
       <div class="case-drawer-header">
-        <h2 style="font-size:18px;margin:0;">Crystal Analysis <span style="font-size:11px;color:var(--text-muted);font-weight:400;">(Beta — 39 stones, crystals only, no Jyotish gemstones)</span></h2>
+        <h2 style="font-size:18px;margin:0;">Crystal Analysis <span style="font-size:11px;color:var(--text-muted);font-weight:400;">(Beta — 43 stones, crystals only, no Jyotish gemstones)</span></h2>
         <button type="button" class="case-drawer-close" id="crystalV2ModalCloseBtn">\u2715</button>
       </div>
-      <div id="crystalV2Content" style="margin-top:16px;"><p class="loading-note">Scoring all 39 stones\u2026</p></div>
+      <div id="crystalV2Content" style="margin-top:16px;"><p class="loading-note">Scoring all 43 stones\u2026</p></div>
     </div>
   `;
   document.body.appendChild(root);
@@ -4281,9 +4281,9 @@ async function openCrystalV2Modal() {
     `).join('');
 
     contentEl.innerHTML = `
-      <p style="font-size:12px;color:var(--text-muted);margin:0 0 16px;">Experimental multi-factor engine: scores every stone on real Driver/Conductor/Name Number associations, Lo Shu balance, and (if set) your stated purpose \u2014 not just \u201cmissing number = crystal.\u201d Roles are left blank rather than forced when nothing genuinely qualifies. This engine is crystals-only: traditional Jyotish gemstones (Ruby, Pearl, Yellow/Blue Sapphire, Red Coral, Hessonite, Cat's Eye, Diamond) are permanently excluded, never scored or recommended here. 25 of these 39 stones have a documented, cited number association from a 2026 research pass across 5 named sites \u2014 Ratnakripa, Navratan and Satvik Gems (Indian gemstone/astrology retailers) plus Solacely and Astrology Answers (international) \u2014 and each reason below shows how many of those sites agreed (hover the "(Tier \u2026)" note for the exact article titles). The rest are scored on Lo Shu balance alone and marked accordingly.</p>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 16px;">Experimental multi-factor engine: scores every stone on real Driver/Conductor/Name Number associations, Lo Shu balance, and (if set) your stated purpose \u2014 not just \u201cmissing number = crystal.\u201d Roles are left blank rather than forced when nothing genuinely qualifies. This engine is crystals-only: traditional Jyotish gemstones (Ruby, Pearl, Yellow/Blue Sapphire, Red Coral, Hessonite, Cat's Eye, Diamond, Emerald) are permanently excluded, never scored or recommended here. 29 of these 43 stones have a documented, cited number association from a 2026 EXPANDED research pass \u2014 roughly 250 independent pages fetched and read across all nine Driver/Conductor Numbers (20\u201328 per number), spanning numerology/crystal-healing blogs, gemstone-astrology sites, and real e-commerce bracelet-seller listings. Every scored association here required at least 3 independent sources to agree (Tier A) \u2014 anything backed by only 1\u20132 sites was found but deliberately left unscored, so nothing in this formula rests on a single website's say-so. Each reason below shows the real source count and links to every site that agreed (hover the "(Tier \u2026)" note for the exact citations). The rest are scored on Lo Shu balance alone and marked accordingly.</p>
       ${tiersHtml}
-      <button type="button" class="ghost" id="crystalV2ShowAllBtn" style="margin-top:16px;">View Full Ranking (39 stones)</button>
+      <button type="button" class="ghost" id="crystalV2ShowAllBtn" style="margin-top:16px;">View Full Ranking (43 stones)</button>
       <div id="crystalV2FullTable" style="display:none;margin-top:16px;overflow-x:auto;">
         <table class="video-compare-table">
           <thead><tr><th>Rank</th><th>Stone</th><th>Score</th><th>Has data</th><th>Key reason</th></tr></thead>
@@ -4296,7 +4296,7 @@ async function openCrystalV2Modal() {
       const table = document.getElementById('crystalV2FullTable');
       const isOpen = table.style.display !== 'none';
       table.style.display = isOpen ? 'none' : 'block';
-      e.target.textContent = isOpen ? 'View Full Ranking (39 stones)' : 'Hide Full Ranking';
+      e.target.textContent = isOpen ? 'View Full Ranking (43 stones)' : 'Hide Full Ranking';
     });
   } catch (err) {
     contentEl.innerHTML = '<p class="wizard-skip-note">Could not reach the server.</p>';
